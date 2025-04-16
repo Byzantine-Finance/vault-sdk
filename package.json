@@ -1,0 +1,35 @@
+{
+  "name": "restake-sdk",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "prebuild": "npm run clean",
+    "pretest": "npm run build",
+    "test": "npm run test:all",
+    "test:all": "npm run test:eigen-erc20 && npm run test:eigen-native && npm run test:symbiotic-erc20 && npm run test:supervault-erc20",
+    "test:eigen-erc20": "node test/create-eigen-erc20.js",
+    "test:eigen-native": "node test/create-eigen-native.js",
+    "test:symbiotic-erc20": "node test/create-symbiotic-erc20.js",
+    "test:supervault-erc20": "node test/create-supervault-erc20.js",
+    "example:eigen-erc20": "node examples/create-eigen-erc20.js",
+    "example:eigen-native": "node examples/create-eigen-native.js",
+    "example:symbiotic-erc20": "node examples/create-symbiotic-erc20.js",
+    "example:supervault-erc20": "node examples/create-supervault-erc20.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "ethers": "^6.13.5",
+    "viem": "^2.27.0",
+    "wagmi": "^2.14.16"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.1",
+    "typescript": "^5.0.4"
+  }
+}

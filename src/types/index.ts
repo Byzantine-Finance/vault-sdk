@@ -1,0 +1,129 @@
+import { Address, Hash, TransactionReceipt } from "viem";
+import { Config } from "wagmi";
+
+export interface NetworkConfig {
+  name: string;
+  factoryContractAddress: Address;
+  scanLink: string;
+  theGraphApiUrl?: string;
+  stETHAddress?: string;
+  wstETHAddress?: string;
+}
+
+/**
+ * Client initialization options
+ */
+export interface ByzantineFactoryClientOptions {
+  chainId: number;
+  wagmiConfig?: Config;
+  provider?: any; // For ethers provider
+  signer?: any; // For ethers signer
+}
+
+/**
+ * Deposit ERC20 token parameters
+ */
+export interface DepositERC20Params {
+  token: Address;
+  amount: bigint;
+}
+
+// For the new version of the vaults
+export interface BaseParams {
+  name: string;
+  description: string;
+
+  token_address: string; // Address of the token that people can deposit in the vault, if native 0xEeeeeEeEeEeEeEeEeeEEEeeeeEeeeeeeeEEeE
+
+  is_deposit_limit: boolean;
+  deposit_limit: number;
+
+  is_private: boolean;
+
+  is_tokenized: boolean;
+  token_name: string;
+  token_symbol: string;
+
+  curator_fee: number;
+
+  role_manager: string;
+  role_version_manager: string;
+  role_deposit_limit_manager: string;
+  role_deposit_whitelist_manager: string;
+  role_curator_fee_claimer: string;
+  role_curator_fee_claimer_admin: string;
+}
+
+export interface NativeParams {
+  operator_id: string;
+
+  roles_validator_manager: string[]; // List of addresses who can manage the validator manager, only when solo staker vault
+}
+
+// ----------------------------------
+// Symbiotic
+// ----------------------------------
+
+export enum DelegatorType {
+  NETWORK_RESTAKE, // 0
+  FULL_RESTAKE, // 1
+  OPERATOR_SPECIFIC, // 2
+  OPERATOR_NETWORK_SPECIFIC, // 3
+}
+
+export enum SlasherType {
+  INSTANT, // 0
+  VETO, // 1
+}
+
+// [param]_[role?]_[name]
+export interface SymbioticParams {
+  vault_version: number; //                           VAULT: Version of the vault, always 1 for now
+  vault_epoch_duration: number; //                    VAULT: Duration of the epoch, in seconds, usually 24 hours
+  slasher_type: SlasherType; //                       SLASHER: Type of the slasher
+  slasher_veto_duration: number; //                   SLASHER: Duration of the veto, in seconds, usually 7d
+  slasher_number_epoch_to_set_delay: number; //       SLASHER: Number of epoch to set the delay, usually 3
+  burner_delay_settings_applied: number; //           BURNER: If true, the delay settings are applied, in days, usually 21
+  burner_global_receiver: string; //                  BURNER: Default receiver of the burner, best practice is to use the ones proposed by Symbiotic for the relevant token
+  burner_network_receiver: []; //                     BURNER: Will be implemented later
+  burner_operator_network_receiver: []; //            BURNER: Will be implemented later
+  delegator_type: DelegatorType; //                   DELEGATOR: Type of the delegator
+  delegator_hook: string; //                          DELEGATOR: Address of the hook of the delegator
+  delegator_operator: string; //                      DELEGATOR: Address of the operator of the delegator, only for type 2 and 3, set to 0x0 if type 0 or 1
+  delegator_network: string; //                       DELEGATOR: Address of the network of the delegator, only for type 2 and 3, set to 0x0 if type 0 or 1
+
+  // role_vault_set_epoch_duration: string; //        VAULT:  Address who can set the duration of the epoch of the vault
+  role_delegator_set_hook: string; //                 DELEGATOR: Address who can set the hook of the delegator
+  role_delegator_set_network_limit: string[]; //      DELEGATOR: Addresses who can set the network limits of the delegator
+  role_delegator_set_operator_network_limit: string[]; // DELEGATOR: Addresses who can set the operator network limits of the delegator
+  role_burner_owner_burner: string; //                BURNER: Address of the owner who can change the receivers and the delay settings
+}
+
+export interface NativeSymbioticVault {
+  base: NativeParams;
+  symbiotic: SymbioticParams;
+}
+
+export interface SymbioticVault {
+  base: BaseParams;
+  symbiotic: SymbioticParams;
+}
+
+// ----------------------------------
+// EigenLayer
+// ----------------------------------
+export interface EigenLayerParams extends BaseParams {
+  operator_id: string;
+
+  role_validator_manager: string;
+}
+
+export interface NativeEigenLayerVault {
+  base: NativeParams;
+  eigenlayer: EigenLayerParams;
+}
+
+export interface EigenLayerVault {
+  base: BaseParams;
+  eigenlayer: EigenLayerVault;
+}
