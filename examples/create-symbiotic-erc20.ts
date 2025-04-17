@@ -11,6 +11,8 @@
 import {
   ByzantineFactoryClient,
   getNetworkConfig,
+  BaseParams,
+  SymbioticParams,
   DelegatorType,
   SlasherType,
 } from "../dist";
@@ -59,7 +61,7 @@ async function main() {
     console.log(`Connected to Byzantine Factory at: ${client.contractAddress}`);
 
     // Define Symbiotic ERC20 vault parameters
-    const baseParams = {
+    const baseParams: BaseParams = {
       name: "Symbiotic wstETH Vault",
       description: "A Symbiotic vault for wstETH restaking",
 
@@ -85,7 +87,7 @@ async function main() {
       role_curator_fee_claimer_admin: address,
     };
 
-    const symbioticParams = {
+    const symbioticParams: SymbioticParams = {
       vault_version: 1,
       vault_epoch_duration: 604800, // 7 days in seconds
       slasher_type: SlasherType.VETO,

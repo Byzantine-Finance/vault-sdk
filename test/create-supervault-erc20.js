@@ -37,7 +37,8 @@ async function runTests() {
   try {
     // Check if environment variables are set
     const { INFURA_API_KEY, MNEMONIC, DEFAULT_CHAIN_ID } = process.env;
-    const chainId = DEFAULT_CHAIN_ID ? parseInt(DEFAULT_CHAIN_ID) : 17000; // Default to Holesky if not set
+    const parsedId = DEFAULT_CHAIN_ID ? parseInt(DEFAULT_CHAIN_ID) : 17000;
+    const chainId = parsedId === 1 ? 1 : 17000;
 
     let skipNetworkTests = false;
     if (!INFURA_API_KEY) {
@@ -80,11 +81,17 @@ async function runTests() {
       ? {}
       : ethers.Wallet.fromPhrase(MNEMONIC).connect(provider);
 
+    const address = await wallet.getAddress();
+    logResult("Wallet address", true, address);
+
     const client = new ByzantineFactoryClient({
       chainId: chainId,
       provider: provider,
       signer: wallet,
     });
+
+    // Get network configuration for token addresses
+    const networkConfig = getNetworkConfig(chainId);
 
     logResult("Client initialization", true);
     assert(client !== undefined, "Client initialization");
@@ -94,7 +101,7 @@ async function runTests() {
       name: "SuperVault USDC",
       description: "A SuperVault for USDC with high yields",
 
-      token_address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC address (mainnet)
+      token_address: networkConfig.wstETHAddress, // wstETH address
 
       is_deposit_limit: true,
       deposit_limit: ethers.parseUnits("1000000", 6), // 1M USDC (6 decimals)
@@ -108,33 +115,33 @@ async function runTests() {
       curator_fee: 1000, // 10% (1000 basis points)
 
       // Roles - replace with actual addresses in production
-      role_manager: wallet.address,
-      role_version_manager: wallet.address,
-      role_deposit_limit_manager: wallet.address,
-      role_deposit_whitelist_manager: wallet.address,
-      role_curator_fee_claimer: wallet.address,
-      role_curator_fee_claimer_admin: wallet.address,
+      role_manager: address,
+      role_version_manager: address,
+      role_deposit_limit_manager: address,
+      role_deposit_whitelist_manager: address,
+      role_curator_fee_claimer: address,
+      role_curator_fee_claimer_admin: address,
     };
 
     const symbioticParams = {
       vault_version: 1,
-      vault_epoch_duration: 43200, // 12 hours in seconds
-      slasher_type: SlasherType.INSTANT,
-      slasher_veto_duration: 0, // Not used for INSTANT slasher
-      slasher_number_epoch_to_set_delay: 2,
-      burner_delay_settings_applied: 14, // 14 days
-      burner_global_receiver: "0x5555555555555555555555555555555555555555", // Global burner receiver address
+      vault_epoch_duration: 604800, // 7 days in seconds
+      slasher_type: SlasherType.VETO,
+      slasher_veto_duration: 86400, // 1 day in seconds
+      slasher_number_epoch_to_set_delay: 3,
+      burner_delay_settings_applied: 21, // 21 days
+      burner_global_receiver: "0x25133c2c49A343F8312bb6e896C1ea0Ad8CD0EBd", // Global receiver for wstETH
       burner_network_receiver: [],
       burner_operator_network_receiver: [],
-      delegator_type: DelegatorType.FULL_RESTAKE,
-      delegator_hook: "0x6666666666666666666666666666666666666666", // Delegator hook address
-      delegator_operator: "0x0000000000000000000000000000000000000000", // Not used for FULL_RESTAKE
-      delegator_network: "0x0000000000000000000000000000000000000000", // Not used for FULL_RESTAKE
+      delegator_type: DelegatorType.NETWORK_RESTAKE,
+      delegator_hook: "0x0000000000000000000000000000000000000001", // Delegator hook address
+      delegator_operator: "0x0000000000000000000000000000000000000000", // Not used for NETWORK_RESTAKE
+      delegator_network: "0x0000000000000000000000000000000000000000", // Not used for NETWORK_RESTAKE
 
-      role_delegator_set_hook: wallet.address,
-      role_delegator_set_network_limit: [wallet.address],
-      role_delegator_set_operator_network_limit: [wallet.address],
-      role_burner_owner_burner: wallet.address,
+      role_delegator_set_hook: address,
+      role_delegator_set_network_limit: [address],
+      role_delegator_set_operator_network_limit: [address],
+      role_burner_owner_burner: address,
     };
 
     // Test parameter validation

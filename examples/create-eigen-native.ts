@@ -11,6 +11,9 @@
 import {
   ByzantineFactoryClient,
   ETH_TOKEN_ADDRESS,
+  NativeParams,
+  EigenlayerParams,
+  EigenpodParams,
   getNetworkConfig,
 } from "../dist";
 const { ethers } = require("ethers");
@@ -58,7 +61,7 @@ async function main() {
     console.log(`Connected to Byzantine Factory at: ${client.contractAddress}`);
 
     // Define Eigenlayer Native vault parameters
-    const baseParams = {
+    const baseParams: NativeParams = {
       // Base vault parameters wrapped in byzVaultParams
       byzVaultParams: {
         name: "Eigenlayer ETH Vault",
@@ -100,7 +103,7 @@ async function main() {
       roles_validator_manager: [address],
     };
 
-    const eigenlayerParams = {
+    const eigenlayerParams: EigenlayerParams = {
       // Eigenlayer specific params
       delegation_set_role_holder: wallet.address,
       operator: "0xb564e795f9877b416cd1af86c98cf8d3d94d760d", // EigenLayer operator address
@@ -114,7 +117,7 @@ async function main() {
     };
 
     // EigenPod parameters - required for native vaults
-    const eigenPodParams = {
+    const eigenPodParams: EigenpodParams = {
       eigen_pod_owner: address,
       proof_submitter: address,
     };

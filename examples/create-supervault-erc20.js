@@ -1,3 +1,5 @@
+// @ts-check
+
 /**
  * Example: Create a SuperVault ERC20
  *
@@ -30,7 +32,8 @@ async function main() {
     process.exit(1);
   }
 
-  const chainId = DEFAULT_CHAIN_ID ? parseInt(DEFAULT_CHAIN_ID) : 17000; // Default to Holesky if not set
+  const parsedId = DEFAULT_CHAIN_ID ? parseInt(DEFAULT_CHAIN_ID) : 17000;
+  const chainId = parsedId === 1 ? 1 : 17000;
 
   console.log(
     `Using network: ${chainId === 1 ? "Ethereum Mainnet" : "Holesky Testnet"}`
@@ -64,7 +67,7 @@ async function main() {
       token_address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC address (mainnet)
 
       is_deposit_limit: true,
-      deposit_limit: ethers.parseUnits("1000000", 6).toString(), // 1M USDC (6 decimals)
+      deposit_limit: ethers.parseUnits("1000000", 6), // 1M USDC (6 decimals)
 
       is_private: true, // Private SuperVault
 
@@ -140,12 +143,12 @@ async function main() {
     // Wait for the transaction to be mined
     const receipt = await tx.wait();
     console.log(
-      `Transaction confirmed! Gas used: ${receipt.gasUsed.toString()}`
+      `Transaction confirmed! Gas used: ${receipt?.gasUsed.toString()}`
     );
 
     // In a real implementation, you would extract the vault address from the event logs
     // For this example, we're using a simplified approach
-    const vaultAddress = receipt.logs[0].address;
+    const vaultAddress = receipt?.logs[0]?.address;
     console.log(`\nSuperVault created at address: ${vaultAddress}`);
 
     console.log("\nSuperVault ERC20 creation completed successfully!");

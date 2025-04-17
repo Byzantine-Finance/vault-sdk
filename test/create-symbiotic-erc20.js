@@ -39,7 +39,8 @@ async function runTests() {
   try {
     // Check if environment variables are set
     const { INFURA_API_KEY, MNEMONIC, DEFAULT_CHAIN_ID } = process.env;
-    const chainId = DEFAULT_CHAIN_ID ? parseInt(DEFAULT_CHAIN_ID) : 17000; // Default to Holesky if not set
+    const parsedId = DEFAULT_CHAIN_ID ? parseInt(DEFAULT_CHAIN_ID) : 17000;
+    const chainId = parsedId === 1 ? 1 : 17000;
 
     let skipNetworkTests = false;
     if (!INFURA_API_KEY) {

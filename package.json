@@ -20,7 +20,11 @@
     "example:eigen-erc20": "node examples/create-eigen-erc20.js",
     "example:eigen-native": "node examples/create-eigen-native.js",
     "example:symbiotic-erc20": "node examples/create-symbiotic-erc20.js",
-    "example:supervault-erc20": "node examples/create-supervault-erc20.js"
+    "example:supervault-erc20": "node examples/create-supervault-erc20.js",
+    "example:get-wallet-keys": "node examples/get-wallet-keys.js",
+    "example:eigen-erc20-ts": "ts-node examples/create-eigen-erc20.ts",
+    "example:eigen-native-ts": "ts-node examples/create-eigen-native.ts",
+    "example:symbiotic-erc20-ts": "ts-node examples/create-symbiotic-erc20.ts"
   },
   "dependencies": {
     "dotenv": "^16.5.0",
@@ -30,6 +34,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.14.1",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "ts-node": "^10.9.2"
   }
 }

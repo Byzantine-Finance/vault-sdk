@@ -9,7 +9,7 @@ Byzantine Finance is the first native restaking aggregation and abstraction laye
 This SDK provides a simple interface to interact with the Byzantine Factory contract deployed on:
 
 - Ethereum Mainnet
-- [Holesky Testnet](https://holesky.etherscan.io/address/0x53CC4133F7A60d48E91D8D27b910a474a3Be9f7d)
+- [Holesky Testnet](https://holesky.etherscan.io/address/0x304AF230BD46Ef3dfe2c26c37207a21Eeb992088)
 
 The factory contract allows users to:
 
@@ -17,7 +17,7 @@ The factory contract allows users to:
 - **Create Eigenlayer Native vaults**
 - **Create Symbiotic ERC20 vaults**
 - **Create ERC20 SuperVaults** with advanced features
-- **Manage vault parameters** like deposit limits, curator fees, and access controls
+<!-- - **Manage vault parameters** like deposit limits, curator fees, and access controls -->
 
 ## Installation
 
@@ -41,6 +41,7 @@ DEFAULT_CHAIN_ID=17000  # 17000 for Holesky testnet, 1 for Ethereum Mainnet
 import {
   ByzantineFactoryClient,
   ETH_TOKEN_ADDRESS,
+  BaseParams,
 } from "byzantine-factory-sdk";
 import { ethers } from "ethers";
 import * as dotenv from "dotenv";
@@ -86,7 +87,7 @@ const client = new ByzantineFactoryClient({
 const networkConfig = getNetworkConfig(17000);
 
 // Define vault parameters
-const baseParams = {
+const baseParams: BaseParams = {
   name: "Eigenlayer stETH Vault",
   description: "An Eigenlayer vault for stETH restaking",
   token_address: networkConfig.stETHAddress,
@@ -105,7 +106,7 @@ const baseParams = {
   role_curator_fee_claimer_admin: wallet.address,
 };
 
-const eigenlayerParams = {
+const eigenlayerParams: EigenlayerParams = {
   operator_id: "0xb564e795f9877b416cd1af86c98cf8d3d94d760d", // Replace with actual operator ID
   role_validator_manager: wallet.address,
 };
@@ -127,50 +128,125 @@ console.log(`Vault created at address: ${vaultAddress}`);
 
 ### Creating an Eigenlayer Native (ETH) Vault
 
-```typescript
-import {
-  ByzantineFactoryClient,
-  ETH_TOKEN_ADDRESS,
-} from "byzantine-factory-sdk";
-import { ethers } from "ethers";
-
-// Initialize client as shown above
+```ts
+// -
+// All import and initialize client as shown above
+// -
 
 // Define vault parameters
-const baseParams = {
-  operator_id: "0xb564e795f9877b416cd1af86c98cf8d3d94d760d",
+const nativeParams: NativeParams = {
+  byzVaultParams: {
+    name: "Eigenlayer ETH Vault",
+    description: "An Eigenlayer vault for ETH restaking",
+    token_address: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+    is_deposit_limit: true,
+    deposit_limit: ethers.parseEther("100"),
+    is_private: false,
+    is_tokenized: true,
+    token_name: "Byzantine ETH Vault",
+    token_symbol: "bETH",
+    curator_fee: 300, // 3% (300 basis points)
+    role_manager: wallet.address,
+    role_version_manager: wallet.address,
+    role_deposit_limit_manager: wallet.address,
+    role_deposit_whitelist_manager: wallet.address,
+    role_curator_fee_claimer: wallet.address,
+    role_curator_fee_claimer_admin: wallet.address,
+  },
+  operator_id:
+    "0x0000000000000000000000000000000000000000000000000000000000000000",
   roles_validator_manager: [wallet.address],
 };
 
-const eigenlayerParams = {
-  name: "Eigenlayer ETH Vault",
-  description: "An Eigenlayer vault for ETH restaking",
-  token_address: ETH_TOKEN_ADDRESS,
+const eigenlayerParams: EigenlayerParams = {
+  delegation_set_role_holder: wallet.address,
+  operator: "0xb564e795f9877b416cd1af86c98cf8d3d94d760d",
+  approver_signature_and_expiry: {
+    signature: "0x",
+    expiry: 0,
+  },
+  approver_salt:
+    "0x0000000000000000000000000000000000000000000000000000000000000000",
+};
+
+const eigenPodParams: EigenpodParams = {
+  eigen_pod_owner: address,
+  proof_submitter: address,
+};
+
+// Create the vault
+const tx = await client.createEigenlayerNativeVault({
+  base: nativeParams,
+  eigenlayer: eigenlayerParams,
+  eigenpod: eigenPodParams,
+});
+
+// Wait for confirmation
+const receipt = await tx.wait();
+```
+
+### Creating a Symbiotic ERC20 Vault
+
+```ts
+// -
+// All import and initialize client as shown above
+// -
+
+// Define vault parameters
+const baseParams: BaseParams = {
+  name: "Symbiotic wstETH Vault",
+  description: "A Symbiotic vault for wstETH restaking",
+  token_address: "0x8d09a4502Cc8Cf1547aD300E066060D043f6982D", // wstETH
   is_deposit_limit: true,
-  deposit_limit: ethers.parseEther("100"),
+  deposit_limit: ethers.parseUnits("500", 18), // 500 wstETH
   is_private: false,
   is_tokenized: true,
-  token_name: "Byzantine ETH Vault",
-  token_symbol: "bETH",
-  curator_fee: 300, // 3% (300 basis points)
+  token_name: "Byzantine wstETH Symbiotic Vault",
+  token_symbol: "bwstETHs",
+  curator_fee: 200, // 2% (200 basis points)
   role_manager: wallet.address,
   role_version_manager: wallet.address,
   role_deposit_limit_manager: wallet.address,
   role_deposit_whitelist_manager: wallet.address,
   role_curator_fee_claimer: wallet.address,
   role_curator_fee_claimer_admin: wallet.address,
-  operator_id: "0xb564e795f9877b416cd1af86c98cf8d3d94d760d",
-  role_validator_manager: wallet.address,
+};
+
+const symbioticParams: SymbioticParams = {
+  vault_version: 1,
+  vault_epoch_duration: 604800, // 7 days in seconds
+  slasher_type: SlasherType.VETO,
+  slasher_veto_duration: 86400, // 1 day in seconds
+  slasher_number_epoch_to_set_delay: 3,
+  burner_delay_settings_applied: 21, // 21 days
+  burner_global_receiver: "0x25133c2c49A343F8312bb6e896C1ea0Ad8CD0EBd", // Global receiver for wstETH
+  burner_network_receiver: [],
+  burner_operator_network_receiver: [],
+  delegator_type: DelegatorType.NETWORK_RESTAKE,
+  delegator_hook: "0x0000000000000000000000000000000000000001", // Delegator hook address
+  delegator_operator: "0x0000000000000000000000000000000000000000", // Not used for NETWORK_RESTAKE
+  delegator_network: "0x0000000000000000000000000000000000000000", // Not used for NETWORK_RESTAKE
+
+  role_delegator_set_hook: address,
+  role_delegator_set_network_limit: [address],
+  role_delegator_set_operator_network_limit: [address],
+  role_burner_owner_burner: address,
 };
 
 // Create the vault
-const tx = await client.createEigenlayerNativeVault({
+const tx = await client.createSymbioticERC20Vault({
   base: baseParams,
-  eigenlayer: eigenlayerParams,
+  symbiotic: symbioticParams,
 });
 
 // Wait for confirmation
 const receipt = await tx.wait();
+```
+
+### Creating a ERC20 SuperVault
+
+```ts
+// Not available yet
 ```
 
 ## Testing

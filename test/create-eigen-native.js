@@ -1,5 +1,3 @@
-// @ts-check
-
 /**
  * Test for creating an Eigenlayer Native vault with Byzantine Factory SDK
  *
@@ -19,15 +17,11 @@ const {
   ByzantineFactoryClient,
   ETH_TOKEN_ADDRESS,
   getNetworkConfig,
+  isChainSupported,
+  getSupportedChainIds,
 } = require("../dist");
 const { ethers } = require("ethers");
-const {
-  logTitle,
-  logResult,
-  assert,
-  assertThrows,
-  getWalletBalances,
-} = require("./utils");
+const { logTitle, logResult, assert } = require("./utils");
 require("dotenv").config();
 
 // Test suite
@@ -39,7 +33,15 @@ async function runTests() {
   try {
     // Check if environment variables are set
     const { INFURA_API_KEY, MNEMONIC, DEFAULT_CHAIN_ID } = process.env;
-    const chainId = DEFAULT_CHAIN_ID ? parseInt(DEFAULT_CHAIN_ID) : 17000; // Default to Holesky if not set
+    const parsedId = DEFAULT_CHAIN_ID ? parseInt(DEFAULT_CHAIN_ID) : 17000;
+    const chainId = parsedId === 1 ? 1 : 17000;
+
+    // Verify chain is supported
+    if (!isChainSupported(chainId)) {
+      console.error(`⚠️ Error: Chain ID ${chainId} is not supported`);
+      console.log(`Supported chains: ${getSupportedChainIds().join(", ")}`);
+      process.exit(1);
+    }
 
     let skipNetworkTests = false;
     if (!INFURA_API_KEY) {
@@ -105,7 +107,7 @@ async function runTests() {
       token_address: ETH_TOKEN_ADDRESS,
 
       is_deposit_limit: true,
-      deposit_limit: ethers.parseUnits("1000", 18), // Keep as string to avoid overflow
+      deposit_limit: ethers.parseEther("1000"), // Keep as string to avoid overflow
 
       is_private: false,
 
@@ -179,11 +181,11 @@ async function runTests() {
         logResult(
           "Vault creation",
           true,
-          `Gas used: ${receipt.gasUsed.toString()}`
+          `Gas used: ${receipt?.gasUsed.toString()}`
         );
 
         // Determine the vault address from the logs
-        const vaultAddress = receipt.logs[0].address; // Simplified - in production, parse the event properly
+        const vaultAddress = receipt?.logs[0]?.address; // Simplified - in production, parse the event properly
         console.log(`\nVault created at address: ${vaultAddress}`);
 
         const networkConfig = getNetworkConfig(chainId);

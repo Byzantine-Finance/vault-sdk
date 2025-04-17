@@ -11,17 +11,23 @@
  * - SuperVault ERC20 vaults
  */
 
-import { ethers } from "ethers";
+import { ethers, TransactionResponse } from "ethers";
 import {
   ByzantineFactoryClientOptions,
   EigenlayerVault,
   NativeEigenlayerVault,
   SymbioticVault,
+  ChainsOptions,
+  BaseParams,
+  NativeParams,
+  EigenlayerParams,
+  EigenpodParams,
+  SymbioticParams,
 } from "../types";
-import { getNetworkConfig } from "../utils/network";
+import { getNetworkConfig, isChainSupported } from "../constants/networks";
 import { BYZANTINE_FACTORY_ABI } from "../constants/abis";
 import { ETH_TOKEN_ADDRESS } from "../constants";
-import { http } from "viem";
+import { http, TransactionReceipt, TransactionRequest } from "viem";
 import { createPublicClient, PublicClient } from "viem";
 import { mainnet } from "viem/chains";
 
@@ -29,7 +35,7 @@ export class ByzantineFactoryClient {
   private provider: ethers.Provider;
   private signer?: ethers.Signer;
   private readonly publicClient?: PublicClient;
-  public readonly chainId: number;
+  public readonly chainId: ChainsOptions;
   public readonly contractAddress: string;
   private contract: ethers.Contract;
 
@@ -79,9 +85,13 @@ export class ByzantineFactoryClient {
   /**
    * Create an Eigenlayer ERC20 vault
    * @param params The vault parameters
-   * @returns Transaction receipt
+   * @param options Optional transaction options to override defaults
+   * @returns Transaction response
    */
-  async createEigenlayerERC20Vault(params: EigenlayerVault) {
+  async createEigenlayerERC20Vault(
+    params: EigenlayerVault,
+    options?: Partial<ethers.TransactionRequest>
+  ): Promise<TransactionResponse> {
     if (!this.signer) {
       throw new Error("Signer is required for this operation");
     }
@@ -90,25 +100,45 @@ export class ByzantineFactoryClient {
     const formattedBaseParams = this.formatBaseParams(params.base);
     const formattedEigenParams = this.formatEigenParams(params.eigenlayer);
 
-    console.log("Creating Eigenlayer ERC20 vault with parameters:");
-    console.log("Base params:", formattedBaseParams);
-    console.log("Eigen params:", formattedEigenParams);
-
     try {
-      // Utiliser une signature explicite de fonction pour éviter l'ambiguïté
+      // Import gas limits from constants
+      const { GAS_LIMITS } = require("../constants");
+
+      // Get block information to determine gas limit
+      const block = await this.provider.getBlock("latest");
+      const blockGasLimit = block?.gasLimit || BigInt(0);
+      // console.log("Current block gas limit:", blockGasLimit.toString());
+
+      // Set a safe gas limit that is below block gas limit
+      // Use 80% of block gas limit or the default gas limit, whichever is lower
+      const recommendedGasLimit = Math.min(
+        Number(blockGasLimit) * 0.8,
+        GAS_LIMITS.createEigenNativeVault
+      );
+
+      // console.log("Recommended gas limit:", recommendedGasLimit);
+
+      // Define default transaction options
+      const defaultOptions = {
+        gasLimit: Math.floor(recommendedGasLimit),
+      };
+
+      // Merge default options with user-provided options (user options take precedence)
+      const txOptions = { ...defaultOptions, ...options };
+
+      // Use an explicit function signature to avoid ambiguity
       const functionSignature =
         "createEigenByzVault((address,address,address,address,address,address,address,uint256,uint256,bool,bool,bool,string,string,string),(address,address,(bytes,uint256),bytes32))";
 
       // Call the contract method to create an Eigenlayer ERC20 vault with explicit function signature
-      const tx = await this.contract.getFunction(functionSignature)(
-        formattedBaseParams,
-        formattedEigenParams
-      );
+      const tx: TransactionResponse = await this.contract.getFunction(
+        functionSignature
+      )(formattedBaseParams, formattedEigenParams, txOptions);
 
-      console.log("Transaction sent, waiting for confirmation...");
-      console.log("Transaction hash:", tx.hash);
+      // console.log("Transaction sent, waiting for confirmation...");
+      // console.log("Transaction hash:", tx.hash);
 
-      return await tx.wait();
+      return tx;
     } catch (error: any) {
       console.error("Error creating Eigenlayer ERC20 vault:", error);
 
@@ -128,48 +158,60 @@ export class ByzantineFactoryClient {
   /**
    * Create an Eigenlayer Native vault
    * @param params The vault parameters
-   * @returns Transaction receipt
+   * @param options Optional transaction options to override defaults
+   * @returns Transaction response
    */
-  async createEigenlayerNativeVault(params: NativeEigenlayerVault) {
+  async createEigenlayerNativeVault(
+    params: NativeEigenlayerVault,
+    options?: Partial<ethers.TransactionRequest>
+  ): Promise<TransactionResponse> {
     if (!this.signer) {
       throw new Error("Signer is required for this operation");
     }
 
-    // Get signer address for default values
-    const signerAddress = await this.signer.getAddress();
-
-    // Use the provided structure directly which should already match the contract's expected format
-    const nativeByzVaultParams = {
-      byzVaultParams: this.formatBaseParams({
-        ...params.base.byzVaultParams,
-        token_address: ETH_TOKEN_ADDRESS, // Ensure ETH address is set for native vault
-      }),
-      operatorId: params.base.operator_id,
-      validatorManagers: params.base.roles_validator_manager,
-    };
-
-    console.log("Creating Eigenlayer Native vault with parameters:", params);
-    console.log("NativeByzVaultParams:", nativeByzVaultParams);
-
+    // Format parameters
+    const nativeByzVaultParams = this.formatNativeParams(params.base);
     const formattedEigenParams = this.formatEigenParams(params.eigenlayer);
     const formattedEigenPodParams = this.formatEigenPodParams(params.eigenpod);
 
-    console.log("Formatted EigenParams:", formattedEigenParams);
-    console.log("Formatted EigenPodParams:", formattedEigenPodParams);
-    // Utiliser une signature explicite de fonction pour éviter l'ambiguïté
-    const functionSignature =
-      "createEigenByzVault(((address,address,address,address,address,address,address,uint256,uint256,bool,bool,bool,string,string,string),bytes32,address[]),(address,address,(bytes,uint256),bytes32),(address,address))";
-
     try {
-      // Call the contract method to create an Eigenlayer Native vault with explicit function signature
-      const tx = await this.contract.getFunction(functionSignature)(
-        nativeByzVaultParams,
-        formattedEigenParams,
-        formattedEigenPodParams
+      // Import gas limits from constants
+      const { GAS_LIMITS } = require("../constants");
+
+      // Get block information to determine gas limit
+      const block = await this.provider.getBlock("latest");
+      const blockGasLimit = block?.gasLimit || BigInt(0);
+      // console.log("Current block gas limit:", blockGasLimit.toString());
+
+      // Set a safe gas limit that is below block gas limit
+      // Use 80% of block gas limit or the default gas limit, whichever is lower
+      const recommendedGasLimit = Math.min(
+        Number(blockGasLimit) * 0.8,
+        GAS_LIMITS.createEigenNativeVault
       );
 
-      console.log("Transaction sent, waiting for confirmation...");
-      return await tx.wait();
+      // console.log("Recommended gas limit:", recommendedGasLimit);
+
+      // Define advanced transaction options with a manual gas limit if necessary
+      const options = {
+        gasLimit: Math.floor(recommendedGasLimit),
+      };
+
+      // Use an explicit function signature to avoid ambiguity
+      const functionSignature =
+        "createEigenByzVault(((address,address,address,address,address,address,address,uint256,uint256,bool,bool,bool,string,string,string),bytes32,address[]),(address,address,(bytes,uint256),bytes32),(address,address))";
+
+      // Call the contract method to create an Eigenlayer Native vault with explicit function signature
+      const tx: TransactionResponse = await this.contract.getFunction(
+        functionSignature
+      )(
+        nativeByzVaultParams,
+        formattedEigenParams,
+        formattedEigenPodParams,
+        options
+      );
+
+      return tx;
     } catch (error: any) {
       console.error("Error creating Eigenlayer Native vault:", error);
 
@@ -189,9 +231,13 @@ export class ByzantineFactoryClient {
   /**
    * Create a Symbiotic ERC20 vault
    * @param params The vault parameters
-   * @returns Transaction receipt
+   * @param options Optional transaction options to override defaults
+   * @returns Transaction response
    */
-  async createSymbioticERC20Vault(params: SymbioticVault) {
+  async createSymbioticERC20Vault(
+    params: SymbioticVault,
+    options?: Partial<ethers.TransactionRequest>
+  ): Promise<TransactionResponse> {
     if (!this.signer) {
       throw new Error("Signer is required for this operation");
     }
@@ -202,49 +248,46 @@ export class ByzantineFactoryClient {
       params.symbiotic
     );
 
-    console.log("Creating Symbiotic ERC20 vault with parameters:");
-    console.log("Base params:", formattedBaseParams);
-    console.log("Symbiotic params:", formattedSymbioticParams);
+    console.log("Going to create symbiotic vault");
+    console.log("Formatted base params:", formattedBaseParams);
+    console.log("Formatted symbiotic params:", formattedSymbioticParams);
 
     try {
-      // Utiliser une signature explicite de fonction pour éviter l'ambiguïté
+      // Use an explicit function signature to avoid ambiguity
       const functionSignature =
         "createSymByzVault((address,address,address,address,address,address,address,uint256,uint256,bool,bool,bool,string,string,string),((address,uint48,address,(address,address)[],(address,address,address)[]),(address,uint64,uint48),(uint8,address,address,address[],address[],address,address),(uint8,uint48,uint256)))";
 
-      // Appel avec une méthode alternative qui spécifie explicitement la fonction à appeler
-      const tx = await this.contract.getFunction(functionSignature)(
-        formattedBaseParams,
-        formattedSymbioticParams
-      );
+      // Call with an alternative method that explicitly specifies the function to call
+      const tx: TransactionResponse = await this.contract.getFunction(
+        functionSignature
+      )(formattedBaseParams, formattedSymbioticParams, options ?? {});
 
-      console.log("Transaction sent, waiting for confirmation...");
-      console.log("Transaction hash:", tx.hash);
+      // console.log("Transaction sent, waiting for confirmation...");
+      // console.log("Transaction hash:", tx.hash);
 
-      return await tx.wait();
+      return tx;
     } catch (error: any) {
       console.error("Error creating Symbiotic ERC20 vault:", error);
 
-      // Amélioration des messages d'erreur pour faciliter le débogage
+      // Improve error messages for easier debugging
       if (
         error.code === "UNPREDICTABLE_GAS_LIMIT" ||
         error.message.includes("eth_estimateGas")
       ) {
-        console.error("Erreur d'estimation de gaz. Cela peut être dû à:");
-        console.error("1. Paramètres incorrects ou invalides");
-        console.error(
-          "2. Solde insuffisant pour payer les frais de transaction"
-        );
-        console.error("3. Problème dans le contrat lui-même");
+        console.error("Gas estimation error. This may be due to:");
+        console.error("1. Incorrect or invalid parameters");
+        console.error("2. Insufficient balance to pay transaction fees");
+        console.error("3. Contract issue");
 
-        // Vérifier les soldes si possible
+        // Check balances if possible
         try {
           const address = await this.signer.getAddress();
           const balance = await this.provider.getBalance(address);
           console.log(
-            `Solde du compte ${address}: ${ethers.formatEther(balance)} ETH`
+            `Balance of account ${address}: ${ethers.formatEther(balance)} ETH`
           );
         } catch (balanceError) {
-          console.error("Impossible de vérifier le solde:", balanceError);
+          console.error("Unable to check balance:", balanceError);
         }
       }
 
@@ -262,9 +305,13 @@ export class ByzantineFactoryClient {
   /**
    * Create a SuperVault ERC20 vault
    * @param params The vault parameters
-   * @returns Transaction receipt
+   * @param options Optional transaction options to override defaults
+   * @returns Transaction response
    */
-  async createSuperVaultERC20(params: SymbioticVault) {
+  async createSuperVaultERC20(
+    params: SymbioticVault,
+    options?: Partial<ethers.TransactionRequest>
+  ): Promise<TransactionResponse> {
     if (!this.signer) {
       throw new Error("Signer is required for this operation");
     }
@@ -273,10 +320,6 @@ export class ByzantineFactoryClient {
     throw new Error(
       "SuperVault ERC20 creation is not yet available in the contract"
     );
-
-    // Placeholder for future implementation
-    // const tx = await this.contract.createSuperVaultERC20(params);
-    // return await tx.wait();
   }
 
   /**
@@ -284,9 +327,7 @@ export class ByzantineFactoryClient {
    * @param params Base parameters
    * @returns Formatted parameters
    */
-  private formatBaseParams(params: any) {
-    console.log("Formatting base params:", params);
-    // Implement parameter formatting logic to match contract expectations
+  private formatBaseParams(params: BaseParams) {
     return {
       token: params.token_address,
       roleManager: params.role_manager,
@@ -307,23 +348,24 @@ export class ByzantineFactoryClient {
   }
 
   /**
+   * Format native parameters to match the contract's expected format
+   * @param params Native parameters
+   * @returns Formatted parameters
+   */
+  private formatNativeParams(params: NativeParams) {
+    return {
+      byzVaultParams: this.formatBaseParams(params.byzVaultParams),
+      operatorId: params.operator_id,
+      validatorManagers: params.roles_validator_manager,
+    };
+  }
+
+  /**
    * Format Eigenlayer parameters to match the contract's expected format
    * @param params Eigenlayer parameters
    * @returns Formatted parameters
    */
-  private formatEigenParams(params: any) {
-    console.log("Formatting eigen params:", params);
-    // Ensure operator is properly formatted as bytes32
-    let operatorId = params.operator || params.operator_id;
-    if (operatorId && !operatorId.startsWith("0x")) {
-      operatorId = "0x" + operatorId;
-    }
-
-    // If operatorId is a hex string shorter than 66 chars (0x + 64 hex chars), pad it
-    // if (operatorId && operatorId.startsWith("0x") && operatorId.length < 66) {
-    //   operatorId = operatorId.padEnd(66, "0");
-    // }
-
+  private formatEigenParams(params: EigenlayerParams) {
     // Get the signature and expiry from approver_signature_and_expiry if it exists
     const signature = params.approver_signature_and_expiry?.signature || "0x";
     const expiry = params.approver_signature_and_expiry?.expiry || 0;
@@ -335,9 +377,8 @@ export class ByzantineFactoryClient {
 
     // Implement parameter formatting logic to match contract expectations
     return {
-      delegationSetRoleHolder:
-        params.delegation_set_role_holder || params.role_validator_manager,
-      operator: operatorId,
+      delegationSetRoleHolder: params.delegation_set_role_holder,
+      operator: params.operator,
       approverSignatureAndExpiry: {
         signature: signature,
         expiry: expiry,
@@ -347,27 +388,23 @@ export class ByzantineFactoryClient {
   }
 
   /**
+   * Format EigenPod parameters to match the contract's expected format
+   * @param params EigenPod parameters
+   * @returns Formatted parameters
+   */
+  private formatEigenPodParams(params: EigenpodParams) {
+    return {
+      eigenPodOwner: params.eigen_pod_owner,
+      proofSubmitter: params.proof_submitter,
+    };
+  }
+
+  /**
    * Format Symbiotic parameters to match the contract's expected format
    * @param params Symbiotic parameters
    * @returns Formatted parameters
    */
-  private formatSymbioticParams(params: any) {
-    // Format parameters to match the SymParams structure in the contract
-    console.log("Raw symbiotic params:", params);
-
-    // Make sure enum values are converted to numbers
-    const delegatorType =
-      typeof params.delegator_type === "number"
-        ? params.delegator_type
-        : parseInt(params.delegator_type.toString());
-
-    const slasherType =
-      typeof params.slasher_type === "number"
-        ? params.slasher_type
-        : parseInt(params.slasher_type.toString());
-
-    console.log("Delegator type:", delegatorType, "Slasher type:", slasherType);
-
+  private formatSymbioticParams(params: SymbioticParams) {
     return {
       burnerParams: {
         owner: params.role_burner_owner_burner,
@@ -382,7 +419,7 @@ export class ByzantineFactoryClient {
         epochDuration: params.vault_epoch_duration,
       },
       delegatorParams: {
-        delegatorType: delegatorType,
+        delegatorType: params.delegator_type,
         hook: params.delegator_hook,
         hookSetRoleHolder: params.role_delegator_set_hook,
         networkLimitSetRoleHolders: params.role_delegator_set_network_limit,
@@ -392,23 +429,10 @@ export class ByzantineFactoryClient {
         network: params.delegator_network,
       },
       slasherParams: {
-        slasherType: slasherType,
+        slasherType: params.slasher_type,
         vetoDuration: params.slasher_veto_duration,
         resolverSetEpochsDelay: params.slasher_number_epoch_to_set_delay,
       },
-    };
-  }
-
-  /**
-   * Format EigenPod parameters to match the contract's expected format
-   * @param params EigenPod parameters
-   * @returns Formatted parameters
-   */
-  private formatEigenPodParams(params: any) {
-    console.log("Formatting eigen pod params:", params);
-    return {
-      eigenPodOwner: params.eigen_pod_owner,
-      proofSubmitter: params.proof_submitter,
     };
   }
 }

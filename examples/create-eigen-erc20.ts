@@ -8,7 +8,12 @@
  * 3. Execute the vault creation transaction
  */
 
-import { ByzantineFactoryClient, getNetworkConfig } from "../dist";
+import {
+  ByzantineFactoryClient,
+  getNetworkConfig,
+  BaseParams,
+  EigenlayerParams,
+} from "../dist";
 import { ethers } from "ethers";
 import "dotenv/config";
 
@@ -54,7 +59,7 @@ async function main() {
     console.log(`Connected to Byzantine Factory at: ${client.contractAddress}`);
 
     // Define Eigenlayer ERC20 vault parameters
-    const baseParams = {
+    const baseParams: BaseParams = {
       name: "Eigenlayer stETH Vault",
       description: "An Eigenlayer vault for stETH restaking",
 
@@ -80,7 +85,7 @@ async function main() {
       role_curator_fee_claimer_admin: wallet.address,
     };
 
-    const eigenlayerParams = {
+    const eigenlayerParams: EigenlayerParams = {
       // Eigenlayer specific params
       delegation_set_role_holder: address,
       operator: "0xb564e795f9877b416cd1af86c98cf8d3d94d760d",

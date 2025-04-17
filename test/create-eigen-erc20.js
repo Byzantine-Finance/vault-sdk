@@ -1,5 +1,3 @@
-// @ts-check
-
 /**
  * Test for creating an Eigenlayer ERC20 vault with Byzantine Factory SDK
  *
@@ -29,7 +27,8 @@ async function runTests() {
   try {
     // Check if environment variables are set
     const { INFURA_API_KEY, MNEMONIC, DEFAULT_CHAIN_ID } = process.env;
-    const chainId = DEFAULT_CHAIN_ID ? parseInt(DEFAULT_CHAIN_ID) : 17000; // Default to Holesky if not set
+    const parsedId = DEFAULT_CHAIN_ID ? parseInt(DEFAULT_CHAIN_ID) : 17000;
+    const chainId = parsedId === 1 ? 1 : 17000;
 
     let skipNetworkTests = false;
     if (!INFURA_API_KEY) {
@@ -106,18 +105,25 @@ async function runTests() {
       curator_fee: 500, // 5% (500 basis points)
 
       // Roles - replace with actual addresses in production
-      role_manager: wallet.address,
-      role_version_manager: wallet.address,
-      role_deposit_limit_manager: wallet.address,
-      role_deposit_whitelist_manager: wallet.address,
-      role_curator_fee_claimer: wallet.address,
-      role_curator_fee_claimer_admin: wallet.address,
+      role_manager: address,
+      role_version_manager: address,
+      role_deposit_limit_manager: address,
+      role_deposit_whitelist_manager: address,
+      role_curator_fee_claimer: address,
+      role_curator_fee_claimer_admin: address,
     };
 
     const eigenlayerParams = {
-      operator_id: "0xb564e795f9877b416cd1af86c98cf8d3d94d760d", // Replace with actual operator ID
+      // Eigenlayer specific params
+      delegation_set_role_holder: address,
+      operator: "0xb564e795f9877b416cd1af86c98cf8d3d94d760d",
 
-      role_validator_manager: wallet.address,
+      approver_signature_and_expiry: {
+        signature: "0x", // null signature
+        expiry: 0, // no expiry
+      },
+      approver_salt:
+        "0x0000000000000000000000000000000000000000000000000000000000000000", // null salt
     };
 
     // Test parameter validation
@@ -129,25 +135,27 @@ async function runTests() {
 
       try {
         // Create the vault
-        const tx = await client.createEigenlayerERC20Vault({
+        const tx = client.createEigenlayerERC20Vault({
           base: baseParams,
           eigenlayer: eigenlayerParams,
         });
 
-        console.log(`\nTransaction sent! Hash: ${tx.hash}`);
+        const txResponse = await tx;
+
+        console.log(`\nTransaction sent! Hash: ${txResponse.hash}`);
         console.log("Waiting for transaction to be mined...");
 
         // Wait for the transaction to be mined
-        const receipt = await tx.wait();
+        const receipt = await txResponse.wait();
 
         logResult(
           "Vault creation",
           true,
-          `Gas used: ${receipt.gasUsed.toString()}`
+          `Gas used: ${receipt?.gasUsed.toString()}`
         );
 
         // Determine the vault address from the logs
-        const vaultAddress = receipt.logs[0].address; // Simplified - in production, parse the event properly
+        const vaultAddress = receipt?.logs[0]?.address; // Simplified - in production, parse the event properly
         console.log(`\nVault created at address: ${vaultAddress}`);
         console.log(
           `Explorer link: ${

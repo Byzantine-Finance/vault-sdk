@@ -3,20 +3,22 @@
 import { Address, Hash, TransactionReceipt } from "viem";
 import { Config } from "wagmi";
 
+export type ChainsOptions = 1 | 17000;
+
 export interface NetworkConfig {
   name: string;
   factoryContractAddress: Address;
   scanLink: string;
+  stETHAddress: string;
+  wstETHAddress: string;
   theGraphApiUrl?: string;
-  stETHAddress?: string;
-  wstETHAddress?: string;
 }
 
 /**
  * Client initialization options
  */
 export interface ByzantineFactoryClientOptions {
-  chainId: number;
+  chainId: ChainsOptions;
   wagmiConfig?: Config;
   provider?: any; // For ethers provider
   signer?: any; // For ethers signer
@@ -38,7 +40,7 @@ export interface BaseParams {
   token_address: string; // Address of the token that people can deposit in the vault, if native 0xEeeeeEeEeEeEeEeEeeEEEeeeeEeeeeeeeEEeE
 
   is_deposit_limit: boolean;
-  deposit_limit: number;
+  deposit_limit: bigint;
 
   is_private: boolean;
 
@@ -80,7 +82,7 @@ export enum SlasherType {
   VETO, // 1
 }
 
-// [param]_[role?]_[name]
+// [role_?][param]_[name]
 export interface SymbioticParams {
   vault_version: number; //                           VAULT: Version of the vault, always 1 for now
   vault_epoch_duration: number; //                    VAULT: Duration of the epoch, in seconds, usually 7 days
@@ -89,8 +91,8 @@ export interface SymbioticParams {
   slasher_number_epoch_to_set_delay: number; //       SLASHER: Number of epoch to set the delay, usually 3
   burner_delay_settings_applied: number; //           BURNER: If true, the delay settings are applied, in days, usually 21
   burner_global_receiver: string; //                  BURNER: Default receiver of the burner, best practice is to use the ones proposed by Symbiotic for the relevant token
-  burner_network_receiver: []; //                     BURNER: Will be implemented later
-  burner_operator_network_receiver: []; //            BURNER: Will be implemented later
+  burner_network_receiver: string[]; //               BURNER: Will be implemented later
+  burner_operator_network_receiver: string[]; //      BURNER: Will be implemented later
   delegator_type: DelegatorType; //                   DELEGATOR: Type of the delegator
   delegator_hook: string; //                          DELEGATOR: Address of the hook of the delegator
   delegator_operator: string; //                      DELEGATOR: Address of the operator of the delegator, only for type 2 and 3, set to 0x0 if type 0 or 1
@@ -103,10 +105,10 @@ export interface SymbioticParams {
   role_burner_owner_burner: string; //                BURNER: Address of the owner who can change the receivers and the delay settings
 }
 
-export interface NativeSymbioticVault {
-  base: NativeParams;
-  symbiotic: SymbioticParams;
-}
+// export interface NativeSymbioticVault {
+//   base: NativeParams;
+//   symbiotic: SymbioticParams;
+// }
 
 export interface SymbioticVault {
   base: BaseParams;
