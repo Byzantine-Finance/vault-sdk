@@ -1,3 +1,5 @@
+// @ts-check
+
 import { Address, Hash, TransactionReceipt } from "viem";
 import { Config } from "wagmi";
 
@@ -55,6 +57,8 @@ export interface BaseParams {
 }
 
 export interface NativeParams {
+  byzVaultParams: BaseParams;
+
   operator_id: string;
 
   roles_validator_manager: string[]; // List of addresses who can manage the validator manager, only when solo staker vault
@@ -79,9 +83,9 @@ export enum SlasherType {
 // [param]_[role?]_[name]
 export interface SymbioticParams {
   vault_version: number; //                           VAULT: Version of the vault, always 1 for now
-  vault_epoch_duration: number; //                    VAULT: Duration of the epoch, in seconds, usually 24 hours
+  vault_epoch_duration: number; //                    VAULT: Duration of the epoch, in seconds, usually 7 days
   slasher_type: SlasherType; //                       SLASHER: Type of the slasher
-  slasher_veto_duration: number; //                   SLASHER: Duration of the veto, in seconds, usually 7d
+  slasher_veto_duration: number; //                   SLASHER: Duration of the veto, in seconds, usually 24 hours, can't be equal or greater than epoch duration
   slasher_number_epoch_to_set_delay: number; //       SLASHER: Number of epoch to set the delay, usually 3
   burner_delay_settings_applied: number; //           BURNER: If true, the delay settings are applied, in days, usually 21
   burner_global_receiver: string; //                  BURNER: Default receiver of the burner, best practice is to use the ones proposed by Symbiotic for the relevant token
@@ -110,20 +114,31 @@ export interface SymbioticVault {
 }
 
 // ----------------------------------
-// EigenLayer
+// Eigenlayer
 // ----------------------------------
-export interface EigenLayerParams extends BaseParams {
-  operator_id: string;
+export interface EigenlayerParams {
+  delegation_set_role_holder: string; // Address of the role holder that can set the delegation
+  operator: string; // Address of the operator that has the AVS
 
-  role_validator_manager: string;
+  approver_signature_and_expiry: {
+    signature: string; // "0x" for null
+    expiry: number; // 0 for null
+  };
+  approver_salt: string; // "0x0000000000000000000000000000000000000000000000000000000000000000" for null
 }
 
-export interface NativeEigenLayerVault {
-  base: NativeParams;
-  eigenlayer: EigenLayerParams;
+export interface EigenpodParams {
+  eigen_pod_owner: string; // Address of the owner of the eigen pod
+  proof_submitter: string; // Address of the proof submitter
 }
 
-export interface EigenLayerVault {
+export interface EigenlayerVault {
   base: BaseParams;
-  eigenlayer: EigenLayerVault;
+  eigenlayer: EigenlayerParams;
+}
+
+export interface NativeEigenlayerVault {
+  base: NativeParams;
+  eigenlayer: EigenlayerParams;
+  eigenpod: EigenpodParams;
 }

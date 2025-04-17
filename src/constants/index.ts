@@ -6,12 +6,12 @@ export * from "./byzantineFactoryABI";
  */
 
 // Special Ethereum address used to represent native ETH
-export const ETH_TOKEN_ADDRESS = "0xEeeeeEeEeEeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+export const ETH_TOKEN_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 
 // Default gas limits for different operations
 export const GAS_LIMITS = {
   createEigenERC20Vault: 5000000000,
   createEigenNativeVault: 5000000000,
-  createSymbioticERC20Vault: 5000000000,
+  createSymbioticERC20Vault: 50000000000,
   createSuperVaultERC20: 5000000000,
 };

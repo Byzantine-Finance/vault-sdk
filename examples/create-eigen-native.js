@@ -1,7 +1,7 @@
 /**
- * Example: Create an EigenLayer Native Vault
+ * Example: Create an Eigenlayer Native Vault
  *
- * This example demonstrates how to create an EigenLayer Native (ETH) vault using the Byzantine Factory SDK.
+ * This example demonstrates how to create an Eigenlayer Native (ETH) vault using the Byzantine Factory SDK.
  * It shows how to:
  * 1. Initialize the client with ethers.js
  * 2. Set up proper vault parameters
@@ -49,8 +49,36 @@ async function main() {
 
     console.log(`Connected to Byzantine Factory at: ${client.contractAddress}`);
 
-    // Define EigenLayer Native vault parameters
+    // Define Eigenlayer Native vault parameters
     const baseParams = {
+      // Base vault parameters wrapped in byzVaultParams
+      byzVaultParams: {
+        name: "Eigenlayer ETH Vault",
+        description: "An Eigenlayer vault for ETH restaking",
+
+        token_address: ETH_TOKEN_ADDRESS,
+
+        is_deposit_limit: true,
+        deposit_limit: ethers.parseEther("100").toString(), // Keep as string to avoid overflow
+
+        is_private: false,
+
+        is_tokenized: true,
+        token_name: "Byzantine ETH Vault",
+        token_symbol: "bETH",
+
+        curator_fee: 300, // 3% (300 basis points)
+
+        // Roles - replace with actual addresses in production
+        role_manager: wallet.address,
+        role_version_manager: wallet.address,
+        role_deposit_limit_manager: wallet.address,
+        role_deposit_whitelist_manager: wallet.address,
+        role_curator_fee_claimer: wallet.address,
+        role_curator_fee_claimer_admin: wallet.address,
+      },
+
+      // Native params specific to Eigenlayer vaults
       operator_id: "0xb564e795f9877b416cd1af86c98cf8d3d94d760d", // Replace with actual operator ID
 
       // Roles - replace with actual addresses in production
@@ -60,50 +88,44 @@ async function main() {
       ],
     };
 
-    const eigenLayerParams = {
-      name: "EigenLayer ETH Vault",
-      description: "An EigenLayer vault for ETH restaking",
+    const eigenlayerParams = {
+      // Eigenlayer specific params
+      delegation_set_role_holder: wallet.address,
+      operator: "0xb564e795f9877b416cd1af86c98cf8d3d94d760d", // Same as operator_id
 
-      token_address: ETH_TOKEN_ADDRESS,
-
-      is_deposit_limit: true,
-      deposit_limit: ethers.parseEther("100"), // 100 ETH
-
-      is_private: false,
-
-      is_tokenized: true,
-      token_name: "Byzantine ETH Vault",
-      token_symbol: "bETH",
-
-      curator_fee: 300, // 3% (300 basis points)
-
-      // Roles - replace with actual addresses in production
-      role_manager: wallet.address,
-      role_version_manager: wallet.address,
-      role_deposit_limit_manager: wallet.address,
-      role_deposit_whitelist_manager: wallet.address,
-      role_curator_fee_claimer: wallet.address,
-      role_curator_fee_claimer_admin: wallet.address,
-
-      operator_id: "0xb564e795f9877b416cd1af86c98cf8d3d94d760d", // Replace with actual operator ID
-
-      role_validator_manager: wallet.address,
+      approver_signature_and_expiry: {
+        signature: "0x", // null signature
+        expiry: 0, // no expiry
+      },
+      approver_salt:
+        "0x0000000000000000000000000000000000000000000000000000000000000000", // null salt
     };
 
-    console.log("\nCreating EigenLayer Native vault with parameters:");
+    // EigenPod parameters - required for native vaults
+    const eigenPodParams = {
+      eigen_pod_owner: wallet.address,
+      proof_submitter: wallet.address,
+    };
+
+    console.log("\nCreating Eigenlayer Native vault with parameters:");
     console.log("Token: ETH (Native)");
     console.log(
       "Deposit limit:",
-      ethers.formatEther(BigInt(eigenLayerParams.deposit_limit)),
+      ethers.formatEther(BigInt(baseParams.byzVaultParams.deposit_limit)),
       "ETH"
     );
-    console.log("Curator fee:", eigenLayerParams.curator_fee / 100, "%");
+    console.log(
+      "Curator fee:",
+      baseParams.byzVaultParams.curator_fee / 100,
+      "%"
+    );
 
-    // Create the vault
+    // Create the vault with the new structure that includes eigenPod params
     console.log("\nSending transaction...");
-    const tx = await client.createEigenLayerNativeVault({
+    const tx = await client.createEigenlayerNativeVault({
       base: baseParams,
-      eigenlayer: eigenLayerParams,
+      eigenlayer: eigenlayerParams,
+      eigenpod: eigenPodParams,
     });
 
     console.log(`Transaction sent! Hash: ${tx.hash}`);
@@ -120,7 +142,7 @@ async function main() {
     const vaultAddress = receipt.logs[0].address;
     console.log(`\nVault created at address: ${vaultAddress}`);
 
-    console.log("\nEigenLayer Native vault creation completed successfully!");
+    console.log("\nEigenlayer Native vault creation completed successfully!");
   } catch (error) {
     console.error("Error creating vault:", error);
     process.exit(1);

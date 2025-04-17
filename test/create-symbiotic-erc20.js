@@ -82,20 +82,24 @@ async function runTests() {
       ? {}
       : ethers.Wallet.fromPhrase(MNEMONIC).connect(provider);
 
+    const address = await wallet.getAddress();
+    logResult("Wallet address", true, address);
+
     const client = new ByzantineFactoryClient({
       chainId: chainId,
       provider: provider,
       signer: wallet,
     });
 
+    // Get network configuration for token addresses
+    const networkConfig = getNetworkConfig(chainId);
+
     logResult("Client initialization", true);
     assert(client !== undefined, "Client initialization");
 
-    logResult("Wallet address", true, wallet.address);
     logResult("Contract address", true, client.contractAddress);
 
     // Get network configuration for token addresses
-    const networkConfig = getNetworkConfig(chainId);
 
     // Define vault parameters
     const baseParams = {
@@ -116,33 +120,33 @@ async function runTests() {
       curator_fee: 200, // 2% (200 basis points)
 
       // Roles - replace with actual addresses in production
-      role_manager: wallet.address,
-      role_version_manager: wallet.address,
-      role_deposit_limit_manager: wallet.address,
-      role_deposit_whitelist_manager: wallet.address,
-      role_curator_fee_claimer: wallet.address,
-      role_curator_fee_claimer_admin: wallet.address,
+      role_manager: address,
+      role_version_manager: address,
+      role_deposit_limit_manager: address,
+      role_deposit_whitelist_manager: address,
+      role_curator_fee_claimer: address,
+      role_curator_fee_claimer_admin: address,
     };
 
     const symbioticParams = {
       vault_version: 1,
-      vault_epoch_duration: 86400, // 24 hours in seconds
+      vault_epoch_duration: 604800, // 7 days in seconds
       slasher_type: SlasherType.VETO,
-      slasher_veto_duration: 604800, // 7 days in seconds
+      slasher_veto_duration: 86400, // 1 day in seconds
       slasher_number_epoch_to_set_delay: 3,
       burner_delay_settings_applied: 21, // 21 days
       burner_global_receiver: "0x25133c2c49A343F8312bb6e896C1ea0Ad8CD0EBd", // Global receiver for wstETH
       burner_network_receiver: [],
       burner_operator_network_receiver: [],
       delegator_type: DelegatorType.NETWORK_RESTAKE,
-      delegator_hook: "0x4444444444444444444444444444444444444444", // Delegator hook address
+      delegator_hook: "0x0000000000000000000000000000000000000001", // Delegator hook address
       delegator_operator: "0x0000000000000000000000000000000000000000", // Not used for NETWORK_RESTAKE
       delegator_network: "0x0000000000000000000000000000000000000000", // Not used for NETWORK_RESTAKE
 
-      role_delegator_set_hook: wallet.address,
-      role_delegator_set_network_limit: [wallet.address],
-      role_delegator_set_operator_network_limit: [wallet.address],
-      role_burner_owner_burner: wallet.address,
+      role_delegator_set_hook: address,
+      role_delegator_set_network_limit: [address],
+      role_delegator_set_operator_network_limit: [address],
+      role_burner_owner_burner: address,
     };
 
     // Test parameter validation

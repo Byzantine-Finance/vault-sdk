@@ -13,8 +13,8 @@ This SDK provides a simple interface to interact with the Byzantine Factory cont
 
 The factory contract allows users to:
 
-- **Create EigenLayer ERC20 vaults**
-- **Create EigenLayer Native vaults**
+- **Create Eigenlayer ERC20 vaults**
+- **Create Eigenlayer Native vaults**
 - **Create Symbiotic ERC20 vaults**
 - **Create ERC20 SuperVaults** with advanced features
 - **Manage vault parameters** like deposit limits, curator fees, and access controls
@@ -61,7 +61,7 @@ const client = new ByzantineFactoryClient({
 
 ## Quick Start
 
-### Creating an EigenLayer ERC20 Vault
+### Creating an Eigenlayer ERC20 Vault
 
 ```typescript
 import {
@@ -87,8 +87,8 @@ const networkConfig = getNetworkConfig(17000);
 
 // Define vault parameters
 const baseParams = {
-  name: "EigenLayer stETH Vault",
-  description: "An EigenLayer vault for stETH restaking",
+  name: "Eigenlayer stETH Vault",
+  description: "An Eigenlayer vault for stETH restaking",
   token_address: networkConfig.stETHAddress,
   is_deposit_limit: true,
   deposit_limit: ethers.parseUnits("1000", 18),
@@ -105,15 +105,15 @@ const baseParams = {
   role_curator_fee_claimer_admin: wallet.address,
 };
 
-const eigenLayerParams = {
+const eigenlayerParams = {
   operator_id: "0xb564e795f9877b416cd1af86c98cf8d3d94d760d", // Replace with actual operator ID
   role_validator_manager: wallet.address,
 };
 
 // Create the vault
-const tx = await client.createEigenLayerERC20Vault({
+const tx = await client.createEigenlayerERC20Vault({
   base: baseParams,
-  eigenlayer: eigenLayerParams,
+  eigenlayer: eigenlayerParams,
 });
 
 // Wait for confirmation
@@ -125,7 +125,7 @@ const vaultAddress = receipt.logs[0].address;
 console.log(`Vault created at address: ${vaultAddress}`);
 ```
 
-### Creating an EigenLayer Native (ETH) Vault
+### Creating an Eigenlayer Native (ETH) Vault
 
 ```typescript
 import {
@@ -142,9 +142,9 @@ const baseParams = {
   roles_validator_manager: [wallet.address],
 };
 
-const eigenLayerParams = {
-  name: "EigenLayer ETH Vault",
-  description: "An EigenLayer vault for ETH restaking",
+const eigenlayerParams = {
+  name: "Eigenlayer ETH Vault",
+  description: "An Eigenlayer vault for ETH restaking",
   token_address: ETH_TOKEN_ADDRESS,
   is_deposit_limit: true,
   deposit_limit: ethers.parseEther("100"),
@@ -164,9 +164,9 @@ const eigenLayerParams = {
 };
 
 // Create the vault
-const tx = await client.createEigenLayerNativeVault({
+const tx = await client.createEigenlayerNativeVault({
   base: baseParams,
-  eigenlayer: eigenLayerParams,
+  eigenlayer: eigenlayerParams,
 });
 
 // Wait for confirmation
@@ -193,12 +193,12 @@ node test/create-supervault-erc20.js
 
 ## Vault Types
 
-### EigenLayer Vaults
+### Eigenlayer Vaults
 
-EigenLayer vaults allow users to deposit ETH or ERC20 tokens for restaking on EigenLayer's protocol. The two types available are:
+Eigenlayer vaults allow users to deposit ETH or ERC20 tokens for restaking on Eigenlayer's protocol. The two types available are:
 
-- **EigenLayer Native (ETH)** - For restaking ETH natively
-- **EigenLayer ERC20** - For restaking supported ERC20 tokens (e.g., stETH, rETH)
+- **Eigenlayer Native (ETH)** - For restaking ETH natively
+- **Eigenlayer ERC20** - For restaking supported ERC20 tokens (e.g., stETH, rETH)
 
 ### Symbiotic Vaults
 
@@ -224,8 +224,8 @@ const client = new ByzantineFactoryClient({
 
 #### Vault Creation
 
-- `createEigenLayerERC20Vault({ base, eigenlayer })`: Create an EigenLayer ERC20 vault
-- `createEigenLayerNativeVault({ base, eigenlayer })`: Create an EigenLayer Native (ETH) vault
+- `createEigenlayerERC20Vault({ base, eigenlayer })`: Create an Eigenlayer ERC20 vault
+- `createEigenlayerNativeVault({ base, eigenlayer })`: Create an Eigenlayer Native (ETH) vault
 - `createSymbioticERC20Vault({ base, symbiotic })`: Create a Symbiotic ERC20 vault
 - `createSuperVaultERC20({ base, symbiotic })`: Create a SuperVault for ERC20 tokens
 

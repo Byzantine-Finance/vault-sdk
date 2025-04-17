@@ -1,7 +1,7 @@
 /**
- * Example: Create an EigenLayer ERC20 Vault
+ * Example: Create an Eigenlayer ERC20 Vault
  *
- * This example demonstrates how to create an EigenLayer ERC20 vault using the Byzantine Factory SDK.
+ * This example demonstrates how to create an Eigenlayer ERC20 vault using the Byzantine Factory SDK.
  * It shows how to:
  * 1. Initialize the client with ethers.js
  * 2. Set up proper vault parameters
@@ -49,10 +49,10 @@ async function main() {
 
     console.log(`Connected to Byzantine Factory at: ${client.contractAddress}`);
 
-    // Define EigenLayer ERC20 vault parameters
+    // Define Eigenlayer ERC20 vault parameters
     const baseParams = {
-      name: "EigenLayer stETH Vault",
-      description: "An EigenLayer vault for stETH restaking",
+      name: "Eigenlayer stETH Vault",
+      description: "An Eigenlayer vault for stETH restaking",
 
       token_address: "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84", // stETH address
 
@@ -76,13 +76,13 @@ async function main() {
       role_curator_fee_claimer_admin: wallet.address,
     };
 
-    const eigenLayerParams = {
+    const eigenlayerParams = {
       operator_id: "0xb564e795f9877b416cd1af86c98cf8d3d94d760d", // Replace with actual operator ID
 
       role_validator_manager: wallet.address,
     };
 
-    console.log("\nCreating EigenLayer ERC20 vault with parameters:");
+    console.log("\nCreating Eigenlayer ERC20 vault with parameters:");
     console.log("Token:", baseParams.token_address);
     console.log(
       "Deposit limit:",
@@ -93,9 +93,9 @@ async function main() {
 
     // Create the vault
     console.log("\nSending transaction...");
-    const tx = await client.createEigenLayerERC20Vault({
+    const tx = await client.createEigenlayerERC20Vault({
       base: baseParams,
-      eigenlayer: eigenLayerParams,
+      eigenlayer: eigenlayerParams,
     });
 
     console.log(`Transaction sent! Hash: ${tx.hash}`);
@@ -112,7 +112,7 @@ async function main() {
     const vaultAddress = receipt.logs[0].address;
     console.log(`\nVault created at address: ${vaultAddress}`);
 
-    console.log("\nEigenLayer ERC20 vault creation completed successfully!");
+    console.log("\nEigenlayer ERC20 vault creation completed successfully!");
   } catch (error) {
     console.error("Error creating vault:", error);
     process.exit(1);
