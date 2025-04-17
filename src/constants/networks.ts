@@ -10,7 +10,7 @@ export const NETWORKS: Record<number, NetworkConfig> = {
   // Ethereum Mainnet
   1: {
     name: "Ethereum",
-    factoryContractAddress: "0x304AF230BD46Ef3dfe2c26c37207a21Eeb992088",
+    factoryContractAddress: "0x2439365bFd681354cc8BCc001a1893CF64e42768",
     scanLink: "https://etherscan.io",
     stETHAddress: "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
     wstETHAddress: "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
@@ -21,7 +21,7 @@ export const NETWORKS: Record<number, NetworkConfig> = {
   // Holesky Testnet
   17000: {
     name: "Holesky",
-    factoryContractAddress: "0x304AF230BD46Ef3dfe2c26c37207a21Eeb992088",
+    factoryContractAddress: "0x2439365bFd681354cc8BCc001a1893CF64e42768",
     scanLink: "https://holesky.etherscan.io",
     stETHAddress: "0x3F1c547b21f65e10480dE3ad8E19fAAC46C95034",
     wstETHAddress: "0x8d09a4502Cc8Cf1547aD300E066060D043f6982D",

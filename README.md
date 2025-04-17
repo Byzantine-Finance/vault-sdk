@@ -9,7 +9,7 @@ Byzantine Finance is the first native restaking aggregation and abstraction laye
 This SDK provides a simple interface to interact with the Byzantine Factory contract deployed on:
 
 - Ethereum Mainnet
-- [Holesky Testnet](https://holesky.etherscan.io/address/0x304AF230BD46Ef3dfe2c26c37207a21Eeb992088)
+- [Holesky Testnet](https://holesky.etherscan.io/address/0x2439365bFd681354cc8BCc001a1893CF64e42768)
 
 The factory contract allows users to:
 
