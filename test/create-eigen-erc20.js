@@ -18,6 +18,16 @@ const { ethers } = require("ethers");
 const { logTitle, logResult, assert } = require("./utils");
 require("dotenv").config();
 
+// Import environment variables
+const { RPC_URL, MNEMONIC, DEFAULT_CHAIN_ID } = process.env;
+
+// Skip network tests if API key is not provided
+if (!RPC_URL) {
+  console.warn(
+    "⚠️ Warning: RPC_URL not set in .env file. Network tests will be skipped."
+  );
+}
+
 // Test suite
 async function runTests() {
   console.log(
@@ -26,14 +36,13 @@ async function runTests() {
 
   try {
     // Check if environment variables are set
-    const { INFURA_API_KEY, MNEMONIC, DEFAULT_CHAIN_ID } = process.env;
     const parsedId = DEFAULT_CHAIN_ID ? parseInt(DEFAULT_CHAIN_ID) : 17000;
     const chainId = parsedId === 1 ? 1 : 17000;
 
     let skipNetworkTests = false;
-    if (!INFURA_API_KEY) {
+    if (!RPC_URL) {
       console.warn(
-        "⚠️ Warning: INFURA_API_KEY not set in .env file. Network tests will be skipped."
+        "⚠️ Warning: RPC_URL not set in .env file. Network tests will be skipped."
       );
       skipNetworkTests = true;
     }
@@ -58,14 +67,13 @@ async function runTests() {
     // Start logging results in tabular format
     logTitle("Eigenlayer ERC20 Vault Creation");
 
+    // Skip tests requiring network connection if no API key
+    skipNetworkTests = !RPC_URL;
+
     // Test client initialization
     const provider = skipNetworkTests
       ? {}
-      : new ethers.JsonRpcProvider(
-          `https://${
-            chainId === 1 ? "mainnet" : "holesky"
-          }.infura.io/v3/${INFURA_API_KEY}`
-        );
+      : new ethers.JsonRpcProvider(RPC_URL);
 
     const wallet = skipNetworkTests
       ? {}

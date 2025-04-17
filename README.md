@@ -30,7 +30,7 @@ npm install byzantine-factory-sdk
 1. Create a `.env` file in your project root with the following variables:
 
 ```shell
-INFURA_API_KEY=your_infura_api_key
+RPC_URL=https://holesky.infura.io/v3/your_api_key_here
 MNEMONIC=your_wallet_mnemonic
 DEFAULT_CHAIN_ID=17000  # 17000 for Holesky testnet, 1 for Ethereum Mainnet
 ```
@@ -48,9 +48,7 @@ import * as dotenv from "dotenv";
 
 dotenv.config();
 
-const provider = new ethers.JsonRpcProvider(
-  `https://holesky.infura.io/v3/${process.env.INFURA_API_KEY}`
-);
+const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
 const wallet = ethers.Wallet.fromPhrase(process.env.MNEMONIC).connect(provider);
 
 const client = new ByzantineFactoryClient({
@@ -73,7 +71,7 @@ import { ethers } from "ethers";
 
 // Initialize with ethers provider and signer
 const provider = new ethers.JsonRpcProvider(
-  "https://holesky.infura.io/v3/YOUR_INFURA_KEY"
+  "https://holesky.infura.io/v3/YOUR_API_KEY"
 );
 const wallet = ethers.Wallet.fromPhrase("your mnemonic").connect(provider);
 

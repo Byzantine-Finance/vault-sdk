@@ -36,14 +36,14 @@ async function runTests() {
 
   try {
     // Check if environment variables are set
-    const { INFURA_API_KEY, MNEMONIC, DEFAULT_CHAIN_ID } = process.env;
+    const { RPC_URL, MNEMONIC, DEFAULT_CHAIN_ID } = process.env;
     const parsedId = DEFAULT_CHAIN_ID ? parseInt(DEFAULT_CHAIN_ID) : 17000;
     const chainId = parsedId === 1 ? 1 : 17000;
 
     let skipNetworkTests = false;
-    if (!INFURA_API_KEY) {
+    if (!RPC_URL) {
       console.warn(
-        "⚠️ Warning: INFURA_API_KEY not set in .env file. Network tests will be skipped."
+        "⚠️ Warning: RPC_URL not set in .env file. Network tests will be skipped."
       );
       skipNetworkTests = true;
     }
@@ -71,11 +71,7 @@ async function runTests() {
     // Test client initialization
     const provider = skipNetworkTests
       ? {}
-      : new ethers.JsonRpcProvider(
-          `https://${
-            chainId === 1 ? "mainnet" : "holesky"
-          }.infura.io/v3/${INFURA_API_KEY}`
-        );
+      : new ethers.JsonRpcProvider(RPC_URL);
 
     const wallet = skipNetworkTests
       ? {}

@@ -21,12 +21,10 @@ require("dotenv").config();
 
 async function main() {
   // Check environment variables
-  const { INFURA_API_KEY, MNEMONIC, DEFAULT_CHAIN_ID } = process.env;
+  const { RPC_URL, MNEMONIC, DEFAULT_CHAIN_ID } = process.env;
 
-  if (!INFURA_API_KEY || !MNEMONIC) {
-    console.error(
-      "Error: INFURA_API_KEY and MNEMONIC must be set in .env file"
-    );
+  if (!RPC_URL || !MNEMONIC) {
+    console.error("Error: RPC_URL and MNEMONIC must be set in .env file");
     process.exit(1);
   }
 
@@ -38,11 +36,7 @@ async function main() {
   );
 
   // Initialize provider and wallet
-  const provider = new ethers.JsonRpcProvider(
-    `https://${
-      chainId === 1 ? "mainnet" : "holesky"
-    }.infura.io/v3/${INFURA_API_KEY}`
-  );
+  const provider = new ethers.JsonRpcProvider(RPC_URL);
 
   const wallet = ethers.Wallet.fromPhrase(MNEMONIC).connect(provider);
   const address = await wallet.getAddress();
