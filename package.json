@@ -1,6 +1,6 @@
 {
   "name": "@byzantine/vault-sdk",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Byzantine Vault SDK for creating and managing vaults on Ethereum for restaking strategies",
   "license": "MIT",
   "author": "Byzantine Finance",
