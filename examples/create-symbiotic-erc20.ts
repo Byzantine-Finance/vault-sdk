@@ -9,7 +9,7 @@
  */
 
 import {
-  ByzantineFactoryClient,
+  ByzantineClient,
   getNetworkConfig,
   BaseParams,
   SymbioticParams,
@@ -46,7 +46,7 @@ async function main() {
 
   try {
     // Initialize Byzantine Factory client
-    const client = new ByzantineFactoryClient({
+    const client = new ByzantineClient({
       chainId: chainId,
       provider: provider,
       signer: wallet,

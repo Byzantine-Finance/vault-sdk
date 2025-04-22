@@ -39,7 +39,7 @@ DEFAULT_CHAIN_ID=17000  # 17000 for Holesky testnet, 1 for Ethereum Mainnet
 
 ```typescript
 import {
-  ByzantineFactoryClient,
+  ByzantineClient,
   ETH_TOKEN_ADDRESS,
   BaseParams,
 } from "byzantine-factory-sdk";
@@ -51,7 +51,7 @@ dotenv.config();
 const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
 const wallet = ethers.Wallet.fromPhrase(process.env.MNEMONIC).connect(provider);
 
-const client = new ByzantineFactoryClient({
+const client = new ByzantineClient({
   chainId: 17000, // 17000 for Holesky, 1 for Mainnet
   provider: provider,
   signer: wallet,
@@ -63,10 +63,7 @@ const client = new ByzantineFactoryClient({
 ### Creating an Eigenlayer ERC20 Vault
 
 ```typescript
-import {
-  ByzantineFactoryClient,
-  getNetworkConfig,
-} from "byzantine-factory-sdk";
+import { ByzantineClient, getNetworkConfig } from "byzantine-factory-sdk";
 import { ethers } from "ethers";
 
 // Initialize with ethers provider and signer
@@ -75,7 +72,7 @@ const provider = new ethers.JsonRpcProvider(
 );
 const wallet = ethers.Wallet.fromPhrase("your mnemonic").connect(provider);
 
-const client = new ByzantineFactoryClient({
+const client = new ByzantineClient({
   chainId: 17000, // Holesky testnet
   provider: provider,
   signer: wallet,
@@ -287,7 +284,7 @@ SuperVaults are advanced vaults with additional features for managing ERC20 toke
 ### Client Initialization
 
 ```typescript
-const client = new ByzantineFactoryClient({
+const client = new ByzantineClient({
   chainId: number, // Chain ID (1 for Mainnet, 17000 for Holesky)
   provider: provider, // ethers.js provider
   signer: signer, // ethers.js signer (required for transactions)

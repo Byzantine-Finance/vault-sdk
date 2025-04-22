@@ -3,7 +3,7 @@
  */
 
 // Export main clients
-export { ByzantineFactoryClient } from "./clients/ByzantineFactoryClient";
+export { ByzantineClient } from "./clients/ByzantineClient";
 
 // Export types
 export * from "./types";

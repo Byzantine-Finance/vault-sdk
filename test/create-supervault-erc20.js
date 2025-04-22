@@ -14,7 +14,7 @@
  */
 
 const {
-  ByzantineFactoryClient,
+  ByzantineClient,
   ETH_TOKEN_ADDRESS,
   getNetworkConfig,
   DelegatorType,
@@ -80,7 +80,7 @@ async function runTests() {
     const address = await wallet.getAddress();
     logResult("Wallet address", true, address);
 
-    const client = new ByzantineFactoryClient({
+    const client = new ByzantineClient({
       chainId: chainId,
       provider: provider,
       signer: wallet,

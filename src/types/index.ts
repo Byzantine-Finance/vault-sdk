@@ -17,7 +17,7 @@ export interface NetworkConfig {
 /**
  * Client initialization options
  */
-export interface ByzantineFactoryClientOptions {
+export interface ByzantineClientOptions {
   chainId: ChainsOptions;
   wagmiConfig?: Config;
   provider?: any; // For ethers provider

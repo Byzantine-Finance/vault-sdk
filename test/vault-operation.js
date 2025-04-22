@@ -16,7 +16,7 @@
  */
 
 const { ethers } = require("ethers");
-const { ByzantineFactoryClient } = require("../dist");
+const { ByzantineClient } = require("../dist");
 const { getNetworkConfig } = require("../dist/constants");
 const {
   logTitle,
@@ -86,7 +86,7 @@ async function runTests() {
   const address = await wallet.getAddress();
   logResult("Wallet address", true, address);
 
-  const client = new ByzantineFactoryClient({
+  const client = new ByzantineClient({
     chainId: chainId,
     provider: provider,
     signer: wallet,

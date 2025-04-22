@@ -13,7 +13,7 @@
  */
 
 const {
-  ByzantineFactoryClient,
+  ByzantineClient,
   ETH_TOKEN_ADDRESS,
   DelegatorType,
   SlasherType,
@@ -45,7 +45,7 @@ async function main() {
 
   try {
     // Initialize Byzantine Factory client
-    const client = new ByzantineFactoryClient({
+    const client = new ByzantineClient({
       chainId: chainId,
       provider: provider,
       signer: wallet,

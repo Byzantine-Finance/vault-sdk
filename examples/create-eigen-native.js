@@ -8,11 +8,7 @@
  * 3. Execute the vault creation transaction
  */
 
-import {
-  ByzantineFactoryClient,
-  ETH_TOKEN_ADDRESS,
-  getNetworkConfig,
-} from "../dist";
+import { ByzantineClient, ETH_TOKEN_ADDRESS, getNetworkConfig } from "../dist";
 const { ethers } = require("ethers");
 require("dotenv").config();
 
@@ -43,7 +39,7 @@ async function main() {
 
   try {
     // Initialize Byzantine Factory client
-    const client = new ByzantineFactoryClient({
+    const client = new ByzantineClient({
       chainId: chainId,
       provider: provider,
       signer: wallet,

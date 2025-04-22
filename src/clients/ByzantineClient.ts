@@ -13,7 +13,7 @@
 
 import { ethers, TransactionResponse } from "ethers";
 import {
-  ByzantineFactoryClientOptions,
+  ByzantineClientOptions,
   EigenlayerVault,
   NativeEigenlayerVault,
   SymbioticVault,
@@ -40,7 +40,7 @@ import * as stakerFunctions from "./staker";
 // Import curator functions
 import * as curatorFunctions from "./curators";
 
-export class ByzantineFactoryClient {
+export class ByzantineClient {
   private provider: ethers.Provider;
   private signer?: ethers.Signer;
   private readonly publicClient?: PublicClient;
@@ -52,7 +52,7 @@ export class ByzantineFactoryClient {
    * Initialize a new ByzantineFactoryClient
    * @param options Client configuration options
    */
-  constructor(options: ByzantineFactoryClientOptions) {
+  constructor(options: ByzantineClientOptions) {
     this.chainId = options.chainId;
 
     // Get network configuration

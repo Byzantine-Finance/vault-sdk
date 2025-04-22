@@ -13,7 +13,7 @@
  * 5. Transaction verification - Validates the transaction receipt
  */
 
-const { ByzantineFactoryClient, getNetworkConfig } = require("../dist");
+const { ByzantineClient, getNetworkConfig } = require("../dist");
 const { ethers } = require("ethers");
 const { logTitle, logResult, assert } = require("./utils");
 require("dotenv").config();
@@ -82,7 +82,7 @@ async function runTests() {
     const address = await wallet.getAddress();
     logResult("Wallet address", true, address);
 
-    const client = new ByzantineFactoryClient({
+    const client = new ByzantineClient({
       chainId: chainId,
       provider: provider,
       signer: wallet,
