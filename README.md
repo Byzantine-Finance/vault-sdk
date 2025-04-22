@@ -1,4 +1,4 @@
-# Byzantine Factory SDK
+# Byzantine Vault SDK
 
 A TypeScript/JavaScript SDK for creating and managing vaults with Byzantine Finance Factory contract.
 
@@ -22,7 +22,7 @@ The factory contract allows users to:
 ## Installation
 
 ```bash
-npm install byzantine-factory-sdk
+npm install @byzantine/vault-sdk
 ```
 
 ## Basic Setup
@@ -42,7 +42,7 @@ import {
   ByzantineClient,
   ETH_TOKEN_ADDRESS,
   BaseParams,
-} from "byzantine-factory-sdk";
+} from "@byzantine/vault-sdk";
 import { ethers } from "ethers";
 import * as dotenv from "dotenv";
 
@@ -63,7 +63,7 @@ const client = new ByzantineClient({
 ### Creating an Eigenlayer ERC20 Vault
 
 ```typescript
-import { ByzantineClient, getNetworkConfig } from "byzantine-factory-sdk";
+import { ByzantineClient, getNetworkConfig } from "@byzantine/vault-sdk";
 import { ethers } from "ethers";
 
 // Initialize with ethers provider and signer
@@ -314,6 +314,10 @@ const client = new ByzantineClient({
 - Holesky Testnet (Chain ID: 17000)
 
 By default, the SDK is configured to use Holesky testnet (Chain ID: 17000). To use Ethereum Mainnet, specify `chainId: 1` when initializing the client.
+
+## NPM Package
+
+This SDK is available on npm as [@byzantine/vault-sdk](https://www.npmjs.com/package/@byzantine/vault-sdk).
 
 ## Security
 

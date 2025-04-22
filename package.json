@@ -1,11 +1,39 @@
 {
-  "name": "restake-sdk",
+  "name": "@byzantine/vault-sdk",
   "version": "1.0.0",
-  "description": "",
-  "license": "ISC",
-  "author": "",
+  "description": "Byzantine Vault SDK for creating and managing vaults on Ethereum for restaking strategies",
+  "license": "MIT",
+  "author": "Byzantine Finance",
   "type": "commonjs",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "keywords": [
+    "ethereum",
+    "restaking",
+    "eigenlayer",
+    "defi",
+    "byzantine",
+    "vault",
+    "staking",
+    "symbiotic",
+    "blockchain",
+    "sdk"
+  ],
+  "homepage": "https://byzantine.finance",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/byzantine-finance/vault-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/byzantine-finance/vault-sdk/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf dist",
