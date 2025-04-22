@@ -17,6 +17,7 @@
     "test:eigen-native": "node test/create-eigen-native.js",
     "test:symbiotic-erc20": "node test/create-symbiotic-erc20.js",
     "test:supervault-erc20": "node test/create-supervault-erc20.js",
+    "test:vault-operation": "ts-node test/vault-operation.js",
     "example:eigen-erc20": "node examples/create-eigen-erc20.js",
     "example:eigen-native": "node examples/create-eigen-native.js",
     "example:symbiotic-erc20": "node examples/create-symbiotic-erc20.js",

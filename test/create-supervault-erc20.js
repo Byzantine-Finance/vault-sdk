@@ -100,7 +100,7 @@ async function runTests() {
       token_address: networkConfig.wstETHAddress, // wstETH address
 
       is_deposit_limit: true,
-      deposit_limit: ethers.parseUnits("1000000", 6), // 1M USDC (6 decimals)
+      deposit_limit: ethers.parseUnits("1000000", 18), // 1M wstETH (18 decimals)
 
       is_private: true, // Private SuperVault
 

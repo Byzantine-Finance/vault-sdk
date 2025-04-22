@@ -18,18 +18,27 @@ import {
   NativeEigenlayerVault,
   SymbioticVault,
   ChainsOptions,
-  BaseParams,
-  NativeParams,
-  EigenlayerParams,
-  EigenpodParams,
-  SymbioticParams,
 } from "../types";
-import { getNetworkConfig, isChainSupported } from "../constants/networks";
-import { BYZANTINE_FACTORY_ABI } from "../constants/abis";
-import { ETH_TOKEN_ADDRESS } from "../constants";
-import { http, TransactionReceipt, TransactionRequest } from "viem";
-import { createPublicClient, PublicClient } from "viem";
+import { getNetworkConfig } from "../constants/networks";
+import { BYZANTINE_FACTORY_ABI, ERC20_VAULT_ABI } from "../constants/abis";
+import { PublicClient } from "viem";
+import { createPublicClient } from "viem";
+import { http } from "viem";
 import { mainnet } from "viem/chains";
+
+// Import vault creator functions
+import {
+  createEigenlayerERC20Vault,
+  createEigenlayerNativeVault,
+  createSymbioticERC20Vault,
+  createSuperVaultERC20,
+} from "./curators";
+
+// Import staker functions
+import * as stakerFunctions from "./staker";
+
+// Import curator functions
+import * as curatorFunctions from "./curators";
 
 export class ByzantineFactoryClient {
   private provider: ethers.Provider;
@@ -96,63 +105,7 @@ export class ByzantineFactoryClient {
       throw new Error("Signer is required for this operation");
     }
 
-    // Format parameters
-    const formattedBaseParams = this.formatBaseParams(params.base);
-    const formattedEigenParams = this.formatEigenParams(params.eigenlayer);
-
-    try {
-      // Import gas limits from constants
-      const { GAS_LIMITS } = require("../constants");
-
-      // Get block information to determine gas limit
-      const block = await this.provider.getBlock("latest");
-      const blockGasLimit = block?.gasLimit || BigInt(0);
-      // console.log("Current block gas limit:", blockGasLimit.toString());
-
-      // Set a safe gas limit that is below block gas limit
-      // Use 80% of block gas limit or the default gas limit, whichever is lower
-      const recommendedGasLimit = Math.min(
-        Number(blockGasLimit) * 0.8,
-        GAS_LIMITS.createEigenNativeVault
-      );
-
-      // console.log("Recommended gas limit:", recommendedGasLimit);
-
-      // Define default transaction options
-      const defaultOptions = {
-        gasLimit: Math.floor(recommendedGasLimit),
-      };
-
-      // Merge default options with user-provided options (user options take precedence)
-      const txOptions = { ...defaultOptions, ...options };
-
-      // Use an explicit function signature to avoid ambiguity
-      const functionSignature =
-        "createEigenByzVault((address,address,address,address,address,address,address,uint256,uint256,bool,bool,bool,string,string,string),(address,address,(bytes,uint256),bytes32))";
-
-      // Call the contract method to create an Eigenlayer ERC20 vault with explicit function signature
-      const tx: TransactionResponse = await this.contract.getFunction(
-        functionSignature
-      )(formattedBaseParams, formattedEigenParams, txOptions);
-
-      // console.log("Transaction sent, waiting for confirmation...");
-      // console.log("Transaction hash:", tx.hash);
-
-      return tx;
-    } catch (error: any) {
-      console.error("Error creating Eigenlayer ERC20 vault:", error);
-
-      // More detailed error information
-      if (error.code === "CALL_EXCEPTION") {
-        console.error("Contract call reverted. This could be due to:");
-        console.error("- Incorrect parameter format");
-        console.error("- Contract function parameter mismatch");
-        console.error("- Insufficient gas");
-        console.error("- Contract constraints not met");
-      }
-
-      throw error;
-    }
+    return createEigenlayerERC20Vault(this.contract, params, options);
   }
 
   /**
@@ -169,63 +122,7 @@ export class ByzantineFactoryClient {
       throw new Error("Signer is required for this operation");
     }
 
-    // Format parameters
-    const nativeByzVaultParams = this.formatNativeParams(params.base);
-    const formattedEigenParams = this.formatEigenParams(params.eigenlayer);
-    const formattedEigenPodParams = this.formatEigenPodParams(params.eigenpod);
-
-    try {
-      // Import gas limits from constants
-      const { GAS_LIMITS } = require("../constants");
-
-      // Get block information to determine gas limit
-      const block = await this.provider.getBlock("latest");
-      const blockGasLimit = block?.gasLimit || BigInt(0);
-      // console.log("Current block gas limit:", blockGasLimit.toString());
-
-      // Set a safe gas limit that is below block gas limit
-      // Use 80% of block gas limit or the default gas limit, whichever is lower
-      const recommendedGasLimit = Math.min(
-        Number(blockGasLimit) * 0.8,
-        GAS_LIMITS.createEigenNativeVault
-      );
-
-      // console.log("Recommended gas limit:", recommendedGasLimit);
-
-      // Define advanced transaction options with a manual gas limit if necessary
-      const options = {
-        gasLimit: Math.floor(recommendedGasLimit),
-      };
-
-      // Use an explicit function signature to avoid ambiguity
-      const functionSignature =
-        "createEigenByzVault(((address,address,address,address,address,address,address,uint256,uint256,bool,bool,bool,string,string,string),bytes32,address[]),(address,address,(bytes,uint256),bytes32),(address,address))";
-
-      // Call the contract method to create an Eigenlayer Native vault with explicit function signature
-      const tx: TransactionResponse = await this.contract.getFunction(
-        functionSignature
-      )(
-        nativeByzVaultParams,
-        formattedEigenParams,
-        formattedEigenPodParams,
-        options
-      );
-
-      return tx;
-    } catch (error: any) {
-      console.error("Error creating Eigenlayer Native vault:", error);
-
-      // More detailed error information
-      if (error.code === "CALL_EXCEPTION") {
-        console.error("Contract call reverted. This could be due to:");
-        console.error("- Incorrect parameter format");
-        console.error("- Contract function parameter mismatch");
-        console.error("- Insufficient gas");
-        console.error("- Contract constraints not met");
-      }
-
-      throw error;
-    }
+    return createEigenlayerNativeVault(this.contract, params, options);
   }
 
   /**
@@ -242,64 +139,7 @@ export class ByzantineFactoryClient {
       throw new Error("Signer is required for this operation");
     }
 
-    // Format parameters
-    const formattedBaseParams = this.formatBaseParams(params.base);
-    const formattedSymbioticParams = this.formatSymbioticParams(
-      params.symbiotic
-    );
-
-    console.log("Going to create symbiotic vault");
-    console.log("Formatted base params:", formattedBaseParams);
-    console.log("Formatted symbiotic params:", formattedSymbioticParams);
-
-    try {
-      // Use an explicit function signature to avoid ambiguity
-      const functionSignature =
-        "createSymByzVault((address,address,address,address,address,address,address,uint256,uint256,bool,bool,bool,string,string,string),((address,uint48,address,(address,address)[],(address,address,address)[]),(address,uint64,uint48),(uint8,address,address,address[],address[],address,address),(uint8,uint48,uint256)))";
-
-      // Call with an alternative method that explicitly specifies the function to call
-      const tx: TransactionResponse = await this.contract.getFunction(
-        functionSignature
-      )(formattedBaseParams, formattedSymbioticParams, options ?? {});
-
-      // console.log("Transaction sent, waiting for confirmation...");
-      // console.log("Transaction hash:", tx.hash);
-
-      return tx;
-    } catch (error: any) {
-      console.error("Error creating Symbiotic ERC20 vault:", error);
-
-      // Improve error messages for easier debugging
-      if (
-        error.code === "UNPREDICTABLE_GAS_LIMIT" ||
-        error.message.includes("eth_estimateGas")
-      ) {
-        console.error("Gas estimation error. This may be due to:");
-        console.error("1. Incorrect or invalid parameters");
-        console.error("2. Insufficient balance to pay transaction fees");
-        console.error("3. Contract issue");
-
-        // Check balances if possible
-        try {
-          const address = await this.signer.getAddress();
-          const balance = await this.provider.getBalance(address);
-          console.log(
-            `Balance of account ${address}: ${ethers.formatEther(balance)} ETH`
-          );
-        } catch (balanceError) {
-          console.error("Unable to check balance:", balanceError);
-        }
-      }
-
-      console.error(
-        "Function signatures available:",
-        Object.keys(this.contract.interface.fragments)
-          .filter((f) => f.includes("createSymByzVault"))
-          .join("\n")
-      );
-
-      throw error;
-    }
+    return createSymbioticERC20Vault(this.contract, params, options);
   }
 
   /**
@@ -316,123 +156,496 @@ export class ByzantineFactoryClient {
       throw new Error("Signer is required for this operation");
     }
 
-    // SuperVault not yet implemented in the contract
-    throw new Error(
-      "SuperVault ERC20 creation is not yet available in the contract"
+    return createSuperVaultERC20(this.contract, params, options);
+  }
+
+  /**
+   * Get a vault contract instance
+   * @param vaultAddress The address of the vault
+   * @returns Vault contract instance
+   */
+  getVaultContract(vaultAddress: string): ethers.Contract {
+    return new ethers.Contract(
+      vaultAddress,
+      ERC20_VAULT_ABI,
+      this.signer || this.provider
+    );
+  }
+
+  // ===========================
+  // Staker Functions
+  // ===========================
+
+  /**
+   * Get the asset address of a vault
+   * @param vaultAddress The address of the vault
+   * @returns The asset address
+   */
+  async getVaultAsset(vaultAddress: string): Promise<string> {
+    const vaultContract = this.getVaultContract(vaultAddress);
+    return await stakerFunctions.getVaultAsset(vaultContract);
+  }
+
+  /**
+   * Get the balance of assets in a user's wallet
+   * @param assetAddress The address of the asset
+   * @param userAddress The address of the user
+   * @returns The user's wallet balance
+   */
+  async getUserWalletBalance(
+    assetAddress: string,
+    userAddress: string
+  ): Promise<bigint> {
+    return await stakerFunctions.getUserWalletBalance(
+      this.provider,
+      assetAddress,
+      userAddress
     );
   }
 
   /**
-   * Format base parameters to match the contract's expected format
-   * @param params Base parameters
-   * @returns Formatted parameters
+   * Get the balance of a user in a vault
+   * @param vaultAddress The address of the vault
+   * @param userAddress The address of the user
+   * @returns The user's vault balance
    */
-  private formatBaseParams(params: BaseParams) {
-    return {
-      token: params.token_address,
-      roleManager: params.role_manager,
-      versionManager: params.role_version_manager,
-      depositWhitelistManager: params.role_deposit_whitelist_manager,
-      depositLimitManager: params.role_deposit_limit_manager,
-      curatorFeeClaimer: params.role_curator_fee_claimer,
-      curatorFeeClaimerRoleAdmin: params.role_curator_fee_claimer_admin,
-      curatorFee: params.curator_fee,
-      depositLimit: params.deposit_limit,
-      isDepositLimit: params.is_deposit_limit,
-      isPrivateVault: params.is_private,
-      isTokenized: params.is_tokenized,
-      name: params.name,
-      symbol: params.token_symbol,
-      metadataURI: params.description || "",
-    };
+  async getUserVaultBalance(
+    vaultAddress: string,
+    userAddress: string
+  ): Promise<bigint> {
+    const vaultContract = this.getVaultContract(vaultAddress);
+    return await stakerFunctions.getUserVaultBalance(
+      vaultContract,
+      userAddress
+    );
   }
 
   /**
-   * Format native parameters to match the contract's expected format
-   * @param params Native parameters
-   * @returns Formatted parameters
+   * Get the total value locked in a vault
+   * @param vaultAddress The address of the vault
+   * @returns The total value locked
    */
-  private formatNativeParams(params: NativeParams) {
-    return {
-      byzVaultParams: this.formatBaseParams(params.byzVaultParams),
-      operatorId: params.operator_id,
-      validatorManagers: params.roles_validator_manager,
-    };
+  async getVaultTVL(vaultAddress: string): Promise<bigint> {
+    const vaultContract = this.getVaultContract(vaultAddress);
+    return await stakerFunctions.getVaultTVL(this.provider, vaultContract);
   }
 
   /**
-   * Format Eigenlayer parameters to match the contract's expected format
-   * @param params Eigenlayer parameters
-   * @returns Formatted parameters
+   * Get the allowance of a user for a vault
+   * @param assetAddress The address of the asset
+   * @param userAddress The address of the user
+   * @param vaultAddress The address of the vault
+   * @returns The user's allowance
    */
-  private formatEigenParams(params: EigenlayerParams) {
-    // Get the signature and expiry from approver_signature_and_expiry if it exists
-    const signature = params.approver_signature_and_expiry?.signature || "0x";
-    const expiry = params.approver_signature_and_expiry?.expiry || 0;
-
-    // Get the salt from approver_salt if it exists
-    const salt =
-      params.approver_salt ||
-      "0x0000000000000000000000000000000000000000000000000000000000000000";
-
-    // Implement parameter formatting logic to match contract expectations
-    return {
-      delegationSetRoleHolder: params.delegation_set_role_holder,
-      operator: params.operator,
-      approverSignatureAndExpiry: {
-        signature: signature,
-        expiry: expiry,
-      },
-      approverSalt: salt,
-    };
+  async getUserAllowance(
+    assetAddress: string,
+    userAddress: string,
+    vaultAddress: string
+  ): Promise<bigint> {
+    return await stakerFunctions.getUserAllowance(
+      this.provider,
+      assetAddress,
+      userAddress,
+      vaultAddress
+    );
   }
 
   /**
-   * Format EigenPod parameters to match the contract's expected format
-   * @param params EigenPod parameters
-   * @returns Formatted parameters
+   * Approve a vault to spend user's tokens
+   * @param assetAddress The address of the asset
+   * @param vaultAddress The address of the vault
+   * @param amount The amount to approve
+   * @returns Transaction response
    */
-  private formatEigenPodParams(params: EigenpodParams) {
-    return {
-      eigenPodOwner: params.eigen_pod_owner,
-      proofSubmitter: params.proof_submitter,
-    };
+  async approveVault(
+    assetAddress: string,
+    vaultAddress: string,
+    amount: bigint
+  ): Promise<TransactionResponse> {
+    if (!this.signer) {
+      throw new Error("Signer is required for this operation");
+    }
+    return await stakerFunctions.approveVault(
+      this.signer,
+      assetAddress,
+      vaultAddress,
+      amount
+    );
   }
 
   /**
-   * Format Symbiotic parameters to match the contract's expected format
-   * @param params Symbiotic parameters
-   * @returns Formatted parameters
+   * Deposit assets into a vault
+   * @param vaultAddress The address of the vault
+   * @param amount The amount to deposit
+   * @param autoApprove Whether to automatically approve if needed
+   * @returns Transaction response
    */
-  private formatSymbioticParams(params: SymbioticParams) {
-    return {
-      burnerParams: {
-        owner: params.role_burner_owner_burner,
-        delay: params.burner_delay_settings_applied,
-        globalReceiver: params.burner_global_receiver,
-        networkReceivers: params.burner_network_receiver || [], // Use provided array or empty array as fallback
-        operatorNetworkReceivers: params.burner_operator_network_receiver || [], // Use provided array or empty array as fallback
-      },
-      vaultParams: {
-        owner: params.role_burner_owner_burner, // Assuming this is the vault owner
-        version: params.vault_version,
-        epochDuration: params.vault_epoch_duration,
-      },
-      delegatorParams: {
-        delegatorType: params.delegator_type,
-        hook: params.delegator_hook,
-        hookSetRoleHolder: params.role_delegator_set_hook,
-        networkLimitSetRoleHolders: params.role_delegator_set_network_limit,
-        operatorNetworkLimitOrSharesSetRoleHolders:
-          params.role_delegator_set_operator_network_limit,
-        operator: params.delegator_operator,
-        network: params.delegator_network,
-      },
-      slasherParams: {
-        slasherType: params.slasher_type,
-        vetoDuration: params.slasher_veto_duration,
-        resolverSetEpochsDelay: params.slasher_number_epoch_to_set_delay,
-      },
-    };
+  async depositToVault(
+    vaultAddress: string,
+    amount: bigint,
+    autoApprove: boolean = true
+  ): Promise<TransactionResponse> {
+    if (!this.signer) {
+      throw new Error("Signer is required for this operation");
+    }
+    const vaultContract = this.getVaultContract(vaultAddress);
+    return await stakerFunctions.depositToVault(
+      this.signer,
+      vaultContract,
+      amount,
+      autoApprove
+    );
+  }
+
+  /**
+   * Withdraw assets from a vault
+   * @param vaultAddress The address of the vault
+   * @param assets The amount of assets to withdraw
+   * @returns Transaction response
+   */
+  async withdrawFromVault(
+    vaultAddress: string,
+    assets: bigint
+  ): Promise<TransactionResponse> {
+    if (!this.signer) {
+      throw new Error("Signer is required for this operation");
+    }
+    const vaultContract = this.getVaultContract(vaultAddress);
+    return await stakerFunctions.withdrawFromVault(
+      this.signer,
+      vaultContract,
+      assets
+    );
+  }
+
+  /**
+   * Redeem shares from a vault
+   * @param vaultAddress The address of the vault
+   * @param shares The amount of shares to redeem
+   * @returns Transaction response
+   */
+  async redeemSharesFromVault(
+    vaultAddress: string,
+    shares: bigint
+  ): Promise<TransactionResponse> {
+    if (!this.signer) {
+      throw new Error("Signer is required for this operation");
+    }
+    const vaultContract = this.getVaultContract(vaultAddress);
+    return await stakerFunctions.redeemSharesFromVault(
+      this.signer,
+      vaultContract,
+      shares
+    );
+  }
+
+  /**
+   * Complete a withdrawal request
+   * @param vaultAddress The address of the vault
+   * @param requestId The ID of the withdrawal request
+   * @returns Transaction response
+   */
+  async completeWithdrawal(
+    vaultAddress: string,
+    requestId: string
+  ): Promise<TransactionResponse> {
+    if (!this.signer) {
+      throw new Error("Signer is required for this operation");
+    }
+    const vaultContract = this.getVaultContract(vaultAddress);
+    return await stakerFunctions.completeWithdrawal(
+      this.signer,
+      vaultContract,
+      requestId
+    );
+  }
+
+  // ===========================
+  // Curator Functions
+  // ===========================
+
+  // Whitelist Management
+
+  /**
+   * Check if an address is whitelisted for a vault
+   * @param vaultAddress The address of the vault
+   * @param address The address to check
+   * @returns True if the address is whitelisted
+   */
+  async isAddressWhitelisted(
+    vaultAddress: string,
+    address: string
+  ): Promise<boolean> {
+    const vaultContract = this.getVaultContract(vaultAddress);
+    return await curatorFunctions.isAddressWhitelisted(vaultContract, address);
+  }
+
+  /**
+   * Check if a vault is private
+   * @param vaultAddress The address of the vault
+   * @returns True if the vault is private
+   */
+  async isVaultPrivate(vaultAddress: string): Promise<boolean> {
+    const vaultContract = this.getVaultContract(vaultAddress);
+    return await curatorFunctions.isVaultPrivate(vaultContract);
+  }
+
+  /**
+   * Set whitelist status for multiple addresses
+   * @param vaultAddress The address of the vault
+   * @param addresses The addresses to update
+   * @param canDeposit Whether the addresses can deposit
+   * @returns Transaction response
+   */
+  async setAddressesWhitelistStatus(
+    vaultAddress: string,
+    addresses: string[],
+    canDeposit: boolean
+  ): Promise<TransactionResponse> {
+    if (!this.signer) {
+      throw new Error("Signer is required for this operation");
+    }
+    const vaultContract = this.getVaultContract(vaultAddress);
+    return await curatorFunctions.setAddressesWhitelistStatus(
+      this.signer,
+      vaultContract,
+      addresses,
+      canDeposit
+    );
+  }
+
+  /**
+   * Set the private status of a vault
+   * @param vaultAddress The address of the vault
+   * @param isPrivate Whether the vault should be private
+   * @returns Transaction response
+   */
+  async setVaultPrivateStatus(
+    vaultAddress: string,
+    isPrivate: boolean
+  ): Promise<TransactionResponse> {
+    if (!this.signer) {
+      throw new Error("Signer is required for this operation");
+    }
+    const vaultContract = this.getVaultContract(vaultAddress);
+    return await curatorFunctions.setVaultPrivateStatus(
+      this.signer,
+      vaultContract,
+      isPrivate
+    );
+  }
+
+  // Deposit Limit Management
+
+  /**
+   * Get the deposit limit of a vault
+   * @param vaultAddress The address of the vault
+   * @returns The deposit limit
+   */
+  async getVaultDepositLimit(vaultAddress: string): Promise<bigint> {
+    const vaultContract = this.getVaultContract(vaultAddress);
+    return await curatorFunctions.getVaultDepositLimit(vaultContract);
+  }
+
+  /**
+   * Check if a vault has a deposit limit enabled
+   * @param vaultAddress The address of the vault
+   * @returns True if the vault has a deposit limit
+   */
+  async isDepositLimitEnabled(vaultAddress: string): Promise<boolean> {
+    const vaultContract = this.getVaultContract(vaultAddress);
+    return await curatorFunctions.isDepositLimitEnabled(vaultContract);
+  }
+
+  /**
+   * Set the deposit limit for a vault
+   * @param vaultAddress The address of the vault
+   * @param limit The new deposit limit
+   * @returns Transaction response
+   */
+  async setVaultDepositLimit(
+    vaultAddress: string,
+    limit: bigint
+  ): Promise<TransactionResponse> {
+    if (!this.signer) {
+      throw new Error("Signer is required for this operation");
+    }
+    const vaultContract = this.getVaultContract(vaultAddress);
+    return await curatorFunctions.setVaultDepositLimit(
+      this.signer,
+      vaultContract,
+      limit
+    );
+  }
+
+  /**
+   * Enable or disable deposit limits for a vault
+   * @param vaultAddress The address of the vault
+   * @param enabled Whether deposit limits should be enabled
+   * @returns Transaction response
+   */
+  async setDepositLimitStatus(
+    vaultAddress: string,
+    enabled: boolean
+  ): Promise<TransactionResponse> {
+    if (!this.signer) {
+      throw new Error("Signer is required for this operation");
+    }
+    const vaultContract = this.getVaultContract(vaultAddress);
+    return await curatorFunctions.setDepositLimitStatus(
+      this.signer,
+      vaultContract,
+      enabled
+    );
+  }
+
+  // Metadata Management
+
+  /**
+   * Get the metadata URI of a vault
+   * @param vaultAddress The address of the vault
+   * @returns The metadata URI
+   */
+  async getVaultMetadataURI(vaultAddress: string): Promise<string> {
+    const vaultContract = this.getVaultContract(vaultAddress);
+    return await curatorFunctions.getVaultMetadataURI(vaultContract);
+  }
+
+  /**
+   * Update the metadata URI of a vault
+   * @param vaultAddress The address of the vault
+   * @param metadataURI The new metadata URI
+   * @returns Transaction response
+   */
+  async updateVaultMetadataURI(
+    vaultAddress: string,
+    metadataURI: string
+  ): Promise<TransactionResponse> {
+    if (!this.signer) {
+      throw new Error("Signer is required for this operation");
+    }
+    const vaultContract = this.getVaultContract(vaultAddress);
+    return await curatorFunctions.updateVaultMetadataURI(
+      this.signer,
+      vaultContract,
+      metadataURI
+    );
+  }
+
+  // Fee Management
+
+  /**
+   * Get the fee percentage of a vault
+   * @param vaultAddress The address of the vault
+   * @returns The fee percentage
+   */
+  async getVaultFeePercentage(vaultAddress: string): Promise<bigint> {
+    const vaultContract = this.getVaultContract(vaultAddress);
+    return await curatorFunctions.getVaultFeePercentage(vaultContract);
+  }
+
+  /**
+   * Get the unclaimed fees of a vault
+   * @param vaultAddress The address of the vault
+   * @returns The unclaimed fees
+   */
+  async getUnclaimedFees(vaultAddress: string): Promise<bigint> {
+    const vaultContract = this.getVaultContract(vaultAddress);
+    return await curatorFunctions.getUnclaimedFees(vaultContract);
+  }
+
+  /**
+   * Set the fee percentage for a vault
+   * @param vaultAddress The address of the vault
+   * @param feePercentage The new fee percentage
+   * @returns Transaction response
+   */
+  async setVaultFeePercentage(
+    vaultAddress: string,
+    feePercentage: bigint
+  ): Promise<TransactionResponse> {
+    if (!this.signer) {
+      throw new Error("Signer is required for this operation");
+    }
+    const vaultContract = this.getVaultContract(vaultAddress);
+    return await curatorFunctions.setVaultFeePercentage(
+      this.signer,
+      vaultContract,
+      feePercentage
+    );
+  }
+
+  /**
+   * Claim the fees from a vault
+   * @param vaultAddress The address of the vault
+   * @returns Transaction response
+   */
+  async claimVaultFees(vaultAddress: string): Promise<TransactionResponse> {
+    if (!this.signer) {
+      throw new Error("Signer is required for this operation");
+    }
+    const vaultContract = this.getVaultContract(vaultAddress);
+    return await curatorFunctions.claimVaultFees(this.signer, vaultContract);
+  }
+
+  // SuperVault Management
+
+  /**
+   * Get the distribution ratio of a supervault
+   * @param supervaultAddress The address of the supervault
+   * @returns The distribution ratio
+   */
+  async getDistributionRatio(supervaultAddress: string): Promise<bigint> {
+    const supervaultContract = this.getVaultContract(supervaultAddress);
+    return await curatorFunctions.getDistributionRatio(supervaultContract);
+  }
+
+  /**
+   * Get the underlying vaults of a supervault
+   * @param supervaultAddress The address of the supervault
+   * @returns The underlying vault addresses
+   */
+  async getUnderlyingVaults(supervaultAddress: string): Promise<string[]> {
+    const supervaultContract = this.getVaultContract(supervaultAddress);
+    return await curatorFunctions.getUnderlyingVaults(supervaultContract);
+  }
+
+  /**
+   * Update the distribution ratio of a supervault
+   * @param supervaultAddress The address of the supervault
+   * @param ratio The new distribution ratio
+   * @returns Transaction response
+   */
+  async updateDistributionRatio(
+    supervaultAddress: string,
+    ratio: bigint
+  ): Promise<TransactionResponse> {
+    if (!this.signer) {
+      throw new Error("Signer is required for this operation");
+    }
+    const supervaultContract = this.getVaultContract(supervaultAddress);
+    return await curatorFunctions.updateDistributionRatio(
+      this.signer,
+      supervaultContract,
+      ratio
+    );
+  }
+
+  /**
+   * Force a rebalance of a supervault
+   * @param supervaultAddress The address of the supervault
+   * @returns Transaction response
+   */
+  async forceRebalance(
+    supervaultAddress: string
+  ): Promise<TransactionResponse> {
+    if (!this.signer) {
+      throw new Error("Signer is required for this operation");
+    }
+    const supervaultContract = this.getVaultContract(supervaultAddress);
+    return await curatorFunctions.forceRebalance(
+      this.signer,
+      supervaultContract
+    );
   }
 }
