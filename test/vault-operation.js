@@ -12,7 +12,8 @@
  * 4. Curator Functions - Tests administrative operations like:
  *    - Deposit limit management
  *    - Whitelist management
- * 5. Cleanup - Withdraws all funds from the vault at the end of testing
+ * 5. Shares Information - Tests shares token properties and conversion functions
+ * 6. Cleanup - Withdraws all funds from the vault at the end of testing
  */
 
 const { ethers } = require("ethers");
@@ -99,7 +100,7 @@ async function runTests() {
   assert(client !== undefined, "Client initialization");
 
   // Test vault and asset addresses
-  const VAULT_ADDRESS = "0x356263fb24dd67ccb4f1012ac8562e3dc23f982c";
+  const VAULT_ADDRESS = "0x76839669C3A4b4542Fc07619255d04CD2e8c14db";
   const ASSET_ADDRESS = networkConfig.stETHAddress;
 
   console.log("Network:", networkConfig.name, `(Chain ID: ${chainId})`);
@@ -516,6 +517,81 @@ async function runTests() {
         logResult("Whitelist removal verification", !isWhitelisted2, "");
       }
     }
+
+    // =============================================
+    // Test shares functions
+    // =============================================
+    logTitle("Shares Information");
+
+    // Check if the vault's shares are tokenized
+    const isTokenized = await client.isSharesTokenized(VAULT_ADDRESS);
+    logResult("Shares are tokenized", true, isTokenized.toString());
+
+    // Get shares token name and symbol
+    const sharesName = await client.getSharesName(VAULT_ADDRESS);
+    const sharesSymbol = await client.getSharesSymbol(VAULT_ADDRESS);
+    logResult("Shares token name", true, sharesName);
+    logResult("Shares token symbol", true, sharesSymbol);
+
+    // Get total supply of shares
+    const totalShares = await client.getTotalShares(VAULT_ADDRESS);
+    logResult(
+      "Total shares supply",
+      true,
+      ethers.formatEther(totalShares) + " shares"
+    );
+
+    // Get user's shares balance
+    const userShares = await client.getSharesBalance(
+      VAULT_ADDRESS,
+      userAddress
+    );
+    logResult(
+      "User shares balance",
+      true,
+      ethers.formatEther(userShares) + " shares"
+    );
+
+    // Test conversion between assets and shares
+    const testAmount = ethers.parseEther("1.0");
+    const sharesAmount = await client.convertToShares(
+      VAULT_ADDRESS,
+      testAmount
+    );
+    logResult(
+      "1 token converts to",
+      true,
+      ethers.formatEther(sharesAmount) + " shares"
+    );
+
+    const assetsAmount = await client.convertToAssets(
+      VAULT_ADDRESS,
+      sharesAmount
+    );
+    const conversionDiff =
+      (Number(ethers.formatEther(assetsAmount)) /
+        Number(ethers.formatEther(testAmount)) -
+        1) *
+      100;
+    logResult(
+      "Conversion roundtrip difference",
+      Math.abs(conversionDiff) < 0.1, // Less than 0.1% difference
+      conversionDiff.toFixed(6) + "%"
+    );
+
+    // Verify that user's shares balance matches the vault balance function
+    const userVaultShares = await client.getUserVaultBalance(
+      VAULT_ADDRESS,
+      userAddress
+    );
+    const sharesMatch = userShares.toString() === userVaultShares.toString();
+    logResult(
+      "Shares balance consistency check",
+      sharesMatch,
+      `${ethers.formatEther(userShares)} = ${ethers.formatEther(
+        userVaultShares
+      )}`
+    );
 
     // =============================================
     // Withdraw all funds and clean up

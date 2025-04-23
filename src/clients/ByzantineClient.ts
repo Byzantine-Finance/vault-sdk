@@ -40,6 +40,9 @@ import * as stakerFunctions from "./staker";
 // Import curator functions
 import * as curatorFunctions from "./curators";
 
+// Import shares vault functions
+import * as sharesVaultFunctions from "./curators/SharesVault";
+
 export class ByzantineClient {
   private provider: ethers.Provider;
   private signer?: ethers.Signer;
@@ -647,5 +650,88 @@ export class ByzantineClient {
       this.signer,
       supervaultContract
     );
+  }
+
+  // ===========================
+  // Shares Functions
+  // ===========================
+
+  /**
+   * Check if the vault's shares are tokenized
+   * @param vaultAddress The address of the vault
+   * @returns True if shares can be transferred like ERC20 tokens
+   */
+  async isSharesTokenized(vaultAddress: string): Promise<boolean> {
+    const vaultContract = this.getVaultContract(vaultAddress);
+    return await sharesVaultFunctions.isTokenized(vaultContract);
+  }
+
+  /**
+   * Get the name of the vault share token
+   * @param vaultAddress The address of the vault
+   * @returns The name of the share token
+   */
+  async getSharesName(vaultAddress: string): Promise<string> {
+    const vaultContract = this.getVaultContract(vaultAddress);
+    return await sharesVaultFunctions.getSharesName(vaultContract);
+  }
+
+  /**
+   * Get the symbol of the vault share token
+   * @param vaultAddress The address of the vault
+   * @returns The symbol of the share token
+   */
+  async getSharesSymbol(vaultAddress: string): Promise<string> {
+    const vaultContract = this.getVaultContract(vaultAddress);
+    return await sharesVaultFunctions.getSharesSymbol(vaultContract);
+  }
+
+  /**
+   * Get the total supply of vault shares
+   * @param vaultAddress The address of the vault
+   * @returns The total supply of shares
+   */
+  async getTotalShares(vaultAddress: string): Promise<bigint> {
+    const vaultContract = this.getVaultContract(vaultAddress);
+    return await sharesVaultFunctions.getTotalShares(vaultContract);
+  }
+
+  /**
+   * Get the balance of shares for a specific address
+   * @param vaultAddress The address of the vault
+   * @param userAddress The address to check balance for
+   * @returns The balance of shares for the address
+   */
+  async getSharesBalance(
+    vaultAddress: string,
+    userAddress: string
+  ): Promise<bigint> {
+    const vaultContract = this.getVaultContract(vaultAddress);
+    return await sharesVaultFunctions.getSharesBalance(
+      vaultContract,
+      userAddress
+    );
+  }
+
+  /**
+   * Convert a given amount of assets to shares
+   * @param vaultAddress The address of the vault
+   * @param assets The amount of assets to convert
+   * @returns The equivalent amount of shares
+   */
+  async convertToShares(vaultAddress: string, assets: bigint): Promise<bigint> {
+    const vaultContract = this.getVaultContract(vaultAddress);
+    return await sharesVaultFunctions.convertToShares(vaultContract, assets);
+  }
+
+  /**
+   * Convert a given amount of shares to assets
+   * @param vaultAddress The address of the vault
+   * @param shares The amount of shares to convert
+   * @returns The equivalent amount of assets
+   */
+  async convertToAssets(vaultAddress: string, shares: bigint): Promise<bigint> {
+    const vaultContract = this.getVaultContract(vaultAddress);
+    return await sharesVaultFunctions.convertToAssets(vaultContract, shares);
   }
 }
