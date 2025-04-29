@@ -133,66 +133,41 @@ export const BYZANTINE_FACTORY_ABI = [
     name: "createEigenByzVault",
     inputs: [
       {
-        name: "_nativeByzVaultParams",
+        name: "_byzVaultParams",
         type: "tuple",
-        internalType: "struct IByzantineFactory.NativeByzVaultParams",
+        internalType: "struct IByzantineFactory.ByzVaultParams",
         components: [
+          { name: "token", type: "address", internalType: "contract IERC20" },
+          { name: "roleManager", type: "address", internalType: "address" },
+          { name: "versionManager", type: "address", internalType: "address" },
           {
-            name: "byzVaultParams",
-            type: "tuple",
-            internalType: "struct IByzantineFactory.ByzVaultParams",
-            components: [
-              {
-                name: "token",
-                type: "address",
-                internalType: "contract IERC20",
-              },
-              { name: "roleManager", type: "address", internalType: "address" },
-              {
-                name: "versionManager",
-                type: "address",
-                internalType: "address",
-              },
-              {
-                name: "depositWhitelistManager",
-                type: "address",
-                internalType: "address",
-              },
-              {
-                name: "depositLimitManager",
-                type: "address",
-                internalType: "address",
-              },
-              {
-                name: "curatorFeeClaimer",
-                type: "address",
-                internalType: "address",
-              },
-              {
-                name: "curatorFeeClaimerRoleAdmin",
-                type: "address",
-                internalType: "address",
-              },
-              { name: "curatorFee", type: "uint256", internalType: "uint256" },
-              {
-                name: "depositLimit",
-                type: "uint256",
-                internalType: "uint256",
-              },
-              { name: "isDepositLimit", type: "bool", internalType: "bool" },
-              { name: "isPrivateVault", type: "bool", internalType: "bool" },
-              { name: "isTokenized", type: "bool", internalType: "bool" },
-              { name: "name", type: "string", internalType: "string" },
-              { name: "symbol", type: "string", internalType: "string" },
-              { name: "metadataURI", type: "string", internalType: "string" },
-            ],
+            name: "depositWhitelistManager",
+            type: "address",
+            internalType: "address",
           },
-          { name: "operatorId", type: "bytes32", internalType: "bytes32" },
           {
-            name: "validatorManagers",
-            type: "address[]",
-            internalType: "address[]",
+            name: "depositLimitManager",
+            type: "address",
+            internalType: "address",
           },
+          {
+            name: "curatorFeeClaimer",
+            type: "address",
+            internalType: "address",
+          },
+          {
+            name: "curatorFeeClaimerRoleAdmin",
+            type: "address",
+            internalType: "address",
+          },
+          { name: "curatorFee", type: "uint256", internalType: "uint256" },
+          { name: "depositLimit", type: "uint256", internalType: "uint256" },
+          { name: "isDepositLimit", type: "bool", internalType: "bool" },
+          { name: "isPrivateVault", type: "bool", internalType: "bool" },
+          { name: "isTokenized", type: "bool", internalType: "bool" },
+          { name: "name", type: "string", internalType: "string" },
+          { name: "symbol", type: "string", internalType: "string" },
+          { name: "metadataURI", type: "string", internalType: "string" },
         ],
       },
       {
@@ -217,15 +192,6 @@ export const BYZANTINE_FACTORY_ABI = [
             ],
           },
           { name: "approverSalt", type: "bytes32", internalType: "bytes32" },
-        ],
-      },
-      {
-        name: "_eigenPodParams",
-        type: "tuple",
-        internalType: "struct IByzantineFactory.EigenPodParams",
-        components: [
-          { name: "eigenPodOwner", type: "address", internalType: "address" },
-          { name: "proofSubmitter", type: "address", internalType: "address" },
         ],
       },
     ],
@@ -294,21 +260,6 @@ export const BYZANTINE_FACTORY_ABI = [
             ],
           },
           { name: "symRatio", type: "uint256", internalType: "uint256" },
-          {
-            name: "symVault",
-            type: "address",
-            internalType: "contract IVault",
-          },
-          {
-            name: "delegationManager",
-            type: "address",
-            internalType: "contract IDelegationManager",
-          },
-          {
-            name: "strategyManager",
-            type: "address",
-            internalType: "contract IStrategyManager",
-          },
           {
             name: "eigenParams",
             type: "tuple",
@@ -401,7 +352,6 @@ export const BYZANTINE_FACTORY_ABI = [
                 type: "tuple",
                 internalType: "struct IByzantineFactory.VaultParams",
                 components: [
-                  { name: "owner", type: "address", internalType: "address" },
                   { name: "version", type: "uint64", internalType: "uint64" },
                   {
                     name: "epochDuration",
@@ -468,21 +418,7 @@ export const BYZANTINE_FACTORY_ABI = [
               },
             ],
           },
-          {
-            name: "byzantineFactory",
-            type: "address",
-            internalType: "contract IByzantineFactory",
-          },
-          {
-            name: "symVaultBeacon",
-            type: "address",
-            internalType: "contract IBeacon",
-          },
-          {
-            name: "eigenVaultBeacon",
-            type: "address",
-            internalType: "contract IBeacon",
-          },
+          { name: "curator", type: "address", internalType: "address" },
         ],
       },
     ],
@@ -586,7 +522,6 @@ export const BYZANTINE_FACTORY_ABI = [
             type: "tuple",
             internalType: "struct IByzantineFactory.VaultParams",
             components: [
-              { name: "owner", type: "address", internalType: "address" },
               { name: "version", type: "uint64", internalType: "uint64" },
               { name: "epochDuration", type: "uint48", internalType: "uint48" },
             ],
@@ -769,7 +704,6 @@ export const BYZANTINE_FACTORY_ABI = [
             type: "tuple",
             internalType: "struct IByzantineFactory.VaultParams",
             components: [
-              { name: "owner", type: "address", internalType: "address" },
               { name: "version", type: "uint64", internalType: "uint64" },
               { name: "epochDuration", type: "uint48", internalType: "uint48" },
             ],
@@ -1038,47 +972,6 @@ export const BYZANTINE_FACTORY_ABI = [
   },
   {
     type: "event",
-    name: "SymBurnerRouter",
-    inputs: [
-      {
-        name: "owner",
-        type: "address",
-        indexed: false,
-        internalType: "address",
-      },
-      { name: "delay", type: "uint48", indexed: false, internalType: "uint48" },
-      {
-        name: "globalReceiver",
-        type: "address",
-        indexed: false,
-        internalType: "address",
-      },
-      {
-        name: "networkReceivers",
-        type: "tuple[]",
-        indexed: false,
-        internalType: "struct IBurnerRouter.NetworkReceiver[]",
-        components: [
-          { name: "network", type: "address", internalType: "address" },
-          { name: "receiver", type: "address", internalType: "address" },
-        ],
-      },
-      {
-        name: "operatorNetworkReceivers",
-        type: "tuple[]",
-        indexed: false,
-        internalType: "struct IBurnerRouter.OperatorNetworkReceiver[]",
-        components: [
-          { name: "network", type: "address", internalType: "address" },
-          { name: "operator", type: "address", internalType: "address" },
-          { name: "receiver", type: "address", internalType: "address" },
-        ],
-      },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
     name: "SymByzVaultCreated",
     inputs: [
       {
@@ -1122,163 +1015,6 @@ export const BYZANTINE_FACTORY_ABI = [
         type: "address",
         indexed: false,
         internalType: "address",
-      },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
-    name: "SymHook",
-    inputs: [
-      {
-        name: "hook",
-        type: "address",
-        indexed: false,
-        internalType: "address",
-      },
-      {
-        name: "hookSetRoleHolder",
-        type: "address",
-        indexed: false,
-        internalType: "address",
-      },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
-    name: "SymInstantSlasher",
-    inputs: [
-      {
-        name: "slasherType",
-        type: "uint8",
-        indexed: false,
-        internalType: "enum IByzantineFactory.SlasherType",
-      },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
-    name: "SymNRFRDelegator",
-    inputs: [
-      {
-        name: "delegatorType",
-        type: "uint8",
-        indexed: false,
-        internalType: "enum IByzantineFactory.DelegatorType",
-      },
-      {
-        name: "networkLimitSetRoleHolders",
-        type: "address[]",
-        indexed: false,
-        internalType: "address[]",
-      },
-      {
-        name: "operatorNetworkLimitOrSharesSetRoleHolders",
-        type: "address[]",
-        indexed: false,
-        internalType: "address[]",
-      },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
-    name: "SymONSDelegator",
-    inputs: [
-      {
-        name: "delegatorType",
-        type: "uint8",
-        indexed: false,
-        internalType: "enum IByzantineFactory.DelegatorType",
-      },
-      {
-        name: "network",
-        type: "address",
-        indexed: false,
-        internalType: "address",
-      },
-      {
-        name: "operator",
-        type: "address",
-        indexed: false,
-        internalType: "address",
-      },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
-    name: "SymOSDelegator",
-    inputs: [
-      {
-        name: "delegatorType",
-        type: "uint8",
-        indexed: false,
-        internalType: "enum IByzantineFactory.DelegatorType",
-      },
-      {
-        name: "networkLimitSetRoleHolders",
-        type: "address[]",
-        indexed: false,
-        internalType: "address[]",
-      },
-      {
-        name: "operator",
-        type: "address",
-        indexed: false,
-        internalType: "address",
-      },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
-    name: "SymVault",
-    inputs: [
-      {
-        name: "symVaultOwner",
-        type: "address",
-        indexed: false,
-        internalType: "address",
-      },
-      {
-        name: "version",
-        type: "uint64",
-        indexed: false,
-        internalType: "uint64",
-      },
-      {
-        name: "epochDuration",
-        type: "uint48",
-        indexed: false,
-        internalType: "uint48",
-      },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
-    name: "SymVetoSlasher",
-    inputs: [
-      {
-        name: "slasherType",
-        type: "uint8",
-        indexed: false,
-        internalType: "enum IByzantineFactory.SlasherType",
-      },
-      {
-        name: "vetoDuration",
-        type: "uint48",
-        indexed: false,
-        internalType: "uint48",
-      },
-      {
-        name: "resolverSetEpochsDelay",
-        type: "uint256",
-        indexed: false,
-        internalType: "uint256",
       },
     ],
     anonymous: false,

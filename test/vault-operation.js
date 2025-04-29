@@ -100,7 +100,7 @@ async function runTests() {
   assert(client !== undefined, "Client initialization");
 
   // Test vault and asset addresses
-  const VAULT_ADDRESS = "0x76839669C3A4b4542Fc07619255d04CD2e8c14db";
+  const VAULT_ADDRESS = "0x1f7cc65ebd5afb3e85b32e5a8a6484afa7811510";
   const ASSET_ADDRESS = networkConfig.stETHAddress;
 
   console.log("Network:", networkConfig.name, `(Chain ID: ${chainId})`);
@@ -171,7 +171,7 @@ async function runTests() {
     logTitle("Deposit Functions");
 
     // Try to deposit a large amount (should fail)
-    const largeAmount = ethers.parseEther("100000000");
+    const largeAmount = ethers.parseEther("100");
     await assertThrows(async () => {
       await client.depositToVault(VAULT_ADDRESS, largeAmount, true);
     }, "Large deposit should fail");

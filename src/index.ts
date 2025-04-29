@@ -18,9 +18,3 @@ export * from "./clients/staker";
 export * from "./constants";
 export * from "./constants/networks";
 export * from "./constants/abis";
-
-// Export clients
-// export { ByzantineFactoryWagmiClient } from "./clients/ByzantineFactoryWagmiClient";
-
-// Export hooks for React disabled due to ESM compatibility issues
-// export * from "./hooks";

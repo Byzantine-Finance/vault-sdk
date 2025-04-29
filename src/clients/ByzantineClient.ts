@@ -17,7 +17,9 @@ import {
   EigenlayerVault,
   NativeEigenlayerVault,
   SymbioticVault,
+  SuperVault,
   ChainsOptions,
+  Metadata,
 } from "../types";
 import { getNetworkConfig } from "../constants/networks";
 import { BYZANTINE_FACTORY_ABI, ERC20_VAULT_ABI } from "../constants/abis";
@@ -32,6 +34,7 @@ import {
   createEigenlayerNativeVault,
   createSymbioticERC20Vault,
   createSuperVaultERC20,
+  setTokenToEigenStrategy,
 } from "./curators";
 
 // Import staker functions
@@ -152,7 +155,7 @@ export class ByzantineClient {
    * @returns Transaction response
    */
   async createSuperVaultERC20(
-    params: SymbioticVault,
+    params: SuperVault,
     options?: Partial<ethers.TransactionRequest>
   ): Promise<TransactionResponse> {
     if (!this.signer) {
@@ -160,6 +163,24 @@ export class ByzantineClient {
     }
 
     return createSuperVaultERC20(this.contract, params, options);
+  }
+
+  /**
+   * Set the token to Eigen strategy mapping
+   * @param tokens The array of ERC20 token addresses
+   * @param strategies The array of EigenLayer strategy addresses
+   * @param options Optional transaction options
+   * @returns Transaction response
+   */
+  async setTokenToEigenStrategy(
+    tokens: string[],
+    strategies: string[],
+    options?: Partial<ethers.TransactionRequest>
+  ): Promise<TransactionResponse> {
+    if (!this.signer) {
+      throw new Error("Signer is required for this operation");
+    }
+    return setTokenToEigenStrategy(this.contract, tokens, strategies, options);
   }
 
   /**
@@ -502,37 +523,101 @@ export class ByzantineClient {
     );
   }
 
-  // Metadata Management
+  // EigenLayer Functions
 
   /**
-   * Get the metadata URI of a vault
+   * Get the Eigen Operator of a vault
    * @param vaultAddress The address of the vault
-   * @returns The metadata URI
+   * @returns The Eigen Operator
    */
-  async getVaultMetadataURI(vaultAddress: string): Promise<string> {
+  async getEigenOperator(vaultAddress: string): Promise<string> {
     const vaultContract = this.getVaultContract(vaultAddress);
-    return await curatorFunctions.getVaultMetadataURI(vaultContract);
+    return await stakerFunctions.getEigenOperator(vaultContract);
   }
 
   /**
-   * Update the metadata URI of a vault
+   * Set the Eigen Operator of a vault
    * @param vaultAddress The address of the vault
-   * @param metadataURI The new metadata URI
+   * @param operator The new Eigen Operator
+   * @param approverSignatureAndExpiry The signature and expiry for the approver
+   * @param approverSalt The salt for the approver
+   * @param options Optional transaction parameters like gas limit, gas price, etc.
    * @returns Transaction response
    */
-  async updateVaultMetadataURI(
+  async setEigenOperator(
     vaultAddress: string,
-    metadataURI: string
+    operator: string,
+    approverSignatureAndExpiry: {
+      signature: string;
+      expiry: number;
+    },
+    approverSalt: string,
+    options?: Partial<ethers.TransactionRequest>
+  ): Promise<TransactionResponse> {
+    if (!this.signer) {
+      throw new Error("Signer is required for this operation");
+    }
+
+    const vaultContract = this.getVaultContract(vaultAddress);
+    return await stakerFunctions.setEigenOperator(
+      this.signer,
+      vaultContract,
+      operator,
+      approverSignatureAndExpiry,
+      approverSalt,
+      options
+    );
+  }
+
+  // Metadata Management
+
+  /**
+   * Get the metadata of a vault
+   * @param vaultAddress The address of the vault
+   * @returns The metadata object
+   *
+   * @example
+   * // Get vault metadata
+   * const metadata = await byzantineClient.getVaultMetadata("0x123...");
+   * console.log(metadata.name); // "My Vault"
+   * console.log(metadata.description); // "This is a description of my vault"
+   * console.log(metadata.image); // "https://example.com/image.png"
+   */
+  async getVaultMetadata(vaultAddress: string): Promise<Metadata> {
+    const vaultContract = this.getVaultContract(vaultAddress);
+    return await curatorFunctions.getVaultMetadata(vaultContract);
+  }
+
+  /**
+   * Update the metadata of a vault
+   * @param vaultAddress The address of the vault
+   * @param metadata The new metadata object
+   * @returns Transaction response
+   *
+   * @example
+   * // Update vault metadata
+   * const metadata = {
+   *   name: "My Vault",
+   *   description: "An updated description of my vault",
+   *   image: "https://example.com/new-image.png",
+   *   external_link: "https://myproject.com",
+   *   attributes: [
+   *     { trait_type: "Asset Type", value: "ETH" },
+   *     { trait_type: "Strategy", value: "Liquid Staking" }
+   *   ]
+   * };
+   * const tx = await byzantineClient.updateVaultMetadata("0x123...", metadata);
+   * await tx.wait();
+   */
+  async updateVaultMetadata(
+    vaultAddress: string,
+    metadata: Metadata
   ): Promise<TransactionResponse> {
     if (!this.signer) {
       throw new Error("Signer is required for this operation");
     }
     const vaultContract = this.getVaultContract(vaultAddress);
-    return await curatorFunctions.updateVaultMetadataURI(
-      this.signer,
-      vaultContract,
-      metadataURI
-    );
+    return await curatorFunctions.setMetadata(vaultContract, metadata);
   }
 
   // Fee Management

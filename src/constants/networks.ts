@@ -10,10 +10,11 @@ export const NETWORKS: Record<number, NetworkConfig> = {
   // Ethereum Mainnet
   1: {
     name: "Ethereum",
-    factoryContractAddress: "0x2439365bFd681354cc8BCc001a1893CF64e42768",
+    factoryContractAddress: "0x567d87C95d5c4A58Df5b5DffB1477F1ADFe37873",
     scanLink: "https://etherscan.io",
     stETHAddress: "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
     wstETHAddress: "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+    osETHAddress: "0xf1c9acdc66974dfb6decb12aa385b9cd01190e38",
     theGraphApiUrl: process.env.NEXT_PUBLIC_THEGRAPH_KEY
       ? `https://gateway.thegraph.com/api/${process.env.NEXT_PUBLIC_THEGRAPH_KEY}/subgraphs/id/qtx1zvMXM3doNdjbavnyhgmKNLQdeVDqVGNQTp6mVEW`
       : undefined,
@@ -21,10 +22,11 @@ export const NETWORKS: Record<number, NetworkConfig> = {
   // Holesky Testnet
   17000: {
     name: "Holesky",
-    factoryContractAddress: "0x2439365bFd681354cc8BCc001a1893CF64e42768",
+    factoryContractAddress: "0x567d87C95d5c4A58Df5b5DffB1477F1ADFe37873",
     scanLink: "https://holesky.etherscan.io",
     stETHAddress: "0x3F1c547b21f65e10480dE3ad8E19fAAC46C95034",
     wstETHAddress: "0x8d09a4502Cc8Cf1547aD300E066060D043f6982D",
+    osETHAddress: "0xF603c5A3F774F05d4D848A9bB139809790890864",
     theGraphApiUrl: process.env.NEXT_PUBLIC_THEGRAPH_KEY
       ? `https://gateway.thegraph.com/api/${process.env.NEXT_PUBLIC_THEGRAPH_KEY}/subgraphs/id/21P9dycN67dz821r26L6UzgsuKehRV4jiMEmH3GJLYyi`
       : undefined,

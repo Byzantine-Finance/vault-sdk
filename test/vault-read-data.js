@@ -91,7 +91,7 @@ async function runTests() {
 
   // Test vault addresses - add your own or use these examples
 
-  const VAULT_ADDRESS = "0x356263fb24dd67ccb4f1012ac8562e3dc23f982c";
+  const VAULT_ADDRESS = "0x1f7cc65ebd5afb3e85b32e5a8a6484afa7811510";
 
   console.log("Network:", networkConfig.name, `(Chain ID: ${chainId})`);
   console.log("User address:", userAddress);
@@ -105,6 +105,10 @@ async function runTests() {
     // Get vault asset address
     const assetAddress = await client.getVaultAsset(VAULT_ADDRESS);
     logResult("Vault asset address", true, assetAddress);
+
+    // Get Eigen Operator
+    // const eigenOperator = await client.getEigenOperator(VAULT_ADDRESS);
+    // logResult("Eigen Operator", true, eigenOperator);
 
     // Get vault TVL (Total Value Locked)
     const tvl = await client.getVaultTVL(VAULT_ADDRESS);

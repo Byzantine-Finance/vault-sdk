@@ -6,3 +6,4 @@
 
 export * from "./DepositVault";
 export * from "./WithdrawVault";
+export * from "./EigenLayer";

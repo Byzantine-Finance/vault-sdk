@@ -96,7 +96,7 @@ async function runTests() {
 
     // Define vault parameters
     const baseParams = {
-      name: "New Eigen stETH Vault",
+      name: "Eigen stETH Vault",
       description: "An Eigenlayer vault for stETH restaking",
 
       token_address: networkConfig.stETHAddress, // wstETH address
@@ -110,7 +110,7 @@ async function runTests() {
       token_name: "Byz2 stETH Vault",
       token_symbol: "bstETH",
 
-      curator_fee: 500, // 5% (500 basis points)
+      curator_fee: 400, // 4% (400 basis points)
 
       // Roles - replace with actual addresses in production
       role_manager: address,
@@ -124,7 +124,7 @@ async function runTests() {
     const eigenlayerParams = {
       // Eigenlayer specific params
       delegation_set_role_holder: address,
-      operator: "0xb564e795f9877b416cd1af86c98cf8d3d94d760d",
+      operator: "0xb564e795f9877b416cd1af86c98cf8d3d94d760d", // Staked
 
       approver_signature_and_expiry: {
         signature: "0x", // null signature

@@ -1,3 +1,5 @@
+// @ts-check
+
 /**
  * Test for creating a SuperVault ERC20 with Byzantine Factory SDK
  *
@@ -70,14 +72,16 @@ async function runTests() {
 
     // Test client initialization
     const provider = skipNetworkTests
-      ? {}
+      ? null
       : new ethers.JsonRpcProvider(RPC_URL);
 
     const wallet = skipNetworkTests
-      ? {}
-      : ethers.Wallet.fromPhrase(MNEMONIC).connect(provider);
+      ? null
+      : ethers.Wallet.fromPhrase(MNEMONIC || "").connect(provider);
 
-    const address = await wallet.getAddress();
+    const address = skipNetworkTests
+      ? "0x0000000000000000000000000000000000000000"
+      : await wallet.getAddress();
     logResult("Wallet address", true, address);
 
     const client = new ByzantineClient({
@@ -94,21 +98,21 @@ async function runTests() {
 
     // Define vault parameters
     const baseParams = {
-      name: "SuperVault USDC",
-      description: "A SuperVault for USDC with high yields",
+      name: "SuperVault osETH",
+      description: "A SuperVault for osETH with high yields",
 
-      token_address: networkConfig.wstETHAddress, // wstETH address
+      token_address: networkConfig.osETHAddress, // osETH address
 
       is_deposit_limit: true,
-      deposit_limit: ethers.parseUnits("1000000", 18), // 1M wstETH (18 decimals)
+      deposit_limit: ethers.parseUnits("1000000", 18), // 1M osETH (18 decimals)
 
-      is_private: true, // Private SuperVault
+      is_private: false, // Private SuperVault
 
       is_tokenized: true,
-      token_name: "Byzantine USDC SuperVault",
-      token_symbol: "bUSDCs",
+      token_name: "Byzantine osETH SuperVault",
+      token_symbol: "bsosETHs",
 
-      curator_fee: 1000, // 10% (1000 basis points)
+      curator_fee: 600, // 6% (600 basis points)
 
       // Roles - replace with actual addresses in production
       role_manager: address,
@@ -140,6 +144,22 @@ async function runTests() {
       role_burner_owner_burner: address,
     };
 
+    const eigenlayerParams = {
+      // Eigenlayer specific params
+      delegation_set_role_holder: address,
+      operator: "0xb564e795f9877b416cd1af86c98cf8d3d94d760d", // Blockshard
+
+      approver_signature_and_expiry: {
+        signature: "0x", // null signature
+        expiry: 0, // no expiry
+      },
+      approver_salt:
+        "0x0000000000000000000000000000000000000000000000000000000000000000", // null salt
+    };
+
+    const ratio = 50;
+    const curator = address;
+
     // Test parameter validation
     logResult("Parameter validation", true, "All parameters set correctly");
 
@@ -152,6 +172,9 @@ async function runTests() {
         const tx = await client.createSuperVaultERC20({
           base: baseParams,
           symbiotic: symbioticParams,
+          eigenlayer: eigenlayerParams,
+          ratio: ratio,
+          curator: curator,
         });
 
         console.log(`\nTransaction sent! Hash: ${tx.hash}`);
@@ -163,11 +186,11 @@ async function runTests() {
         logResult(
           "Vault creation",
           true,
-          `Gas used: ${receipt.gasUsed.toString()}`
+          `Gas used: ${receipt?.gasUsed.toString() || "unknown"}`
         );
 
         // Determine the vault address from the logs
-        const vaultAddress = receipt.logs[0].address; // Simplified - in production, parse the event properly
+        const vaultAddress = receipt?.logs?.[0]?.address || "unknown"; // Simplified - in production, parse the event properly
         console.log(`\nSuperVault created at address: ${vaultAddress}`);
         console.log(
           `Explorer link: ${

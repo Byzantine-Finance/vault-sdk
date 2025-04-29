@@ -45,26 +45,18 @@
     "test:eigen-native": "node test/create-eigen-native.js",
     "test:symbiotic-erc20": "node test/create-symbiotic-erc20.js",
     "test:supervault-erc20": "node test/create-supervault-erc20.js",
+    "test:vault-read-data": "ts-node test/vault-read-data.js",
     "test:vault-operation": "ts-node test/vault-operation.js",
-    "test:read-vault-data": "ts-node test/read-vault-data.js",
-    "example:eigen-erc20": "node examples/create-eigen-erc20.js",
-    "example:eigen-native": "node examples/create-eigen-native.js",
-    "example:symbiotic-erc20": "node examples/create-symbiotic-erc20.js",
-    "example:supervault-erc20": "node examples/create-supervault-erc20.js",
-    "example:get-wallet-keys": "node examples/get-wallet-keys.js",
-    "example:eigen-erc20-ts": "ts-node examples/create-eigen-erc20.ts",
-    "example:eigen-native-ts": "ts-node examples/create-eigen-native.ts",
-    "example:symbiotic-erc20-ts": "ts-node examples/create-symbiotic-erc20.ts"
+    "test:vault-metadata": "ts-node test/vault-metadata.js"
   },
   "dependencies": {
     "dotenv": "^16.5.0",
     "ethers": "^6.13.5",
-    "viem": "^2.27.0",
-    "wagmi": "^2.14.16"
+    "viem": "^2.27.0"
   },
   "devDependencies": {
     "@types/node": "^22.14.1",
-    "typescript": "^5.0.4",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.0.4"
   }
 }

@@ -16,7 +16,10 @@ import {
   EigenlayerParams,
   EigenpodParams,
   SymbioticParams,
+  SuperVault,
 } from "../../types";
+
+import { BYZANTINE_FACTORY_ABI } from "../../constants/abis";
 
 /**
  * Format base parameters to match the contract's expected format
@@ -110,7 +113,6 @@ export function formatSymbioticParams(params: SymbioticParams) {
       operatorNetworkReceivers: params.burner_operator_network_receiver || [], // Use provided array or empty array as fallback
     },
     vaultParams: {
-      owner: params.role_burner_owner_burner, // Assuming this is the vault owner
       version: params.vault_version,
       epochDuration: params.vault_epoch_duration,
     },
@@ -215,7 +217,7 @@ export async function createEigenlayerNativeVault(
 
     // Use an explicit function signature to avoid ambiguity
     const functionSignature =
-      "createEigenByzVault(((address,address,address,address,address,address,address,uint256,uint256,bool,bool,bool,string,string,string),bytes32,address[]),(address,address,(bytes,uint256),bytes32),(address,address))";
+      "createEigenByzVault(((address,address,address,address,address,address,address,uint256,uint256,bool,bool,bool,string,string,string),bytes32,address[]),(address,address,(bytes,uint256),bytes32),(address))";
 
     // Call the contract method to create an Eigenlayer Native vault with explicit function signature
     const tx: TransactionResponse = await contract.getFunction(
@@ -272,7 +274,7 @@ export async function createSymbioticERC20Vault(
 
     // Use an explicit function signature to avoid ambiguity
     const functionSignature =
-      "createSymByzVault((address,address,address,address,address,address,address,uint256,uint256,bool,bool,bool,string,string,string),((address,uint48,address,(address,address)[],(address,address,address)[]),(address,uint64,uint48),(uint8,address,address,address[],address[],address,address),(uint8,uint48,uint256)))";
+      "createSymByzVault((address,address,address,address,address,address,address,uint256,uint256,bool,bool,bool,string,string,string),((address,uint48,address,(address,address)[],(address,address,address)[]),(uint64,uint48),(uint8,address,address,address[],address[],address,address),(uint8,uint48,uint256)))";
 
     // Call with an alternative method that explicitly specifies the function to call
     const tx: TransactionResponse = await contract.getFunction(
@@ -307,11 +309,118 @@ export async function createSymbioticERC20Vault(
  */
 export async function createSuperVaultERC20(
   contract: ethers.Contract,
-  params: SymbioticVault,
+  params: SuperVault,
   options?: Partial<ethers.TransactionRequest>
 ): Promise<TransactionResponse> {
-  // SuperVault not yet implemented in the contract
-  throw new Error(
-    "SuperVault ERC20 creation is not yet available in the contract"
-  );
+  // Format parameters
+  const formattedBaseParams = formatBaseParams(params.base);
+  const formattedSymbioticParams = formatSymbioticParams(params.symbiotic);
+  const formattedEigenParams = formatEigenParams(params.eigenlayer);
+
+  try {
+    // Import gas limits from constants
+    const { GAS_LIMITS } = require("../../constants");
+
+    // Define transaction options
+    const txOptions = {
+      gasLimit: GAS_LIMITS.createSuperVaultERC20,
+      ...options,
+    };
+
+    // Create the SuperVaultParams structure according to the ABI
+    const superVaultParams = {
+      byzVaultParams: formattedBaseParams,
+      symRatio: params.ratio,
+      eigenParams: formattedEigenParams,
+      symParams: formattedSymbioticParams,
+      curator: params.curator,
+    };
+
+    console.log("superVaultParams", superVaultParams);
+
+    // Call the contract method directly with the structured params
+    const tx = await contract.createSuperERC20Vault(
+      superVaultParams,
+      txOptions
+    );
+
+    return tx;
+  } catch (error: any) {
+    console.error("Error creating SuperVault ERC20 vault:", error);
+
+    // Improve error messages for easier debugging
+    if (
+      error.code === "UNPREDICTABLE_GAS_LIMIT" ||
+      error.message.includes("eth_estimateGas")
+    ) {
+      console.error("Gas estimation error. This may be due to:");
+      console.error("1. Incorrect or invalid parameters");
+      console.error("2. Insufficient balance to pay transaction fees");
+      console.error("3. Contract issue");
+    }
+
+    throw error;
+  }
+}
+
+//
+// {
+//   type: "function",
+//   name: "setTokenToEigenStrategy",
+//   inputs: [
+//     { name: "_token", type: "address[]", internalType: "contract IERC20[]" },
+//     {
+//       name: "_strategy",
+//       type: "address[]",
+//       internalType: "contract IStrategy[]",
+//     },
+//   ],
+//   outputs: [],
+//   stateMutability: "nonpayable",
+// },
+
+/**
+ * Set the token to Eigen strategy mapping
+ * @param contract Byzantine Factory contract instance
+ * @param tokens The array of ERC20 token addresses
+ * @param strategies The array of EigenLayer strategy addresses
+ * @param options Optional transaction options
+ * @returns Transaction response
+ */
+export async function setTokenToEigenStrategy(
+  contract: ethers.Contract,
+  tokens: string[],
+  strategies: string[],
+  options?: Partial<ethers.TransactionRequest>
+): Promise<TransactionResponse> {
+  try {
+    //check if same length
+    if (tokens.length !== strategies.length) {
+      throw new Error(
+        "Tokens and strategies arrays must be of the same length"
+      );
+    }
+
+    // Import gas limits from constants
+    const { GAS_LIMITS } = require("../../constants");
+
+    // Define transaction options
+    const txOptions = {
+      gasLimit: GAS_LIMITS.setTokenToEigenStrategy,
+      ...options,
+    };
+
+    // Call the contract method directly with the structured params
+    const tx = await contract.setTokenToEigenStrategy(
+      tokens,
+      strategies,
+      txOptions
+    );
+
+    return tx;
+  } catch (error: any) {
+    console.error("Error setting token to Eigen strategy:", error);
+
+    throw error;
+  }
 }

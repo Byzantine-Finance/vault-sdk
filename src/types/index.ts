@@ -1,7 +1,6 @@
 // @ts-check
 
 import { Address, Hash, TransactionReceipt } from "viem";
-import { Config } from "wagmi";
 
 export type ChainsOptions = 1 | 17000;
 
@@ -11,6 +10,7 @@ export interface NetworkConfig {
   scanLink: string;
   stETHAddress: string;
   wstETHAddress: string;
+  osETHAddress: string;
   theGraphApiUrl?: string;
 }
 
@@ -19,17 +19,17 @@ export interface NetworkConfig {
  */
 export interface ByzantineClientOptions {
   chainId: ChainsOptions;
-  wagmiConfig?: Config;
   provider?: any; // For ethers provider
   signer?: any; // For ethers signer
 }
 
-/**
- * Deposit ERC20 token parameters
- */
-export interface DepositERC20Params {
-  token: Address;
-  amount: bigint;
+export interface Metadata {
+  name: string;
+  description: string;
+  image_url?: string;
+  social_twitter?: string;
+  social_telegram?: string;
+  social_website?: string;
 }
 
 // For the new version of the vaults
@@ -143,4 +143,16 @@ export interface NativeEigenlayerVault {
   base: NativeParams;
   eigenlayer: EigenlayerParams;
   eigenpod: EigenpodParams;
+}
+
+// ----------------------------------
+// SuperVault
+// ----------------------------------
+
+export interface SuperVault {
+  base: BaseParams;
+  symbiotic: SymbioticParams;
+  eigenlayer: EigenlayerParams;
+  ratio: number;
+  curator: string;
 }

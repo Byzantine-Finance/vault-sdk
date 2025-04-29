@@ -137,7 +137,7 @@ async function runTests() {
     const eigenlayerParams = {
       // Eigenlayer specific params
       delegation_set_role_holder: address,
-      operator: "0xb564e795f9877b416cd1af86c98cf8d3d94d760d",
+      operator: "0xb564e795f9877b416cd1af86c98cf8d3d94d760d", // Staked
 
       approver_signature_and_expiry: {
         signature: "0x", // null signature

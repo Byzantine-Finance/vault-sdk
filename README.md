@@ -9,12 +9,12 @@ Byzantine Finance is the first native restaking aggregation and abstraction laye
 This SDK provides a simple interface to interact with the Byzantine Factory contract deployed on:
 
 - Ethereum Mainnet
-- [Holesky Testnet](https://holesky.etherscan.io/address/0x2439365bFd681354cc8BCc001a1893CF64e42768)
+- [Holesky Testnet](https://holesky.etherscan.io/address/0xe0f5fc7913C4aDC0975bD21d20DF7FC27360a267)
 
 The factory contract allows users to:
 
 - **Create Eigenlayer ERC20 vaults**
-- **Create Eigenlayer Native vaults**
+<!-- - **Create Eigenlayer Native vaults** -->
 - **Create Symbiotic ERC20 vaults**
 - **Create ERC20 SuperVaults** with advanced features
 <!-- - **Manage vault parameters** like deposit limits, curator fees, and access controls -->
