@@ -142,12 +142,14 @@ async function runMetadataTests() {
 
     // Create complete valid metadata
     const validMetadata = {
-      name: `Byzantine Test Vault (${new Date().toISOString()})`,
-      description: "Updated description via SDK test",
+      name: "Symbiotic Vault",
+      description: "A Symbiotic vault for wstETH restaking",
       image_url: "https://example.com/updated-vault-image.png",
-      social_twitter: "https://twitter.com/byzantinelabs",
+      social_twitter: "https://x.com/byzantine_fi",
+      social_discord: "https://discord.gg/byzantine",
       social_telegram: "https://t.me/byzantine",
-      social_website: "https://byzantine.finance",
+      social_website: "https://byzantine.fi",
+      social_github: "https://github.com/byzantine-fi",
     };
 
     try {

@@ -599,12 +599,12 @@ export class ByzantineClient {
    * const metadata = {
    *   name: "My Vault",
    *   description: "An updated description of my vault",
-   *   image: "https://example.com/new-image.png",
-   *   external_link: "https://myproject.com",
-   *   attributes: [
-   *     { trait_type: "Asset Type", value: "ETH" },
-   *     { trait_type: "Strategy", value: "Liquid Staking" }
-   *   ]
+   *   image_url: "https://example.com/new-image.png",
+   *   social_twitter: "https://x.com/byzantine_fi",
+   *   social_discord: "https://discord.gg/byzantine",
+   *   social_telegram: "https://t.me/byzantine",
+   *   social_website: "https://byzantine.fi",
+   *   social_github: "https://github.com/Byzantine-Finance/",
    * };
    * const tx = await byzantineClient.updateVaultMetadata("0x123...", metadata);
    * await tx.wait();

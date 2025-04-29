@@ -28,8 +28,10 @@ export interface Metadata {
   description: string;
   image_url?: string;
   social_twitter?: string;
+  social_discord?: string;
   social_telegram?: string;
   social_website?: string;
+  social_github?: string;
 }
 
 // For the new version of the vaults

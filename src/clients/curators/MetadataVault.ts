@@ -1,3 +1,5 @@
+// @ts-check
+
 // Get the metadata of the vault // metadata()
 
 // Change the metadata of the vault // updateMetadataURI (string metadataURI), use pinata to store the metadata
