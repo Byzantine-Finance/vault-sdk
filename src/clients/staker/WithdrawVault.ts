@@ -36,18 +36,18 @@ export async function getQueuedWithdrawalRequests(
  * Withdraw assets from the vault in exchange for shares
  * @param signer - Ethereum signer
  * @param vaultContract - The vault contract connected to signer
- * @param assets - Amount of assets to withdraw
+ * @param amount - Amount of assets to withdraw
  * @returns Transaction response
  */
 export async function withdrawFromVault(
   signer: ethers.Signer,
   vaultContract: ethers.Contract,
-  assets: bigint
+  amount: bigint
 ): Promise<ethers.TransactionResponse> {
   const signerAddress = await signer.getAddress();
 
   // Call withdraw function with the same address for receiver and owner
-  return await vaultContract.withdraw(assets, signerAddress, signerAddress);
+  return await vaultContract.withdraw(amount, signerAddress, signerAddress);
 }
 
 /**

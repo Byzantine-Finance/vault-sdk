@@ -82,6 +82,9 @@ async function runTests() {
     const address = await wallet.getAddress();
     logResult("Wallet address", true, address);
 
+    const networkConfig = getNetworkConfig(chainId);
+    logResult("Factory address", true, networkConfig.factoryContractAddress);
+
     const client = new ByzantineClient({
       chainId: chainId,
       provider: provider,
@@ -89,25 +92,32 @@ async function runTests() {
     });
 
     // Get network configuration for token addresses
-    const networkConfig = getNetworkConfig(chainId);
 
     logResult("Client initialization", true);
     assert(client !== undefined, "Client initialization");
 
     // Define vault parameters
     const baseParams = {
-      name: "Eigen stETH Vault",
-      description: "An Eigenlayer vault for stETH restaking",
+      metadata: {
+        name: "Eigen ETHx Vault",
+        description: "An Eigenlayer vault for ETHx restaking",
+        image_url: "https://example.com/updated-vault-image.png",
+        social_twitter: "https://x.com/byzantine_fi",
+        social_discord: "https://discord.gg/byzantine",
+        social_telegram: "https://t.me/byzantine",
+        social_website: "https://byzantine.fi",
+        social_github: "https://github.com/byzantine-fi",
+      },
 
-      token_address: networkConfig.stETHAddress, // wstETH address
+      token_address: networkConfig.ETHxAddress, // ETHx address
 
-      is_deposit_limit: true,
+      is_deposit_limit: false,
       deposit_limit: ethers.parseUnits("1000", 18), // 1000 stETH
 
       is_private: false,
 
       is_tokenized: true,
-      token_name: "Byz2 stETH Vault",
+      token_name: " stETH Vault",
       token_symbol: "bstETH",
 
       curator_fee: 400, // 4% (400 basis points)
@@ -124,7 +134,7 @@ async function runTests() {
     const eigenlayerParams = {
       // Eigenlayer specific params
       delegation_set_role_holder: address,
-      operator: "0xb564e795f9877b416cd1af86c98cf8d3d94d760d", // Staked
+      operator: "0x73bf91bb1327415ec7b9d436bfced67c3ee843fa", // A41
 
       approver_signature_and_expiry: {
         signature: "0x", // null signature

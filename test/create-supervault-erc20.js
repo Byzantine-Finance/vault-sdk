@@ -82,7 +82,11 @@ async function runTests() {
     const address = skipNetworkTests
       ? "0x0000000000000000000000000000000000000000"
       : await wallet.getAddress();
+
     logResult("Wallet address", true, address);
+
+    const networkConfig = getNetworkConfig(chainId);
+    logResult("Factory address", true, networkConfig.factoryContractAddress);
 
     const client = new ByzantineClient({
       chainId: chainId,
@@ -90,16 +94,15 @@ async function runTests() {
       signer: wallet,
     });
 
-    // Get network configuration for token addresses
-    const networkConfig = getNetworkConfig(chainId);
-
     logResult("Client initialization", true);
     assert(client !== undefined, "Client initialization");
 
     // Define vault parameters
     const baseParams = {
-      name: "SuperVault osETH",
-      description: "A SuperVault for osETH with high yields",
+      metadata: {
+        name: "SuperVault osETH",
+        description: "A SuperVault for osETH with high yields",
+      },
 
       token_address: networkConfig.osETHAddress, // osETH address
 

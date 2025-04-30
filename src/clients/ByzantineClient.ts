@@ -301,7 +301,7 @@ export class ByzantineClient {
    * Deposit assets into a vault
    * @param vaultAddress The address of the vault
    * @param amount The amount to deposit
-   * @param autoApprove Whether to automatically approve if needed
+   * @param autoApprove Whether to automatically approve if needed, true by default
    * @returns Transaction response
    */
   async depositToVault(
@@ -324,12 +324,12 @@ export class ByzantineClient {
   /**
    * Withdraw assets from a vault
    * @param vaultAddress The address of the vault
-   * @param assets The amount of assets to withdraw
+   * @param amount The amount of assets to withdraw
    * @returns Transaction response
    */
   async withdrawFromVault(
     vaultAddress: string,
-    assets: bigint
+    amount: bigint
   ): Promise<TransactionResponse> {
     if (!this.signer) {
       throw new Error("Signer is required for this operation");
@@ -338,7 +338,7 @@ export class ByzantineClient {
     return await stakerFunctions.withdrawFromVault(
       this.signer,
       vaultContract,
-      assets
+      amount
     );
   }
 

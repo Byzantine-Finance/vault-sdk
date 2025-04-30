@@ -83,22 +83,24 @@ async function runTests() {
     const address = await wallet.getAddress();
     logResult("Wallet address", true, address);
 
+    const networkConfig = getNetworkConfig(chainId);
+    logResult("Factory address", true, networkConfig.factoryContractAddress);
+
     const client = new ByzantineClient({
       chainId: chainId,
       provider: provider,
       signer: wallet,
     });
 
-    // Get network configuration for token addresses
-    const networkConfig = getNetworkConfig(chainId);
-
     logResult("Client initialization", true);
     assert(client !== undefined, "Client initialization");
 
     // Define vault parameters with correct structure
     const baseParams = {
-      name: "Eigenlayer ETH Vault",
-      description: "An Eigenlayer vault for ETH restaking",
+      metadata: {
+        name: "Eigenlayer ETH Vault",
+        description: "An Eigenlayer vault for ETH restaking",
+      },
 
       token_address: ETH_TOKEN_ADDRESS,
 

@@ -83,8 +83,16 @@ const networkConfig = getNetworkConfig(17000);
 
 // Define vault parameters
 const baseParams: BaseParams = {
-  name: "Eigenlayer stETH Vault",
-  description: "An Eigenlayer vault for stETH restaking",
+  metadata: {
+    name: "Eigenlayer stETH Vault",
+    description: "An Eigenlayer vault for stETH restaking",
+    image_url: "https://example.com/updated-vault-image.png",
+    social_twitter: "https://x.com/byzantine_fi",
+    social_discord: "https://discord.gg/byzantine",
+    social_telegram: "https://t.me/byzantine",
+    social_website: "https://byzantine.fi",
+    social_github: "https://github.com/byzantine-fi",
+  },
   token_address: networkConfig.stETHAddress,
   is_deposit_limit: true,
   deposit_limit: ethers.parseUnits("1000", 18),
@@ -131,8 +139,10 @@ console.log(`Vault created at address: ${vaultAddress}`);
 // Define vault parameters
 const nativeParams: NativeParams = {
   byzVaultParams: {
-    name: "Eigenlayer ETH Vault",
-    description: "An Eigenlayer vault for ETH restaking",
+    metadata: {
+      name: "Eigenlayer ETH Vault",
+      description: "An Eigenlayer vault for ETH restaking",
+    },
     token_address: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
     is_deposit_limit: true,
     deposit_limit: ethers.parseEther("100"),
@@ -189,8 +199,9 @@ const receipt = await tx.wait();
 
 // Define vault parameters
 const baseParams: BaseParams = {
-  name: "Symbiotic wstETH Vault",
-  description: "A Symbiotic vault for wstETH restaking",
+  // Either metadata (that will be converted to URI) or directly URI
+  metadata:
+    "data:application/json;base64,eyJuYW1lIjoiU3ltYmlvdGljIG1FVEggVmF1bHQiLCJkZXNjcmlwdGlvbiI6IkEgU3ltYmlvdGljIHZhdWx0IGZvciBtRVRIIHJlc3Rha2luZyIsImltYWdlX3VybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20vdXBkYXRlZC12YXVsdC1pbWFnZS5wbmciLCJzb2NpYWxfdHdpdHRlciI6Imh0dHBzOi8veC5jb20vYnl6YW50aW5lX2ZpIiwic29jaWFsX2Rpc2NvcmQiOiJodHRwczovL2Rpc2NvcmQuZ2cvYnl6YW50aW5lIiwic29jaWFsX3RlbGVncmFtIjoiaHR0cHM6Ly90Lm1lL2J5emFudGluZSIsInNvY2lhbF93ZWJzaXRlIjoiaHR0cHM6Ly9ieXphbnRpbmUuZmkiLCJzb2NpYWxfZ2l0aHViIjoiaHR0cHM6Ly9naXRodWIuY29tL2J5emFudGluZS1maSJ9",
   token_address: "0x8d09a4502Cc8Cf1547aD300E066060D043f6982D", // wstETH
   is_deposit_limit: true,
   deposit_limit: ethers.parseUnits("500", 18), // 500 wstETH

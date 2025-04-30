@@ -50,6 +50,12 @@ export const convertMetadataToURI = async (
   const pinataApiKey = process.env.PINATA_API_KEY;
   const pinataSecretApiKey = process.env.PINATA_SECRET_API_KEY;
 
+  if (!pinataApiKey || !pinataSecretApiKey) {
+    throw Error(
+      "Missing required Pinata API credentials: PINATA_API_KEY and PINATA_SECRET_API_KEY environment variables must be configured"
+    );
+  }
+
   // Try to use Pinata if API keys are available
   if (pinataApiKey && pinataSecretApiKey) {
     try {
@@ -169,12 +175,12 @@ export const convertURItoMetadata = async (uri: string): Promise<Metadata> => {
 /**
  * Update the metadata URI of the vault
  * @param vaultContract - The vault contract connected to signer
- * @param metadata - The metadata object to be stored
+ * @param metadata - The metadata object to be stored or directly URI
  * @returns Transaction response
  */
 export async function setMetadata(
   vaultContract: ethers.Contract,
-  metadata: Metadata
+  metadata: Metadata | string
 ): Promise<ethers.TransactionResponse> {
   if (!vaultContract) {
     throw Error("Vault contract is required");
@@ -182,7 +188,12 @@ export async function setMetadata(
 
   try {
     // Convert metadata to URI (validation done inside convertMetadataToURI)
-    const metadataURI = await convertMetadataToURI(metadata);
+    let metadataURI;
+    if (typeof metadata === "string") {
+      metadataURI = metadata;
+    } else {
+      metadataURI = await convertMetadataToURI(metadata);
+    }
 
     console.log(`Using URI: ${metadataURI}`);
 

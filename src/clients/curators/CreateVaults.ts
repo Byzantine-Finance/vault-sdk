@@ -20,13 +20,21 @@ import {
 } from "../../types";
 
 import { BYZANTINE_FACTORY_ABI } from "../../constants/abis";
+import { convertMetadataToURI } from "./MetadataVault";
 
 /**
  * Format base parameters to match the contract's expected format
  * @param params Base parameters
  * @returns Formatted parameters
  */
-export function formatBaseParams(params: BaseParams) {
+export async function formatBaseParams(params: BaseParams) {
+  let metadataURI;
+  if (typeof params.metadata === "string") {
+    metadataURI = params.metadata; // If it's already a URI, use it
+  } else {
+    metadataURI = await convertMetadataToURI(params.metadata); // If it's a Metadata object, convert it to a URI
+  }
+
   return {
     token: params.token_address,
     roleManager: params.role_manager,
@@ -40,9 +48,9 @@ export function formatBaseParams(params: BaseParams) {
     isDepositLimit: params.is_deposit_limit,
     isPrivateVault: params.is_private,
     isTokenized: params.is_tokenized,
-    name: params.name,
+    name: params.token_name,
     symbol: params.token_symbol,
-    metadataURI: params.description || "",
+    metadataURI: metadataURI,
   };
 }
 
@@ -51,9 +59,9 @@ export function formatBaseParams(params: BaseParams) {
  * @param params Native parameters
  * @returns Formatted parameters
  */
-export function formatNativeParams(params: NativeParams) {
+export async function formatNativeParams(params: NativeParams) {
   return {
-    byzVaultParams: formatBaseParams(params.byzVaultParams),
+    byzVaultParams: await formatBaseParams(params.byzVaultParams),
     operatorId: params.operator_id,
     validatorManagers: params.roles_validator_manager,
   };
@@ -147,7 +155,7 @@ export async function createEigenlayerERC20Vault(
   options?: Partial<ethers.TransactionRequest>
 ): Promise<TransactionResponse> {
   // Format parameters
-  const formattedBaseParams = formatBaseParams(params.base);
+  const formattedBaseParams = await formatBaseParams(params.base);
   const formattedEigenParams = formatEigenParams(params.eigenlayer);
 
   try {
@@ -201,7 +209,7 @@ export async function createEigenlayerNativeVault(
   options?: Partial<ethers.TransactionRequest>
 ): Promise<TransactionResponse> {
   // Format parameters
-  const nativeByzVaultParams = formatNativeParams(params.base);
+  const nativeByzVaultParams = await formatNativeParams(params.base);
   const formattedEigenParams = formatEigenParams(params.eigenlayer);
   const formattedEigenPodParams = formatEigenPodParams(params.eigenpod);
 
@@ -259,7 +267,7 @@ export async function createSymbioticERC20Vault(
   options?: Partial<ethers.TransactionRequest>
 ): Promise<TransactionResponse> {
   // Format parameters
-  const formattedBaseParams = formatBaseParams(params.base);
+  const formattedBaseParams = await formatBaseParams(params.base);
   const formattedSymbioticParams = formatSymbioticParams(params.symbiotic);
 
   try {
@@ -313,7 +321,7 @@ export async function createSuperVaultERC20(
   options?: Partial<ethers.TransactionRequest>
 ): Promise<TransactionResponse> {
   // Format parameters
-  const formattedBaseParams = formatBaseParams(params.base);
+  const formattedBaseParams = await formatBaseParams(params.base);
   const formattedSymbioticParams = formatSymbioticParams(params.symbiotic);
   const formattedEigenParams = formatEigenParams(params.eigenlayer);
 

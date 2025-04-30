@@ -11,6 +11,8 @@ export interface NetworkConfig {
   stETHAddress: string;
   wstETHAddress: string;
   osETHAddress: string;
+  mETHAddress: string;
+  ETHxAddress: string;
   theGraphApiUrl?: string;
 }
 
@@ -36,8 +38,7 @@ export interface Metadata {
 
 // For the new version of the vaults
 export interface BaseParams {
-  name: string;
-  description: string;
+  metadata: Metadata | string; // If string, it's the URI of the metadata
 
   token_address: string; // Address of the token that people can deposit in the vault, if native 0xEeeeeEeEeEeEeEeEeeEEEeeeeEeeeeeeeEEeE
 
