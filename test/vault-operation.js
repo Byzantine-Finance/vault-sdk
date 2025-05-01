@@ -104,11 +104,9 @@ async function runTests() {
   const ASSET_ADDRESS = networkConfig.stETHAddress;
 
   console.log("Network:", networkConfig.name, `(Chain ID: ${chainId})`);
+  console.log("User address:", userAddress);
   console.log("Vault address:", VAULT_ADDRESS);
   console.log("Asset address:", ASSET_ADDRESS);
-
-  const userAddress = await wallet.getAddress();
-  console.log("User address:", userAddress);
 
   try {
     // =============================================

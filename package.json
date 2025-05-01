@@ -47,7 +47,8 @@
     "test:supervault-erc20": "node test/create-supervault-erc20.js",
     "test:vault-read-data": "ts-node test/vault-read-data.js",
     "test:vault-operation": "ts-node test/vault-operation.js",
-    "test:vault-metadata": "ts-node test/vault-metadata.js"
+    "test:vault-metadata": "ts-node test/vault-metadata.js",
+    "test:vault-withdraw": "ts-node test/vault-claim-withdrawals.js"
   },
   "dependencies": {
     "dotenv": "^16.5.0",

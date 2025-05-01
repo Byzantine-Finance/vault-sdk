@@ -81,6 +81,7 @@ async function runMetadataTests() {
   console.log("Network:", networkConfig.name, `(Chain ID: ${chainId})`);
   console.log("Vault address:", VAULT_ADDRESS);
   console.log("User address:", userAddress);
+  console.log("Vault address:", VAULT_ADDRESS);
 
   try {
     // =============================================

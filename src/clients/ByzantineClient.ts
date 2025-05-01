@@ -37,8 +37,13 @@ import {
   setTokenToEigenStrategy,
 } from "./curators";
 
-// Import staker functions
-import * as stakerFunctions from "./staker";
+// Import specialized clients
+import {
+  DepositClient,
+  WithdrawClient,
+  EigenLayerClient,
+  SymbioticClient,
+} from "./staker";
 
 // Import curator functions
 import * as curatorFunctions from "./curators";
@@ -53,6 +58,12 @@ export class ByzantineClient {
   public readonly chainId: ChainsOptions;
   public readonly contractAddress: string;
   private contract: ethers.Contract;
+
+  // Specialized clients
+  private depositClient: DepositClient;
+  private withdrawClient: WithdrawClient;
+  private eigenLayerClient: EigenLayerClient;
+  private symbioticClient: SymbioticClient;
 
   /**
    * Initialize a new ByzantineFactoryClient
@@ -95,7 +106,17 @@ export class ByzantineClient {
         transport: http(),
       });
     }
+
+    // Initialize specialized clients
+    this.depositClient = new DepositClient(this.provider, this.signer);
+    this.withdrawClient = new WithdrawClient(this.provider, this.signer);
+    this.eigenLayerClient = new EigenLayerClient(this.provider, this.signer);
+    this.symbioticClient = new SymbioticClient(this.provider, this.signer);
   }
+
+  // ===========================
+  // Create Vaults Functions
+  // ===========================
 
   /**
    * Create an Eigenlayer ERC20 vault
@@ -193,194 +214,6 @@ export class ByzantineClient {
       vaultAddress,
       ERC20_VAULT_ABI,
       this.signer || this.provider
-    );
-  }
-
-  // ===========================
-  // Staker Functions
-  // ===========================
-
-  /**
-   * Get the asset address of a vault
-   * @param vaultAddress The address of the vault
-   * @returns The asset address
-   */
-  async getVaultAsset(vaultAddress: string): Promise<string> {
-    const vaultContract = this.getVaultContract(vaultAddress);
-    return await stakerFunctions.getVaultAsset(vaultContract);
-  }
-
-  /**
-   * Get the balance of assets in a user's wallet
-   * @param assetAddress The address of the asset
-   * @param userAddress The address of the user
-   * @returns The user's wallet balance
-   */
-  async getUserWalletBalance(
-    assetAddress: string,
-    userAddress: string
-  ): Promise<bigint> {
-    return await stakerFunctions.getUserWalletBalance(
-      this.provider,
-      assetAddress,
-      userAddress
-    );
-  }
-
-  /**
-   * Get the balance of a user in a vault
-   * @param vaultAddress The address of the vault
-   * @param userAddress The address of the user
-   * @returns The user's vault balance
-   */
-  async getUserVaultBalance(
-    vaultAddress: string,
-    userAddress: string
-  ): Promise<bigint> {
-    const vaultContract = this.getVaultContract(vaultAddress);
-    return await stakerFunctions.getUserVaultBalance(
-      vaultContract,
-      userAddress
-    );
-  }
-
-  /**
-   * Get the total value locked in a vault
-   * @param vaultAddress The address of the vault
-   * @returns The total value locked
-   */
-  async getVaultTVL(vaultAddress: string): Promise<bigint> {
-    const vaultContract = this.getVaultContract(vaultAddress);
-    return await stakerFunctions.getVaultTVL(this.provider, vaultContract);
-  }
-
-  /**
-   * Get the allowance of a user for a vault
-   * @param assetAddress The address of the asset
-   * @param userAddress The address of the user
-   * @param vaultAddress The address of the vault
-   * @returns The user's allowance
-   */
-  async getUserAllowance(
-    assetAddress: string,
-    userAddress: string,
-    vaultAddress: string
-  ): Promise<bigint> {
-    return await stakerFunctions.getUserAllowance(
-      this.provider,
-      assetAddress,
-      userAddress,
-      vaultAddress
-    );
-  }
-
-  /**
-   * Approve a vault to spend user's tokens
-   * @param assetAddress The address of the asset
-   * @param vaultAddress The address of the vault
-   * @param amount The amount to approve
-   * @returns Transaction response
-   */
-  async approveVault(
-    assetAddress: string,
-    vaultAddress: string,
-    amount: bigint
-  ): Promise<TransactionResponse> {
-    if (!this.signer) {
-      throw new Error("Signer is required for this operation");
-    }
-    return await stakerFunctions.approveVault(
-      this.signer,
-      assetAddress,
-      vaultAddress,
-      amount
-    );
-  }
-
-  /**
-   * Deposit assets into a vault
-   * @param vaultAddress The address of the vault
-   * @param amount The amount to deposit
-   * @param autoApprove Whether to automatically approve if needed, true by default
-   * @returns Transaction response
-   */
-  async depositToVault(
-    vaultAddress: string,
-    amount: bigint,
-    autoApprove: boolean = true
-  ): Promise<TransactionResponse> {
-    if (!this.signer) {
-      throw new Error("Signer is required for this operation");
-    }
-    const vaultContract = this.getVaultContract(vaultAddress);
-    return await stakerFunctions.depositToVault(
-      this.signer,
-      vaultContract,
-      amount,
-      autoApprove
-    );
-  }
-
-  /**
-   * Withdraw assets from a vault
-   * @param vaultAddress The address of the vault
-   * @param amount The amount of assets to withdraw
-   * @returns Transaction response
-   */
-  async withdrawFromVault(
-    vaultAddress: string,
-    amount: bigint
-  ): Promise<TransactionResponse> {
-    if (!this.signer) {
-      throw new Error("Signer is required for this operation");
-    }
-    const vaultContract = this.getVaultContract(vaultAddress);
-    return await stakerFunctions.withdrawFromVault(
-      this.signer,
-      vaultContract,
-      amount
-    );
-  }
-
-  /**
-   * Redeem shares from a vault
-   * @param vaultAddress The address of the vault
-   * @param shares The amount of shares to redeem
-   * @returns Transaction response
-   */
-  async redeemSharesFromVault(
-    vaultAddress: string,
-    shares: bigint
-  ): Promise<TransactionResponse> {
-    if (!this.signer) {
-      throw new Error("Signer is required for this operation");
-    }
-    const vaultContract = this.getVaultContract(vaultAddress);
-    return await stakerFunctions.redeemSharesFromVault(
-      this.signer,
-      vaultContract,
-      shares
-    );
-  }
-
-  /**
-   * Complete a withdrawal request
-   * @param vaultAddress The address of the vault
-   * @param requestId The ID of the withdrawal request
-   * @returns Transaction response
-   */
-  async completeWithdrawal(
-    vaultAddress: string,
-    requestId: string
-  ): Promise<TransactionResponse> {
-    if (!this.signer) {
-      throw new Error("Signer is required for this operation");
-    }
-    const vaultContract = this.getVaultContract(vaultAddress);
-    return await stakerFunctions.completeWithdrawal(
-      this.signer,
-      vaultContract,
-      requestId
     );
   }
 
@@ -523,53 +356,9 @@ export class ByzantineClient {
     );
   }
 
-  // EigenLayer Functions
-
-  /**
-   * Get the Eigen Operator of a vault
-   * @param vaultAddress The address of the vault
-   * @returns The Eigen Operator
-   */
-  async getEigenOperator(vaultAddress: string): Promise<string> {
-    const vaultContract = this.getVaultContract(vaultAddress);
-    return await stakerFunctions.getEigenOperator(vaultContract);
-  }
-
-  /**
-   * Set the Eigen Operator of a vault
-   * @param vaultAddress The address of the vault
-   * @param operator The new Eigen Operator
-   * @param approverSignatureAndExpiry The signature and expiry for the approver
-   * @param approverSalt The salt for the approver
-   * @param options Optional transaction parameters like gas limit, gas price, etc.
-   * @returns Transaction response
-   */
-  async setEigenOperator(
-    vaultAddress: string,
-    operator: string,
-    approverSignatureAndExpiry: {
-      signature: string;
-      expiry: number;
-    },
-    approverSalt: string,
-    options?: Partial<ethers.TransactionRequest>
-  ): Promise<TransactionResponse> {
-    if (!this.signer) {
-      throw new Error("Signer is required for this operation");
-    }
-
-    const vaultContract = this.getVaultContract(vaultAddress);
-    return await stakerFunctions.setEigenOperator(
-      this.signer,
-      vaultContract,
-      operator,
-      approverSignatureAndExpiry,
-      approverSalt,
-      options
-    );
-  }
-
+  // ===========================
   // Metadata Management
+  // ===========================
 
   /**
    * Get the metadata of a vault
@@ -818,5 +607,279 @@ export class ByzantineClient {
   async convertToAssets(vaultAddress: string, shares: bigint): Promise<bigint> {
     const vaultContract = this.getVaultContract(vaultAddress);
     return await sharesVaultFunctions.convertToAssets(vaultContract, shares);
+  }
+
+  // ===========================
+  // Staker Functions
+  // ===========================
+
+  // Deposit Functions
+
+  /**
+   * Get the asset address of a vault
+   * @param vaultAddress The address of the vault
+   * @returns The asset address
+   */
+  async getVaultAsset(vaultAddress: string): Promise<string> {
+    return await this.depositClient.getVaultAsset(vaultAddress);
+  }
+
+  /**
+   * Get the balance of assets in a user's wallet
+   * @param assetAddress The address of the asset
+   * @param userAddress The address of the user
+   * @returns The user's wallet balance
+   */
+  async getUserWalletBalance(
+    assetAddress: string,
+    userAddress: string
+  ): Promise<bigint> {
+    return await this.depositClient.getUserWalletBalance(
+      assetAddress,
+      userAddress
+    );
+  }
+
+  /**
+   * Get the balance of a user in a vault
+   * @param vaultAddress The address of the vault
+   * @param userAddress The address of the user
+   * @returns The user's vault balance
+   */
+  async getUserVaultBalance(
+    vaultAddress: string,
+    userAddress: string
+  ): Promise<bigint> {
+    return await this.depositClient.getUserVaultBalance(
+      vaultAddress,
+      userAddress
+    );
+  }
+
+  /**
+   * Get the total value locked in a vault
+   * @param vaultAddress The address of the vault
+   * @returns The total value locked
+   */
+  async getVaultTVL(vaultAddress: string): Promise<bigint> {
+    return await this.depositClient.getVaultTVL(vaultAddress);
+  }
+
+  /**
+   * Get the allowance of a user for a vault
+   * @param assetAddress The address of the asset
+   * @param userAddress The address of the user
+   * @param vaultAddress The address of the vault
+   * @returns The user's allowance
+   */
+  async getUserAllowance(
+    assetAddress: string,
+    userAddress: string,
+    vaultAddress: string
+  ): Promise<bigint> {
+    return await this.depositClient.getUserAllowance(
+      assetAddress,
+      userAddress,
+      vaultAddress
+    );
+  }
+
+  /**
+   * Approve a vault to spend user's tokens
+   * @param assetAddress The address of the asset
+   * @param vaultAddress The address of the vault
+   * @param amount The amount to approve
+   * @returns Transaction response
+   */
+  async approveVault(
+    assetAddress: string,
+    vaultAddress: string,
+    amount: bigint
+  ): Promise<TransactionResponse> {
+    return await this.depositClient.approveVault(
+      assetAddress,
+      vaultAddress,
+      amount
+    );
+  }
+
+  /**
+   * Deposit assets into a vault
+   * @param vaultAddress The address of the vault
+   * @param amount The amount to deposit
+   * @param autoApprove Whether to automatically approve if needed, true by default
+   * @returns Transaction response
+   */
+  async depositToVault(
+    vaultAddress: string,
+    amount: bigint,
+    autoApprove: boolean = true
+  ): Promise<TransactionResponse> {
+    return await this.depositClient.depositToVault(
+      vaultAddress,
+      amount,
+      autoApprove
+    );
+  }
+
+  // Withdraw Functions
+
+  /**
+   * Withdraw assets from a vault
+   * @param vaultAddress The address of the vault
+   * @param amount The amount of assets to withdraw
+   * @returns Transaction response
+   */
+  async withdrawFromVault(
+    vaultAddress: string,
+    amount: bigint
+  ): Promise<TransactionResponse> {
+    return await this.withdrawClient.withdrawFromVault(vaultAddress, amount);
+  }
+
+  /**
+   * Redeem shares from a vault
+   * @param vaultAddress The address of the vault
+   * @param shares The amount of shares to redeem
+   * @returns Transaction response
+   */
+  async redeemSharesFromVault(
+    vaultAddress: string,
+    shares: bigint
+  ): Promise<TransactionResponse> {
+    return await this.withdrawClient.redeemSharesFromVault(
+      vaultAddress,
+      shares
+    );
+  }
+
+  /**
+   * Check if a withdrawal request is claimable
+   * @param vaultAddress The address of the vault
+   * @param requestId The ID of the withdrawal request
+   * @returns True if the request is claimable
+   */
+  async isClaimable(vaultAddress: string, requestId: string): Promise<boolean> {
+    return await this.withdrawClient.isClaimable(vaultAddress, requestId);
+  }
+
+  /**
+   * Complete a withdrawal request
+   * @param vaultAddress The address of the vault
+   * @param requestId The ID of the withdrawal request
+   * @returns Transaction response
+   */
+  async completeWithdrawal(
+    vaultAddress: string,
+    requestId: string
+  ): Promise<TransactionResponse> {
+    return await this.withdrawClient.completeWithdrawal(
+      vaultAddress,
+      requestId
+    );
+  }
+
+  // ===========================
+  // EigenLayer Functions
+  // ===========================
+
+  /**
+   * Get the Eigen Operator of a vault
+   * @param vaultAddress The address of the vault
+   * @returns The Eigen Operator
+   */
+  async getEigenOperator(vaultAddress: string): Promise<string> {
+    return await this.eigenLayerClient.getEigenOperator(vaultAddress);
+  }
+
+  /**
+   * Set the Eigen Operator of a vault
+   * @param vaultAddress The address of the vault
+   * @param operator The new Eigen Operator
+   * @param approverSignatureAndExpiry The signature and expiry for the approver
+   * @param approverSalt The salt for the approver
+   * @param options Optional transaction parameters like gas limit, gas price, etc.
+   * @returns Transaction response
+   */
+  async setEigenOperator(
+    vaultAddress: string,
+    operator: string,
+    approverSignatureAndExpiry: {
+      signature: string;
+      expiry: number;
+    },
+    approverSalt: string,
+    options?: Partial<ethers.TransactionRequest>
+  ): Promise<TransactionResponse> {
+    return await this.eigenLayerClient.setEigenOperator(
+      vaultAddress,
+      operator,
+      approverSignatureAndExpiry,
+      approverSalt,
+      options
+    );
+  }
+
+  // ===========================
+  // Symbiotic Functions
+  // ===========================
+
+  /**
+   * Get the epoch at a specific timestamp for a Symbiotic vault
+   * @param vaultAddress The address of the vault
+   * @param timestamp The timestamp to check
+   * @returns The epoch number
+   */
+  async getEpochAt(vaultAddress: string, timestamp: number): Promise<number> {
+    return await this.symbioticClient.getEpochAt(vaultAddress, timestamp);
+  }
+
+  /**
+   * Get the epoch duration for a Symbiotic vault
+   * @param vaultAddress The address of the vault
+   * @returns The epoch duration
+   */
+  async getEpochDuration(vaultAddress: string): Promise<number> {
+    return await this.symbioticClient.getEpochDuration(vaultAddress);
+  }
+
+  /**
+   * Get the current epoch for a Symbiotic vault
+   * @param vaultAddress The address of the vault
+   * @returns The current epoch number
+   */
+  async getCurrentEpoch(vaultAddress: string): Promise<number> {
+    return await this.symbioticClient.getCurrentEpoch(vaultAddress);
+  }
+
+  /**
+   * Get the start timestamp of the current epoch for a Symbiotic vault
+   * @param vaultAddress The address of the vault
+   * @returns The start timestamp of the current epoch
+   */
+  async getCurrentEpochStart(vaultAddress: string): Promise<number> {
+    return await this.symbioticClient.getCurrentEpochStart(vaultAddress);
+  }
+
+  /**
+   * Get the start timestamp of the previous epoch for a Symbiotic vault
+   * @param vaultAddress The address of the vault
+   * @returns The start timestamp of the previous epoch
+   */
+  async getPreviousEpochStart(vaultAddress: string): Promise<number> {
+    try {
+      return await this.symbioticClient.getPreviousEpochStart(vaultAddress);
+    } catch (error) {
+      return 0;
+    }
+  }
+
+  /**
+   * Get the start timestamp of the next epoch for a Symbiotic vault
+   * @param vaultAddress The address of the vault
+   * @returns The start timestamp of the next epoch
+   */
+  async getNextEpochStart(vaultAddress: string): Promise<number> {
+    return await this.symbioticClient.getNextEpochStart(vaultAddress);
   }
 }

@@ -32,13 +32,22 @@ const {
 } = require("./utils");
 require("dotenv").config();
 
+// Import environment variables
+const { RPC_URL, MNEMONIC, DEFAULT_CHAIN_ID } = process.env;
+
+// Skip network tests if API key is not provided
+if (!RPC_URL) {
+  console.warn(
+    "⚠️ Warning: RPC_URL not set in .env file. Network tests will be skipped."
+  );
+}
+
 // Test suite
 async function runTests() {
   console.log("\n🧪 Byzantine Factory SDK - Create SuperVault ERC20 Test 🧪\n");
 
   try {
     // Check if environment variables are set
-    const { RPC_URL, MNEMONIC, DEFAULT_CHAIN_ID } = process.env;
     const parsedId = DEFAULT_CHAIN_ID ? parseInt(DEFAULT_CHAIN_ID) : 17000;
     const chainId = parsedId === 1 ? 1 : 17000;
 
@@ -70,19 +79,19 @@ async function runTests() {
     // Start logging results in tabular format
     logTitle("SuperVault ERC20 Creation");
 
+    // Skip tests requiring network connection if no API key
+    skipNetworkTests = !RPC_URL;
+
     // Test client initialization
     const provider = skipNetworkTests
-      ? null
+      ? {}
       : new ethers.JsonRpcProvider(RPC_URL);
 
     const wallet = skipNetworkTests
-      ? null
-      : ethers.Wallet.fromPhrase(MNEMONIC || "").connect(provider);
+      ? {}
+      : ethers.Wallet.fromPhrase(MNEMONIC).connect(provider);
 
-    const address = skipNetworkTests
-      ? "0x0000000000000000000000000000000000000000"
-      : await wallet.getAddress();
-
+    const address = await wallet.getAddress();
     logResult("Wallet address", true, address);
 
     const networkConfig = getNetworkConfig(chainId);
@@ -93,6 +102,8 @@ async function runTests() {
       provider: provider,
       signer: wallet,
     });
+
+    // Get network configuration for token addresses
 
     logResult("Client initialization", true);
     assert(client !== undefined, "Client initialization");

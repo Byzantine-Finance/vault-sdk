@@ -95,6 +95,7 @@ async function runTests() {
 
   console.log("Network:", networkConfig.name, `(Chain ID: ${chainId})`);
   console.log("User address:", userAddress);
+  console.log("Vault address:", VAULT_ADDRESS);
 
   try {
     // =============================================
@@ -113,6 +114,36 @@ async function runTests() {
     // Get vault TVL (Total Value Locked)
     const tvl = await client.getVaultTVL(VAULT_ADDRESS);
     logResult("Vault TVL", true, ethers.formatEther(tvl) + " tokens");
+
+    // Symbiotic Functions
+    // Get epoch at a specific timestamp
+    const epoch = await client.getEpochAt(
+      VAULT_ADDRESS,
+      new Date().getTime() + 1000 * 60 * 60 * 24
+    );
+    logResult("Epoch at timestamp", true, epoch.toString());
+
+    // Get epoch duration
+    const epochDuration = await client.getEpochDuration(VAULT_ADDRESS);
+    logResult("Epoch duration", true, epochDuration.toString());
+
+    // Get current epoch
+    const currentEpoch = await client.getCurrentEpoch(VAULT_ADDRESS);
+    logResult("Current epoch", true, currentEpoch.toString());
+
+    // Get current epoch start
+    const currentEpochStart = await client.getCurrentEpochStart(VAULT_ADDRESS);
+    logResult("Current epoch start", true, currentEpochStart.toString());
+
+    // Get previous epoch start
+    const previousEpochStart = await client.getPreviousEpochStart(
+      VAULT_ADDRESS
+    );
+    logResult("Previous epoch start", true, previousEpochStart.toString());
+
+    // Get next epoch start
+    const nextEpochStart = await client.getNextEpochStart(VAULT_ADDRESS);
+    logResult("Next epoch start", true, nextEpochStart.toString());
 
     // Get vault metadata URI
     // const metadataURI = await client.getVaultMetadataURI(VAULT_ADDRESS);
@@ -178,15 +209,13 @@ async function runTests() {
     const hasLimit = await client.isDepositLimitEnabled(VAULT_ADDRESS);
     logResult("Deposit limit enabled", true, hasLimit.toString());
 
-    if (hasLimit) {
-      // Get deposit limit
-      const depositLimit = await client.getVaultDepositLimit(VAULT_ADDRESS);
-      logResult(
-        "Deposit limit",
-        true,
-        ethers.formatEther(depositLimit) + " tokens"
-      );
-    }
+    // Get deposit limit
+    const depositLimit = await client.getVaultDepositLimit(VAULT_ADDRESS);
+    logResult(
+      "Deposit limit",
+      true,
+      ethers.formatEther(depositLimit) + " tokens"
+    );
 
     // Check if vault is private
     logResult("Vault is private", true, isPrivate.toString());

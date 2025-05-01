@@ -1,9 +1,11 @@
 // @ts-check
 
 /**
- * Export all staking related functions
+ * Export all staking related clients
  */
 
-export * from "./DepositVault";
-export * from "./WithdrawVault";
-export * from "./EigenLayer";
+// Export specialized clients
+export { EigenLayerClient } from "./EigenLayerClient";
+export { SymbioticClient } from "./SymbioticClient";
+export { DepositClient } from "./DepositClient";
+export { WithdrawClient } from "./WithdrawClient";
