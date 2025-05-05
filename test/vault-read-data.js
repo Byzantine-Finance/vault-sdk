@@ -10,6 +10,7 @@
  * 2. User-specific Information - Balances, allowances, whitelist status
  * 3. Administrative Information - Fee settings, deposit limits, privacy settings
  * 4. Shares Information - Token name, symbol, supply, conversion rates
+ * 5. Protocol-specific Information - EigenLayer or Symbiotic specific data
  */
 
 const { ethers } = require("ethers");
@@ -90,8 +91,7 @@ async function runTests() {
   assert(client !== undefined, "Client initialization");
 
   // Test vault addresses - add your own or use these examples
-
-  const VAULT_ADDRESS = "0x1f7cc65ebd5afb3e85b32e5a8a6484afa7811510";
+  const VAULT_ADDRESS = "0x26b1086c36Cf1Ee780005937C30Cb58d6E0Fc960";
 
   console.log("Network:", networkConfig.name, `(Chain ID: ${chainId})`);
   console.log("User address:", userAddress);
@@ -103,54 +103,88 @@ async function runTests() {
     // =============================================
     logTitle("Basic Vault Information");
 
+    // Get vault type
+    const vaultType = await client.getVaultType(VAULT_ADDRESS);
+    logResult("Vault type", true, vaultType || "Very likely to not be a vault");
+
+    if (!vaultType) {
+      throw new Error("Vault type not found");
+    }
+
     // Get vault asset address
     const assetAddress = await client.getVaultAsset(VAULT_ADDRESS);
     logResult("Vault asset address", true, assetAddress);
-
-    // Get Eigen Operator
-    // const eigenOperator = await client.getEigenOperator(VAULT_ADDRESS);
-    // logResult("Eigen Operator", true, eigenOperator);
+    // Create flags for protocol tests
+    const isSymbiotic = vaultType === "Symbiotic" || vaultType === "Supervault";
+    const isEigenLayer =
+      vaultType === "EigenLayer" || vaultType === "Supervault";
 
     // Get vault TVL (Total Value Locked)
     const tvl = await client.getVaultTVL(VAULT_ADDRESS);
     logResult("Vault TVL", true, ethers.formatEther(tvl) + " tokens");
 
-    // Symbiotic Functions
-    // Get epoch at a specific timestamp
-    const epoch = await client.getEpochAt(
-      VAULT_ADDRESS,
-      new Date().getTime() + 1000 * 60 * 60 * 24
-    );
-    logResult("Epoch at timestamp", true, epoch.toString());
+    // =============================================
+    // 2. Protocol-specific Information
+    // =============================================
 
-    // Get epoch duration
-    const epochDuration = await client.getEpochDuration(VAULT_ADDRESS);
-    logResult("Epoch duration", true, epochDuration.toString());
+    // EigenLayer Tests
+    if (isEigenLayer) {
+      logTitle("EigenLayer Information");
 
-    // Get current epoch
-    const currentEpoch = await client.getCurrentEpoch(VAULT_ADDRESS);
-    logResult("Current epoch", true, currentEpoch.toString());
+      try {
+        const eigenOperator = await client.getEigenOperator(VAULT_ADDRESS);
+        logResult("Eigen Operator", true, eigenOperator);
+      } catch (error) {
+        logResult("Eigen Operator", false, "Failed to get operator");
+      }
+    }
 
-    // Get current epoch start
-    const currentEpochStart = await client.getCurrentEpochStart(VAULT_ADDRESS);
-    logResult("Current epoch start", true, currentEpochStart.toString());
+    // Symbiotic Tests
+    if (isSymbiotic) {
+      logTitle("Symbiotic Information");
 
-    // Get previous epoch start
-    const previousEpochStart = await client.getPreviousEpochStart(
-      VAULT_ADDRESS
-    );
-    logResult("Previous epoch start", true, previousEpochStart.toString());
+      try {
+        // Get epoch at a specific timestamp
+        const epoch = await client.getEpochAt(
+          VAULT_ADDRESS,
+          new Date().getTime() + 1000 * 60 * 60 * 24
+        );
+        logResult("Epoch at timestamp", true, epoch.toString());
 
-    // Get next epoch start
-    const nextEpochStart = await client.getNextEpochStart(VAULT_ADDRESS);
-    logResult("Next epoch start", true, nextEpochStart.toString());
+        // Get epoch duration
+        const epochDuration = await client.getEpochDuration(VAULT_ADDRESS);
+        logResult("Epoch duration", true, epochDuration.toString());
 
-    // Get vault metadata URI
-    // const metadataURI = await client.getVaultMetadataURI(VAULT_ADDRESS);
-    // logResult("Vault metadata URI", true, metadataURI);
+        // Get current epoch
+        const currentEpoch = await client.getCurrentEpoch(VAULT_ADDRESS);
+        logResult("Current epoch", true, currentEpoch.toString());
+
+        // Get current epoch start
+        const currentEpochStart = await client.getCurrentEpochStart(
+          VAULT_ADDRESS
+        );
+        logResult("Current epoch start", true, currentEpochStart.toString());
+
+        // Get previous epoch start
+        const previousEpochStart = await client.getPreviousEpochStart(
+          VAULT_ADDRESS
+        );
+        logResult("Previous epoch start", true, previousEpochStart.toString());
+
+        // Get next epoch start
+        const nextEpochStart = await client.getNextEpochStart(VAULT_ADDRESS);
+        logResult("Next epoch start", true, nextEpochStart.toString());
+      } catch (error) {
+        logResult(
+          "Symbiotic epoch functions",
+          false,
+          "Failed to get epoch information"
+        );
+      }
+    }
 
     // =============================================
-    // 2. User-specific Information
+    // 3. User-specific Information
     // =============================================
     logTitle("User-specific Information");
 
@@ -201,7 +235,7 @@ async function runTests() {
     }
 
     // =============================================
-    // 3. Administrative Information
+    // 4. Administrative Information
     // =============================================
     logTitle("Administrative Information");
 
@@ -221,7 +255,7 @@ async function runTests() {
     logResult("Vault is private", true, isPrivate.toString());
 
     // =============================================
-    // 4. Shares Information
+    // 5. Shares Information
     // =============================================
     logTitle("Shares Information");
 

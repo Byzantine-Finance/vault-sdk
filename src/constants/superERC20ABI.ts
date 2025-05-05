@@ -1,15 +1,8 @@
-export const ERC20_VAULT_ABI = [
+export const SUPER_ERC20_ABI = [
   { type: "constructor", inputs: [], stateMutability: "nonpayable" },
   {
     type: "function",
     name: "DEFAULT_ADMIN_ROLE",
-    inputs: [],
-    outputs: [{ name: "", type: "bytes32", internalType: "bytes32" }],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "DELEGATION_MANAGER_ROLE",
     inputs: [],
     outputs: [{ name: "", type: "bytes32", internalType: "bytes32" }],
     stateMutability: "view",
@@ -85,7 +78,7 @@ export const ERC20_VAULT_ABI = [
   },
   {
     type: "function",
-    name: "completeUndelegation",
+    name: "completeRebalancing",
     inputs: [],
     outputs: [],
     stateMutability: "nonpayable",
@@ -120,32 +113,6 @@ export const ERC20_VAULT_ABI = [
   },
   {
     type: "function",
-    name: "delegateTo",
-    inputs: [
-      { name: "operator", type: "address", internalType: "address" },
-      {
-        name: "approverSignatureAndExpiry",
-        type: "tuple",
-        internalType: "struct ISignatureUtilsMixinTypes.SignatureWithExpiry",
-        components: [
-          { name: "signature", type: "bytes", internalType: "bytes" },
-          { name: "expiry", type: "uint256", internalType: "uint256" },
-        ],
-      },
-      { name: "approverSalt", type: "bytes32", internalType: "bytes32" },
-    ],
-    outputs: [],
-    stateMutability: "nonpayable",
-  },
-  {
-    type: "function",
-    name: "delegatedTo",
-    inputs: [],
-    outputs: [{ name: "", type: "address", internalType: "address" }],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
     name: "deposit",
     inputs: [
       { name: "assets", type: "uint256", internalType: "uint256" },
@@ -163,18 +130,12 @@ export const ERC20_VAULT_ABI = [
   },
   {
     type: "function",
-    name: "eigenStrategy",
+    name: "getDistributionRatio",
     inputs: [],
     outputs: [
-      { name: "", type: "address", internalType: "contract IStrategy" },
+      { name: "symRatio", type: "uint256", internalType: "uint256" },
+      { name: "eigenRatio", type: "uint256", internalType: "uint256" },
     ],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "getDepositedEigenShares",
-    inputs: [],
-    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
     stateMutability: "view",
   },
   {
@@ -193,11 +154,11 @@ export const ERC20_VAULT_ABI = [
   },
   {
     type: "function",
-    name: "getWithdrawableEigenShares",
+    name: "getUnderlyingVaults",
     inputs: [],
     outputs: [
-      { name: "", type: "uint256", internalType: "uint256" },
-      { name: "", type: "uint256", internalType: "uint256" },
+      { name: "symVault", type: "address", internalType: "address" },
+      { name: "eigenVault", type: "address", internalType: "address" },
     ],
     stateMutability: "view",
   },
@@ -240,71 +201,221 @@ export const ERC20_VAULT_ABI = [
     name: "initialize",
     inputs: [
       {
-        name: "_byzVaultParams",
+        name: "_params",
         type: "tuple",
-        internalType: "struct IByzantineFactory.ByzVaultParams",
-        components: [
-          { name: "token", type: "address", internalType: "contract IERC20" },
-          { name: "roleManager", type: "address", internalType: "address" },
-          { name: "versionManager", type: "address", internalType: "address" },
-          {
-            name: "depositWhitelistManager",
-            type: "address",
-            internalType: "address",
-          },
-          {
-            name: "depositLimitManager",
-            type: "address",
-            internalType: "address",
-          },
-          {
-            name: "curatorFeeClaimer",
-            type: "address",
-            internalType: "address",
-          },
-          {
-            name: "curatorFeeClaimerRoleAdmin",
-            type: "address",
-            internalType: "address",
-          },
-          { name: "curatorFee", type: "uint256", internalType: "uint256" },
-          { name: "depositLimit", type: "uint256", internalType: "uint256" },
-          { name: "isDepositLimit", type: "bool", internalType: "bool" },
-          { name: "isPrivateVault", type: "bool", internalType: "bool" },
-          { name: "isTokenized", type: "bool", internalType: "bool" },
-          { name: "name", type: "string", internalType: "string" },
-          { name: "symbol", type: "string", internalType: "string" },
-          { name: "metadataURI", type: "string", internalType: "string" },
-        ],
-      },
-      {
-        name: "_eigenParams",
-        type: "tuple",
-        internalType: "struct IByzantineFactory.EigenParams",
+        internalType: "struct ISuperERC20Vault.SuperVaultParams",
         components: [
           {
-            name: "delegationSetRoleHolder",
-            type: "address",
-            internalType: "address",
-          },
-          { name: "operator", type: "address", internalType: "address" },
-          {
-            name: "approverSignatureAndExpiry",
+            name: "byzVaultParams",
             type: "tuple",
-            internalType:
-              "struct ISignatureUtilsMixinTypes.SignatureWithExpiry",
+            internalType: "struct IByzantineFactory.ByzVaultParams",
             components: [
-              { name: "signature", type: "bytes", internalType: "bytes" },
-              { name: "expiry", type: "uint256", internalType: "uint256" },
+              {
+                name: "token",
+                type: "address",
+                internalType: "contract IERC20",
+              },
+              { name: "roleManager", type: "address", internalType: "address" },
+              {
+                name: "versionManager",
+                type: "address",
+                internalType: "address",
+              },
+              {
+                name: "depositWhitelistManager",
+                type: "address",
+                internalType: "address",
+              },
+              {
+                name: "depositLimitManager",
+                type: "address",
+                internalType: "address",
+              },
+              {
+                name: "curatorFeeClaimer",
+                type: "address",
+                internalType: "address",
+              },
+              {
+                name: "curatorFeeClaimerRoleAdmin",
+                type: "address",
+                internalType: "address",
+              },
+              { name: "curatorFee", type: "uint256", internalType: "uint256" },
+              {
+                name: "depositLimit",
+                type: "uint256",
+                internalType: "uint256",
+              },
+              { name: "isDepositLimit", type: "bool", internalType: "bool" },
+              { name: "isPrivateVault", type: "bool", internalType: "bool" },
+              { name: "isTokenized", type: "bool", internalType: "bool" },
+              { name: "name", type: "string", internalType: "string" },
+              { name: "symbol", type: "string", internalType: "string" },
+              { name: "metadataURI", type: "string", internalType: "string" },
             ],
           },
-          { name: "approverSalt", type: "bytes32", internalType: "bytes32" },
+          { name: "symRatio", type: "uint256", internalType: "uint256" },
+          {
+            name: "eigenParams",
+            type: "tuple",
+            internalType: "struct IByzantineFactory.EigenParams",
+            components: [
+              {
+                name: "delegationSetRoleHolder",
+                type: "address",
+                internalType: "address",
+              },
+              { name: "operator", type: "address", internalType: "address" },
+              {
+                name: "approverSignatureAndExpiry",
+                type: "tuple",
+                internalType:
+                  "struct ISignatureUtilsMixinTypes.SignatureWithExpiry",
+                components: [
+                  { name: "signature", type: "bytes", internalType: "bytes" },
+                  { name: "expiry", type: "uint256", internalType: "uint256" },
+                ],
+              },
+              {
+                name: "approverSalt",
+                type: "bytes32",
+                internalType: "bytes32",
+              },
+            ],
+          },
+          {
+            name: "symParams",
+            type: "tuple",
+            internalType: "struct IByzantineFactory.SymParams",
+            components: [
+              {
+                name: "burnerParams",
+                type: "tuple",
+                internalType: "struct IByzantineFactory.BurnerParams",
+                components: [
+                  { name: "owner", type: "address", internalType: "address" },
+                  { name: "delay", type: "uint48", internalType: "uint48" },
+                  {
+                    name: "globalReceiver",
+                    type: "address",
+                    internalType: "address",
+                  },
+                  {
+                    name: "networkReceivers",
+                    type: "tuple[]",
+                    internalType: "struct IBurnerRouter.NetworkReceiver[]",
+                    components: [
+                      {
+                        name: "network",
+                        type: "address",
+                        internalType: "address",
+                      },
+                      {
+                        name: "receiver",
+                        type: "address",
+                        internalType: "address",
+                      },
+                    ],
+                  },
+                  {
+                    name: "operatorNetworkReceivers",
+                    type: "tuple[]",
+                    internalType:
+                      "struct IBurnerRouter.OperatorNetworkReceiver[]",
+                    components: [
+                      {
+                        name: "network",
+                        type: "address",
+                        internalType: "address",
+                      },
+                      {
+                        name: "operator",
+                        type: "address",
+                        internalType: "address",
+                      },
+                      {
+                        name: "receiver",
+                        type: "address",
+                        internalType: "address",
+                      },
+                    ],
+                  },
+                ],
+              },
+              {
+                name: "vaultParams",
+                type: "tuple",
+                internalType: "struct IByzantineFactory.VaultParams",
+                components: [
+                  { name: "version", type: "uint64", internalType: "uint64" },
+                  {
+                    name: "epochDuration",
+                    type: "uint48",
+                    internalType: "uint48",
+                  },
+                ],
+              },
+              {
+                name: "delegatorParams",
+                type: "tuple",
+                internalType: "struct IByzantineFactory.DelegatorParams",
+                components: [
+                  {
+                    name: "delegatorType",
+                    type: "uint8",
+                    internalType: "enum IByzantineFactory.DelegatorType",
+                  },
+                  { name: "hook", type: "address", internalType: "address" },
+                  {
+                    name: "hookSetRoleHolder",
+                    type: "address",
+                    internalType: "address",
+                  },
+                  {
+                    name: "networkLimitSetRoleHolders",
+                    type: "address[]",
+                    internalType: "address[]",
+                  },
+                  {
+                    name: "operatorNetworkLimitOrSharesSetRoleHolders",
+                    type: "address[]",
+                    internalType: "address[]",
+                  },
+                  {
+                    name: "operator",
+                    type: "address",
+                    internalType: "address",
+                  },
+                  { name: "network", type: "address", internalType: "address" },
+                ],
+              },
+              {
+                name: "slasherParams",
+                type: "tuple",
+                internalType: "struct IByzantineFactory.SlasherParams",
+                components: [
+                  {
+                    name: "slasherType",
+                    type: "uint8",
+                    internalType: "enum IByzantineFactory.SlasherType",
+                  },
+                  {
+                    name: "vetoDuration",
+                    type: "uint48",
+                    internalType: "uint48",
+                  },
+                  {
+                    name: "resolverSetEpochsDelay",
+                    type: "uint256",
+                    internalType: "uint256",
+                  },
+                ],
+              },
+            ],
+          },
+          { name: "curator", type: "address", internalType: "address" },
         ],
-      },
-      {
-        name: "_strategy",
-        type: "address",
-        internalType: "contract IStrategy",
       },
     ],
     outputs: [],
@@ -400,6 +511,13 @@ export const ERC20_VAULT_ABI = [
   },
   {
     type: "function",
+    name: "owner",
+    inputs: [],
+    outputs: [{ name: "", type: "address", internalType: "address" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "previewDeposit",
     inputs: [{ name: "assets", type: "uint256", internalType: "uint256" }],
     outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
@@ -421,6 +539,25 @@ export const ERC20_VAULT_ABI = [
   },
   {
     type: "function",
+    name: "rebalance",
+    inputs: [
+      { name: "_newSymRatio", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "rebalancingStatus",
+    inputs: [],
+    outputs: [
+      { name: "isRebalancing", type: "bool", internalType: "bool" },
+      { name: "targetSymRatio", type: "uint256", internalType: "uint256" },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "redeem",
     inputs: [
       { name: "shares", type: "uint256", internalType: "uint256" },
@@ -432,28 +569,7 @@ export const ERC20_VAULT_ABI = [
   },
   {
     type: "function",
-    name: "redelegate",
-    inputs: [
-      { name: "newOperator", type: "address", internalType: "address" },
-      {
-        name: "newOperatorApproverSig",
-        type: "tuple",
-        internalType: "struct ISignatureUtilsMixinTypes.SignatureWithExpiry",
-        components: [
-          { name: "signature", type: "bytes", internalType: "bytes" },
-          { name: "expiry", type: "uint256", internalType: "uint256" },
-        ],
-      },
-      { name: "approverSalt", type: "bytes32", internalType: "bytes32" },
-    ],
-    outputs: [
-      { name: "withdrawalRoot", type: "bytes32", internalType: "bytes32" },
-    ],
-    stateMutability: "nonpayable",
-  },
-  {
-    type: "function",
-    name: "restakeIdleTokens",
+    name: "renounceOwnership",
     inputs: [],
     outputs: [],
     stateMutability: "nonpayable",
@@ -542,11 +658,9 @@ export const ERC20_VAULT_ABI = [
   },
   {
     type: "function",
-    name: "undelegate",
-    inputs: [],
-    outputs: [
-      { name: "withdrawalRoot", type: "bytes32", internalType: "bytes32" },
-    ],
+    name: "transferOwnership",
+    inputs: [{ name: "newOwner", type: "address", internalType: "address" }],
+    outputs: [],
     stateMutability: "nonpayable",
   },
   {
@@ -625,6 +739,45 @@ export const ERC20_VAULT_ABI = [
   },
   {
     type: "event",
+    name: "DepositSplit",
+    inputs: [
+      { name: "user", type: "address", indexed: true, internalType: "address" },
+      {
+        name: "symAmount",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+      {
+        name: "eigenAmount",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "DistributionRatioUpdated",
+    inputs: [
+      {
+        name: "symRatio",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+      {
+        name: "eigenRatio",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
     name: "Initialized",
     inputs: [
       {
@@ -632,6 +785,50 @@ export const ERC20_VAULT_ABI = [
         type: "uint64",
         indexed: false,
         internalType: "uint64",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "OwnershipTransferred",
+    inputs: [
+      {
+        name: "previousOwner",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+      {
+        name: "newOwner",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "Rebalanced",
+    inputs: [
+      {
+        name: "previousRatio",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+      {
+        name: "newRatio",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+      {
+        name: "amount",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
       },
     ],
     anonymous: false,
@@ -897,13 +1094,29 @@ export const ERC20_VAULT_ABI = [
     ],
   },
   { type: "error", name: "InvalidInitialization", inputs: [] },
+  { type: "error", name: "InvalidRatio", inputs: [] },
   {
     type: "error",
     name: "InvalidWithdrawalRequest",
     inputs: [{ name: "requestId", type: "bytes32", internalType: "bytes32" }],
   },
   { type: "error", name: "MissingRoles", inputs: [] },
+  { type: "error", name: "NoAssets", inputs: [] },
+  { type: "error", name: "NoRebalancingInProgress", inputs: [] },
   { type: "error", name: "NotInitializing", inputs: [] },
+  { type: "error", name: "OnlyCurator", inputs: [] },
+  {
+    type: "error",
+    name: "OwnableInvalidOwner",
+    inputs: [{ name: "owner", type: "address", internalType: "address" }],
+  },
+  {
+    type: "error",
+    name: "OwnableUnauthorizedAccount",
+    inputs: [{ name: "account", type: "address", internalType: "address" }],
+  },
+  { type: "error", name: "RebalancingInProgress", inputs: [] },
+  { type: "error", name: "RebalancingNotInProgress", inputs: [] },
   { type: "error", name: "ReentrancyGuardReentrantCall", inputs: [] },
   {
     type: "error",
@@ -913,6 +1126,7 @@ export const ERC20_VAULT_ABI = [
   { type: "error", name: "VaultDepositLimitNotEnabled", inputs: [] },
   { type: "error", name: "VaultNotPrivate", inputs: [] },
   { type: "error", name: "VaultNotTokenized", inputs: [] },
+  { type: "error", name: "VaultsAlreadyInitialized", inputs: [] },
   {
     type: "error",
     name: "WithdrawalNotClaimable",
@@ -920,5 +1134,7 @@ export const ERC20_VAULT_ABI = [
   },
   { type: "error", name: "WithdrawalNotReadyToClaim", inputs: [] },
   { type: "error", name: "WithdrawalStateInconsistency", inputs: [] },
+  { type: "error", name: "ZeroAddressBeacon", inputs: [] },
+  { type: "error", name: "ZeroAddressFactory", inputs: [] },
   { type: "error", name: "ZeroInput", inputs: [] },
 ];

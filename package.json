@@ -48,7 +48,7 @@
     "test:vault-read-data": "ts-node test/vault-read-data.js",
     "test:vault-operation": "ts-node test/vault-operation.js",
     "test:vault-metadata": "ts-node test/vault-metadata.js",
-    "test:vault-withdraw": "ts-node test/vault-claim-withdrawals.js"
+    "test:vault-claim-withdrawals": "ts-node test/vault-claim-withdrawals.js"
   },
   "dependencies": {
     "dotenv": "^16.5.0",

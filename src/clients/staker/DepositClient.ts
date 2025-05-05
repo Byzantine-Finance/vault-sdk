@@ -80,59 +80,7 @@ export class DepositClient {
    */
   async getVaultTVL(vaultAddress: string): Promise<bigint> {
     const vaultContract = this.getVaultContract(vaultAddress);
-    const assetAddress = await vaultContract.asset();
-    const vaultAddress2 = vaultContract.target as string;
-
-    // Check if the vault has an eigenStrategy
-    let hasEigenStrategy = false;
-    let strategyAddress: string | null = null;
-
-    try {
-      // Try to call the eigenStrategy method if it exists
-      strategyAddress = await vaultContract.eigenStrategy();
-      hasEigenStrategy = !!(
-        strategyAddress &&
-        strategyAddress !== "0x0000000000000000000000000000000000000000"
-      );
-    } catch (error) {
-      // If the method doesn't exist or fails, assume there's no eigenStrategy
-      hasEigenStrategy = false;
-      console.log(
-        "This vault doesn't have an eigenStrategy method or the call failed"
-      );
-    }
-
-    // If we have an eigenStrategy, check its balance instead of the vault's balance
-    if (hasEigenStrategy && strategyAddress) {
-      console.log(
-        `Using eigenStrategy at ${strategyAddress} for TVL calculation`
-      );
-
-      try {
-        // For Eigenlayer vaults, we need to check the deposited shares in the strategy
-        const depositedShares = await vaultContract.getDepositedEigenShares(
-          strategyAddress
-        );
-        return depositedShares;
-      } catch (error) {
-        console.error("Error getting eigenStrategy balance:", error);
-        // Fallback to standard TVL calculation
-      }
-    }
-
-    // Standard TVL calculation for non-Eigenlayer vaults
-    // Check if asset is native ETH
-    if (assetAddress === ETH_TOKEN_ADDRESS) {
-      return await this.provider.getBalance(vaultAddress2);
-    } else {
-      // For ERC20 tokens
-      const tokenContract = new ethers.Contract(
-        assetAddress,
-        erc20Abi,
-        this.provider
-      );
-      return await tokenContract.balanceOf(vaultAddress2);
-    }
+    return await vaultContract.totalAssets();
   }
 
   /**

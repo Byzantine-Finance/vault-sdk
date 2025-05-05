@@ -1,6 +1,7 @@
 import { ethers } from "ethers";
 import { ERC20_VAULT_ABI } from "../../constants/abis";
 import { ETH_TOKEN_ADDRESS } from "../../constants";
+import {} from "ethers";
 
 export class WithdrawClient {
   private provider: ethers.Provider;
@@ -56,9 +57,9 @@ export class WithdrawClient {
 
       // If we get here, it means the simulation was successful
       return true;
-    } catch (error) {
+    } catch (error: any) {
       // The simulation failed, so the transaction would revert
-      console.log("Withdrawal claim would fail:", error);
+      console.log("Revert reason:", error.revert);
       return false;
     }
   }

@@ -25,6 +25,10 @@ export interface ByzantineClientOptions {
   signer?: any; // For ethers signer
 }
 
+export type RestakingProtocol = "EigenLayer" | "Symbiotic" | "Supervault";
+
+export type RestakingType = "Native" | "ERC20";
+
 export interface Metadata {
   name: string;
   description: string;
@@ -159,3 +163,5 @@ export interface SuperVault {
   ratio: number;
   curator: string;
 }
+
+// ----------------------------------

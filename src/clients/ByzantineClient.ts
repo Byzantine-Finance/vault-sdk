@@ -20,6 +20,7 @@ import {
   SuperVault,
   ChainsOptions,
   Metadata,
+  RestakingProtocol,
 } from "../types";
 import { getNetworkConfig } from "../constants/networks";
 import { BYZANTINE_FACTORY_ABI, ERC20_VAULT_ABI } from "../constants/abis";
@@ -43,6 +44,7 @@ import {
   WithdrawClient,
   EigenLayerClient,
   SymbioticClient,
+  VaultTypeClient,
 } from "./staker";
 
 // Import curator functions
@@ -64,6 +66,7 @@ export class ByzantineClient {
   private withdrawClient: WithdrawClient;
   private eigenLayerClient: EigenLayerClient;
   private symbioticClient: SymbioticClient;
+  private vaultTypeClient: VaultTypeClient;
 
   /**
    * Initialize a new ByzantineFactoryClient
@@ -112,6 +115,7 @@ export class ByzantineClient {
     this.withdrawClient = new WithdrawClient(this.provider, this.signer);
     this.eigenLayerClient = new EigenLayerClient(this.provider, this.signer);
     this.symbioticClient = new SymbioticClient(this.provider, this.signer);
+    this.vaultTypeClient = new VaultTypeClient(this.provider);
   }
 
   // ===========================
@@ -881,5 +885,47 @@ export class ByzantineClient {
    */
   async getNextEpochStart(vaultAddress: string): Promise<number> {
     return await this.symbioticClient.getNextEpochStart(vaultAddress);
+  }
+
+  // ===========================
+  // Vault Type Functions
+  // ===========================
+
+  /**
+   * Check if a vault is a Symbiotic vault
+   * @param vaultAddress The address of the vault to check
+   * @returns True if the vault is a Symbiotic vault, false otherwise
+   */
+  async isSymbioticVault(vaultAddress: string): Promise<boolean> {
+    return await this.vaultTypeClient.isSymbioticVault(vaultAddress);
+  }
+
+  /**
+   * Check if a vault is an EigenLayer vault
+   * @param vaultAddress The address of the vault to check
+   * @returns True if the vault is an EigenLayer vault, false otherwise
+   */
+  async isEigenVault(vaultAddress: string): Promise<boolean> {
+    return await this.vaultTypeClient.isEigenVault(vaultAddress);
+  }
+
+  /**
+   * Check if a vault is a SuperVault
+   * @param vaultAddress The address of the vault to check
+   * @returns True if the vault is a SuperVault, false otherwise
+   */
+  async isSupervault(vaultAddress: string): Promise<boolean> {
+    return await this.vaultTypeClient.isSupervault(vaultAddress);
+  }
+
+  /**
+   * Get the type of vault
+   * @param vaultAddress The address of the vault to check
+   * @returns The type of the vault (Symbiotic, EigenLayer, Supervault), or undefined if unknown
+   */
+  async getVaultType(
+    vaultAddress: string
+  ): Promise<RestakingProtocol | undefined> {
+    return await this.vaultTypeClient.getVaultType(vaultAddress);
   }
 }

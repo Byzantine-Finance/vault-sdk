@@ -1,3 +1,5 @@
+// @ts-check
+
 /**
  * Byzantine Vault Data Reading Test
  *
@@ -91,17 +93,31 @@ async function runTests() {
 
   // Test vault addresses - add your own or use these examples
 
-  const VAULT_ADDRESS = "0x26b1086c36Cf1Ee780005937C30Cb58d6E0Fc960";
+  const VAULT_ADDRESS = "0x26b1086c36Cf1Ee780005937C30Cb58d6E0Fc960"; // Eigen stETH vault
   const REQUEST_ID =
-    "0x26380055764782D8A2B658F7E646048C2725234CEF48418D7AC014250F505B45";
+    "0xBBB5C00413D3D0541A8B48189AA3652F4F3A2AAA820FD9ED044F9B83503F4A1B";
 
   console.log("Network:", networkConfig.name, `(Chain ID: ${chainId})`);
   console.log("User address:", userAddress);
   console.log("Vault address:", VAULT_ADDRESS);
 
   try {
-    const claimable = await client.isClaimable(VAULT_ADDRESS, REQUEST_ID);
-    logResult("Claimable", true, claimable);
+    // const claimable = await client.isClaimable(VAULT_ADDRESS, REQUEST_ID);
+    // logResult("Claimable", true, claimable);
+
+    //deposit 0.1 dans le vault
+    const tx = await client.depositToVault(
+      VAULT_ADDRESS,
+      ethers.parseEther("0.1"),
+      true
+    );
+    await tx.wait();
+    logResult("Deposit", true, tx.hash);
+
+    // completeWithdrawal
+    // const tx = await client.completeWithdrawal(VAULT_ADDRESS, REQUEST_ID);
+    // await tx.wait();
+    // logResult("Complete withdrawal", true, tx);
   } catch (error) {
     console.error("❌ Test failed:", error);
   }
