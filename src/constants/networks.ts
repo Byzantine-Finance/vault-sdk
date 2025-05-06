@@ -17,9 +17,6 @@ export const NETWORKS: Record<number, NetworkConfig> = {
     osETHAddress: "0xf1c9acdc66974dfb6decb12aa385b9cd01190e38",
     mETHAddress: "0xd5f7838f5c461feff7fe49ea5ebaf7728bb0adfa",
     ETHxAddress: "0xa35b1b31ce002fbf2058d22f30f95d405200a15b",
-    theGraphApiUrl: process.env.NEXT_PUBLIC_THEGRAPH_KEY
-      ? `https://gateway.thegraph.com/api/${process.env.NEXT_PUBLIC_THEGRAPH_KEY}/subgraphs/id/qtx1zvMXM3doNdjbavnyhgmKNLQdeVDqVGNQTp6mVEW`
-      : undefined,
   },
   // Holesky Testnet
   17000: {
@@ -31,9 +28,6 @@ export const NETWORKS: Record<number, NetworkConfig> = {
     osETHAddress: "0xF603c5A3F774F05d4D848A9bB139809790890864",
     mETHAddress: "0xe3C063B1BEe9de02eb28352b55D49D85514C67FF",
     ETHxAddress: "0xB4F5fc289a778B80392b86fa70A7111E5bE0F859",
-    theGraphApiUrl: process.env.NEXT_PUBLIC_THEGRAPH_KEY
-      ? `https://gateway.thegraph.com/api/${process.env.NEXT_PUBLIC_THEGRAPH_KEY}/subgraphs/id/21P9dycN67dz821r26L6UzgsuKehRV4jiMEmH3GJLYyi`
-      : undefined,
   },
 };
 

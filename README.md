@@ -4,12 +4,13 @@ A TypeScript/JavaScript SDK for creating and managing vaults with Byzantine Fina
 
 ## About Byzantine Finance
 
-Byzantine Finance is the first native restaking aggregation and abstraction layer. The platform allows users to deploy various types of vaults for generating staking and restaking revenues.
+Byzantine Finance is the first native restaking aggregation and abstraction layer. The protocol allows users to deploy various types of vaults for generating staking and restaking revenues.
 
 This SDK provides a simple interface to interact with the Byzantine Factory contract deployed on:
 
-- Ethereum Mainnet
+- _Ethereum Mainnet -> Soon_
 - [Holesky Testnet](https://holesky.etherscan.io/address/0xe0f5fc7913C4aDC0975bD21d20DF7FC27360a267)
+- _Hoodi Testnet -> Soon_
 
 The factory contract allows users to:
 
@@ -31,8 +32,13 @@ npm install @byzantine/vault-sdk
 
 ```shell
 RPC_URL=https://holesky.infura.io/v3/your_api_key_here
+
+# Choose ONE of the following authentication methods:
 MNEMONIC=your_wallet_mnemonic
-DEFAULT_CHAIN_ID=17000  # 17000 for Holesky testnet, 1 for Ethereum Mainnet
+# OR
+PRIVATE_KEY=your_wallet_private_key_without_0x_prefix
+
+DEFAULT_CHAIN_ID=17000  # 17000 for Holesky testnet, 1 for Ethereum Mainnet, 560048 for Hoodi Testnet
 ```
 
 2. Import and initialize the client:
@@ -50,9 +56,10 @@ dotenv.config();
 
 const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
 const wallet = ethers.Wallet.fromPhrase(process.env.MNEMONIC).connect(provider);
+// OR const wallet = new ethers.Wallet(process.env.PRIVATE_KEY).connect(provider);
 
 const client = new ByzantineClient({
-  chainId: 17000, // 17000 for Holesky, 1 for Mainnet
+  chainId: 17000, // 17000 for Holesky, 1 for Mainnet, 560048 for Hoodi
   provider: provider,
   signer: wallet,
 });
@@ -71,6 +78,7 @@ const provider = new ethers.JsonRpcProvider(
   "https://holesky.infura.io/v3/YOUR_API_KEY"
 );
 const wallet = ethers.Wallet.fromPhrase("your mnemonic").connect(provider);
+// OR const wallet = new ethers.Wallet(process.env.PRIVATE_KEY).connect(provider);
 
 const client = new ByzantineClient({
   chainId: 17000, // Holesky testnet
@@ -91,7 +99,7 @@ const baseParams: BaseParams = {
     social_discord: "https://discord.gg/byzantine",
     social_telegram: "https://t.me/byzantine",
     social_website: "https://byzantine.fi",
-    social_github: "https://github.com/byzantine-fi",
+    social_github: "https://github.com/byzantine-finance",
   },
   token_address: networkConfig.stETHAddress,
   is_deposit_limit: true,
@@ -255,22 +263,102 @@ const receipt = await tx.wait();
 // Not available yet
 ```
 
-## Testing
+## Available Functions
 
-The SDK includes tests for each vault type:
+### Create Vaults
 
-```bash
-# Install dependencies
-npm install
+```js
+// Create Eigenlayer ERC20
+await client.createEigenlayerERC20Vault(params);
 
-# Build the SDK
-npm run build
+// Create Eigenlayer Native
+await client.createEigenlayerNativeVault(params);
 
-# Run tests (requires environment variables in .env file)
-node test/create-eigen-erc20.js
-node test/create-eigen-native.js
-node test/create-symbiotic-erc20.js
-node test/create-supervault-erc20.js
+// Create Symbiotic ERC20
+await client.createSymbioticERC20Vault(params);
+
+// Create SuperVault ERC20
+await client.createSuperVaultERC20(params);
+```
+
+### Curate
+
+```js
+// Whitelist Management
+await client.isAddressWhitelisted(vaultAddress, address);
+await client.isVaultPrivate(vaultAddress);
+await client.setAddressesWhitelistStatus(vaultAddress, addresses, canDeposit);
+await client.setVaultPrivateStatus(vaultAddress, isPrivate);
+
+// Deposit Limit Management
+await client.getVaultDepositLimit(vaultAddress);
+await client.isDepositLimitEnabled(vaultAddress);
+await client.setVaultDepositLimit(vaultAddress, limit);
+await client.setDepositLimitStatus(vaultAddress, enabled);
+
+// Metadata Management
+await client.getVaultMetadata(vaultAddress);
+await client.updateVaultMetadata(vaultAddress, metadata);
+
+// Fee Management
+await client.getVaultFeePercentage(vaultAddress);
+await client.getUnclaimedFees(vaultAddress);
+await client.setVaultFeePercentage(vaultAddress, feePercentage);
+await client.claimVaultFees(vaultAddress);
+
+// SuperVault Management
+await client.getDistributionRatio(supervaultAddress);
+await client.getUnderlyingVaults(supervaultAddress);
+await client.updateDistributionRatio(supervaultAddress, ratio);
+await client.forceRebalance(supervaultAddress);
+
+// Shares Management
+await client.isSharesTokenized(vaultAddress);
+await client.getSharesName(vaultAddress);
+await client.getSharesSymbol(vaultAddress);
+await client.getTotalShares(vaultAddress);
+await client.getSharesBalance(vaultAddress, userAddress);
+await client.convertToShares(vaultAddress, assets);
+await client.convertToAssets(vaultAddress, shares);
+```
+
+### Staker
+
+```js
+// Vault Information
+await client.getVaultAsset(vaultAddress);
+await client.getUserWalletBalance(assetAddress, userAddress);
+await client.getUserVaultBalance(vaultAddress, userAddress);
+await client.getVaultTVL(vaultAddress);
+await client.getUserAllowance(assetAddress, userAddress, vaultAddress);
+await client.getVaultType(vaultAddress);
+
+// Deposit
+await client.approveVault(assetAddress, vaultAddress, amount);
+await client.depositToVault(vaultAddress, amount, autoApprove);
+
+// Withdraw
+await client.withdrawFromVault(vaultAddress, amount);
+await client.redeemSharesFromVault(vaultAddress, shares);
+await client.isClaimable(vaultAddress, requestId);
+await client.completeWithdrawal(vaultAddress, requestId);
+
+// Eigenlayer
+await client.getEigenOperator(vaultAddress);
+await client.setEigenOperator(
+  vaultAddress,
+  operator,
+  approverSignatureAndExpiry,
+  approverSalt
+);
+
+// Symbiotic
+await client.getEpochAt(vaultAddress, timestamp);
+await client.getEpochDuration(vaultAddress);
+await client.getCurrentEpoch(vaultAddress);
+await client.getCurrentEpochStart(vaultAddress);
+await client.getPreviousEpochStart(vaultAddress);
+await client.getNextEpochStart(vaultAddress);
 ```
 
 ## Vault Types
@@ -290,41 +378,40 @@ Symbiotic vaults provide enhanced features for ERC20 tokens, allowing customizab
 
 SuperVaults are advanced vaults with additional features for managing ERC20 tokens with greater customization and control.
 
-## API Reference
+## Testing
 
-### Client Initialization
+The SDK includes comprehensive tests for all vault types and operations:
 
-```typescript
-const client = new ByzantineClient({
-  chainId: number, // Chain ID (1 for Mainnet, 17000 for Holesky)
-  provider: provider, // ethers.js provider
-  signer: signer, // ethers.js signer (required for transactions)
-});
+```bash
+# Install dependencies
+npm install
+
+# Build the SDK
+npm run build
+
+# Run all tests (requires environment variables in .env file)
+npm run test
+
+# Run specific vault creation tests
+npm run test:eigen-erc20      # Test Eigenlayer ERC20 vault creation
+npm run test:eigen-native     # Test Eigenlayer Native vault creation
+npm run test:symbiotic-erc20  # Test Symbiotic ERC20 vault creation
+npm run test:supervault-erc20 # Test SuperVault ERC20 creation
+
+# Run vault operation tests
+npm run test:vault-read-data        # Test reading vault data
+npm run test:vault-operation        # Test vault operations (deposit/withdraw)
+npm run test:vault-metadata         # Test vault metadata operations
+npm run test:vault-claim-withdrawals # Test withdrawal claim process
 ```
-
-### Core Functions
-
-#### Vault Creation
-
-- `createEigenlayerERC20Vault({ base, eigenlayer })`: Create an Eigenlayer ERC20 vault
-- `createEigenlayerNativeVault({ base, eigenlayer })`: Create an Eigenlayer Native (ETH) vault
-- `createSymbioticERC20Vault({ base, symbiotic })`: Create a Symbiotic ERC20 vault
-- `createSuperVaultERC20({ base, symbiotic })`: Create a SuperVault for ERC20 tokens
-
-### Constants
-
-- `ETH_TOKEN_ADDRESS`: The canonical address for ETH (0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)
-
-### Utility Functions
-
-- `getNetworkConfig(chainId)`: Returns the network configuration for the given chain ID
 
 ## Supported Networks
 
-- Ethereum Mainnet (Chain ID: 1)
-- Holesky Testnet (Chain ID: 17000)
+- _Ethereum Mainnet (Chain ID: 1) -> Soon_
+- **Holesky Testnet (Chain ID: 17000)**
+- _Hoodi Testnet (Chain ID: 560048) -> Soon_
 
-By default, the SDK is configured to use Holesky testnet (Chain ID: 17000). To use Ethereum Mainnet, specify `chainId: 1` when initializing the client.
+By default, the SDK is configured to use Holesky testnet (Chain ID: 17000). To use Ethereum Mainnet, specify `chainId: 1` when initializing the client. Or `chainId: 560048` for Hoodi Testnet.
 
 ## NPM Package
 

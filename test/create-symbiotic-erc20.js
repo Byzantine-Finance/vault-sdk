@@ -38,7 +38,7 @@ async function runTests() {
 
   try {
     // Check if environment variables are set
-    const { RPC_URL, MNEMONIC, DEFAULT_CHAIN_ID } = process.env;
+    const { RPC_URL, MNEMONIC, PRIVATE_KEY, DEFAULT_CHAIN_ID } = process.env;
     const parsedId = DEFAULT_CHAIN_ID ? parseInt(DEFAULT_CHAIN_ID) : 17000;
     const chainId = parsedId === 1 ? 1 : 17000;
 
@@ -50,9 +50,9 @@ async function runTests() {
       skipNetworkTests = true;
     }
 
-    if (!MNEMONIC) {
+    if (!MNEMONIC && !PRIVATE_KEY) {
       console.warn(
-        "⚠️ Warning: MNEMONIC not set in .env file. Wallet tests will be skipped."
+        "⚠️ Warning: Neither MNEMONIC nor PRIVATE_KEY set in .env file. Wallet tests will be skipped."
       );
       skipNetworkTests = true;
     }
@@ -77,7 +77,11 @@ async function runTests() {
 
     const wallet = skipNetworkTests
       ? {}
-      : ethers.Wallet.fromPhrase(MNEMONIC).connect(provider);
+      : MNEMONIC
+      ? ethers.Wallet.fromPhrase(MNEMONIC).connect(provider)
+      : PRIVATE_KEY
+      ? new ethers.Wallet(PRIVATE_KEY).connect(provider)
+      : {};
 
     const address = await wallet.getAddress();
     logResult("Wallet address", true, address);
@@ -108,7 +112,7 @@ async function runTests() {
         social_discord: "https://discord.gg/byzantine",
         social_telegram: "https://t.me/byzantine",
         social_website: "https://byzantine.fi",
-        social_github: "https://github.com/byzantine-fi",
+        social_github: "https://github.com/byzantine-finance",
       },
 
       token_address: networkConfig.mETHAddress, // mETH address

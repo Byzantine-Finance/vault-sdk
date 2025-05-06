@@ -14,7 +14,7 @@ const { logTitle, logResult, assert } = require("./utils");
 require("dotenv").config();
 
 // Import environment variables
-const { RPC_URL, MNEMONIC, DEFAULT_CHAIN_ID } = process.env;
+const { RPC_URL, MNEMONIC, PRIVATE_KEY, DEFAULT_CHAIN_ID } = process.env;
 
 // Test suite
 async function runMetadataTests() {
@@ -32,9 +32,9 @@ async function runMetadataTests() {
     skipNetworkTests = true;
   }
 
-  if (!MNEMONIC) {
+  if (!MNEMONIC && !PRIVATE_KEY) {
     console.warn(
-      "⚠️ Warning: MNEMONIC not set in .env file. Tests will be skipped."
+      "⚠️ Warning: Neither MNEMONIC nor PRIVATE_KEY set in .env file. Wallet tests will be skipped."
     );
     skipNetworkTests = true;
   }
@@ -59,7 +59,16 @@ async function runMetadataTests() {
 
   // Initialize provider and wallet
   const provider = new ethers.JsonRpcProvider(RPC_URL);
-  const wallet = ethers.Wallet.fromPhrase(MNEMONIC).connect(provider);
+  let wallet;
+  if (MNEMONIC) {
+    wallet = ethers.Wallet.fromPhrase(MNEMONIC).connect(provider);
+    console.log("Using wallet from mnemonic phrase");
+  } else if (PRIVATE_KEY) {
+    wallet = new ethers.Wallet(PRIVATE_KEY).connect(provider);
+    console.log("Using wallet from private key");
+  } else {
+    throw new Error("No wallet credentials provided");
+  }
   const userAddress = await wallet.getAddress();
 
   // Initialize client
@@ -150,7 +159,7 @@ async function runMetadataTests() {
       social_discord: "https://discord.gg/byzantine",
       social_telegram: "https://t.me/byzantine",
       social_website: "https://byzantine.fi",
-      social_github: "https://github.com/byzantine-fi",
+      social_github: "https://github.com/byzantine-finance",
     };
 
     try {

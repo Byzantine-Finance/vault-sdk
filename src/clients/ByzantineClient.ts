@@ -1,9 +1,9 @@
 // @ts-check
 
 /**
- * ByzantineFactoryClient
+ * ByzantineClient
  *
- * Client for interacting with the Byzantine Factory contract
+ * Client for interacting with the Byzantine contract
  * Provides methods to create different types of vaults:
  * - Eigenlayer ERC20 vaults
  * - Eigenlayer Native vaults
@@ -69,7 +69,7 @@ export class ByzantineClient {
   private vaultTypeClient: VaultTypeClient;
 
   /**
-   * Initialize a new ByzantineFactoryClient
+   * Initialize a new ByzantineClient
    * @param options Client configuration options
    */
   constructor(options: ByzantineClientOptions) {
@@ -384,7 +384,7 @@ export class ByzantineClient {
   /**
    * Update the metadata of a vault
    * @param vaultAddress The address of the vault
-   * @param metadata The new metadata object
+   * @param metadata The new metadata object, or URI
    * @returns Transaction response
    *
    * @example
@@ -399,12 +399,14 @@ export class ByzantineClient {
    *   social_website: "https://byzantine.fi",
    *   social_github: "https://github.com/Byzantine-Finance/",
    * };
+   *
+   *
    * const tx = await byzantineClient.updateVaultMetadata("0x123...", metadata);
    * await tx.wait();
    */
   async updateVaultMetadata(
     vaultAddress: string,
-    metadata: Metadata
+    metadata: Metadata | string
   ): Promise<TransactionResponse> {
     if (!this.signer) {
       throw new Error("Signer is required for this operation");

@@ -1,19 +1,16 @@
 // @ts-check
 
-import { Address, Hash, TransactionReceipt } from "viem";
-
 export type ChainsOptions = 1 | 17000;
 
 export interface NetworkConfig {
   name: string;
-  factoryContractAddress: Address;
+  factoryContractAddress: string;
   scanLink: string;
   stETHAddress: string;
   wstETHAddress: string;
   osETHAddress: string;
   mETHAddress: string;
   ETHxAddress: string;
-  theGraphApiUrl?: string;
 }
 
 /**
@@ -25,7 +22,11 @@ export interface ByzantineClientOptions {
   signer?: any; // For ethers signer
 }
 
-export type RestakingProtocol = "EigenLayer" | "Symbiotic" | "Supervault";
+export type RestakingProtocol =
+  | "EigenLayer"
+  | "Symbiotic"
+  | "SuperVault"
+  | "Babylon";
 
 export type RestakingType = "Native" | "ERC20";
 

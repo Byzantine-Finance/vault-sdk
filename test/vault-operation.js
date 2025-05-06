@@ -29,7 +29,7 @@ const {
 require("dotenv").config();
 
 // Import environment variables
-const { RPC_URL, MNEMONIC, DEFAULT_CHAIN_ID } = process.env;
+const { RPC_URL, MNEMONIC, PRIVATE_KEY, DEFAULT_CHAIN_ID } = process.env;
 
 // Skip network tests if API key is not provided
 if (!RPC_URL) {
@@ -54,9 +54,9 @@ async function runTests() {
     skipNetworkTests = true;
   }
 
-  if (!MNEMONIC) {
+  if (!MNEMONIC && !PRIVATE_KEY) {
     console.warn(
-      "⚠️ Warning: MNEMONIC not set in .env file. Wallet tests will be skipped."
+      "⚠️ Warning: Neither MNEMONIC nor PRIVATE_KEY set in .env file. Wallet tests will be skipped."
     );
     skipNetworkTests = true;
   }
@@ -82,7 +82,11 @@ async function runTests() {
 
   const wallet = skipNetworkTests
     ? {}
-    : ethers.Wallet.fromPhrase(MNEMONIC).connect(provider);
+    : MNEMONIC
+    ? ethers.Wallet.fromPhrase(MNEMONIC).connect(provider)
+    : PRIVATE_KEY
+    ? new ethers.Wallet(PRIVATE_KEY).connect(provider)
+    : {};
 
   const address = await wallet.getAddress();
   logResult("Wallet address", true, address);

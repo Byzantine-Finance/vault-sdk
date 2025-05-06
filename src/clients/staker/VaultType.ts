@@ -111,7 +111,7 @@ export class VaultTypeClient {
     if (isEigen) return "EigenLayer";
 
     const isSuper = await this.isSupervault(vaultAddress);
-    if (isSuper) return "Supervault";
+    if (isSuper) return "SuperVault";
 
     return undefined; // Default fallback, though this is unexpected
   }
