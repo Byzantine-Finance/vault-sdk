@@ -2,6 +2,7 @@ import { ethers } from "ethers";
 import { ERC20_VAULT_ABI } from "../../constants/abis";
 import { ETH_TOKEN_ADDRESS } from "../../constants";
 import { erc20Abi } from "viem";
+import { callContractMethod, executeContractMethod } from "../../utils";
 
 export class DepositClient {
   private provider: ethers.Provider;
@@ -32,7 +33,7 @@ export class DepositClient {
    */
   async getVaultAsset(vaultAddress: string): Promise<string> {
     const vaultContract = this.getVaultContract(vaultAddress);
-    return await vaultContract.asset();
+    return await callContractMethod<string>(vaultContract, "asset");
   }
 
   /**
@@ -55,7 +56,11 @@ export class DepositClient {
         erc20Abi,
         this.provider
       );
-      return await tokenContract.balanceOf(userAddress);
+      return await callContractMethod<bigint>(
+        tokenContract,
+        "balanceOf",
+        userAddress
+      );
     }
   }
 
@@ -70,7 +75,11 @@ export class DepositClient {
     userAddress: string
   ): Promise<bigint> {
     const vaultContract = this.getVaultContract(vaultAddress);
-    return await vaultContract.balanceOf(userAddress);
+    return await callContractMethod<bigint>(
+      vaultContract,
+      "balanceOf",
+      userAddress
+    );
   }
 
   /**
@@ -80,7 +89,7 @@ export class DepositClient {
    */
   async getVaultTVL(vaultAddress: string): Promise<bigint> {
     const vaultContract = this.getVaultContract(vaultAddress);
-    return await vaultContract.totalAssets();
+    return await callContractMethod<bigint>(vaultContract, "totalAssets");
   }
 
   /**
@@ -105,7 +114,12 @@ export class DepositClient {
       erc20Abi,
       this.provider
     );
-    return await tokenContract.allowance(userAddress, vaultAddress);
+    return await callContractMethod<bigint>(
+      tokenContract,
+      "allowance",
+      userAddress,
+      vaultAddress
+    );
   }
 
   /**
@@ -133,7 +147,12 @@ export class DepositClient {
       erc20Abi,
       this.signer
     );
-    return await tokenContract.approve(vaultAddress, amount);
+    return await executeContractMethod(
+      tokenContract,
+      "approve",
+      vaultAddress,
+      amount
+    );
   }
 
   /**
@@ -153,14 +172,21 @@ export class DepositClient {
     }
 
     const vaultContract = this.getVaultContract(vaultAddress);
-    const assetAddress = await vaultContract.asset();
+    const assetAddress = await callContractMethod<string>(
+      vaultContract,
+      "asset"
+    );
     const signerAddress = await this.signer.getAddress();
 
     // If asset is native ETH
     if (assetAddress === ETH_TOKEN_ADDRESS) {
-      return await vaultContract.deposit(amount, signerAddress, {
-        value: amount,
-      });
+      return await executeContractMethod(
+        vaultContract,
+        "deposit",
+        amount,
+        signerAddress,
+        { value: amount }
+      );
     } else {
       // For ERC20 tokens
       if (autoApprove) {
@@ -169,18 +195,30 @@ export class DepositClient {
           erc20Abi,
           this.signer
         );
-        const allowance = await tokenContract.allowance(
+        const allowance = await callContractMethod<bigint>(
+          tokenContract,
+          "allowance",
           signerAddress,
           vaultAddress
         );
 
         if (allowance < amount) {
-          const approveTx = await tokenContract.approve(vaultAddress, amount);
+          const approveTx = await executeContractMethod(
+            tokenContract,
+            "approve",
+            vaultAddress,
+            amount
+          );
           await approveTx.wait();
         }
       }
 
-      return await vaultContract.deposit(amount, signerAddress);
+      return await executeContractMethod(
+        vaultContract,
+        "deposit",
+        amount,
+        signerAddress
+      );
     }
   }
 }

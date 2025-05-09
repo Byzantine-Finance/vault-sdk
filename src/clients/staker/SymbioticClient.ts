@@ -5,6 +5,7 @@ import {
   SUPER_ERC20_ABI,
 } from "../../constants/abis";
 import { VaultTypeClient } from "./VaultType";
+import { callContractMethod } from "../../utils";
 
 interface VaultCache {
   isSupervault?: boolean;
@@ -83,14 +84,21 @@ export class SymbioticClient {
       if (cacheEntry.isSupervault) {
         // For SuperVaults, we need to get the symVault from the SuperVault contract
         const superVaultContract = this.getSuperVaultContract(vaultAddress);
-        const [symVaultAddress, eigenVaultAddress] =
-          await superVaultContract.getUnderlyingVaults();
+        const [symVaultAddress, eigenVaultAddress] = await callContractMethod<
+          [string, string]
+        >(superVaultContract, "getUnderlyingVaults");
         const byzVaultContract = this.getByzVaultContract(symVaultAddress);
-        symVaultAdd = await byzVaultContract.symVault();
+        symVaultAdd = await callContractMethod<string>(
+          byzVaultContract,
+          "symVault"
+        );
       } else {
         // For regular Symbiotic vaults, proceed as before
         const byzVaultContract = this.getByzVaultContract(vaultAddress);
-        symVaultAdd = await byzVaultContract.symVault();
+        symVaultAdd = await callContractMethod<string>(
+          byzVaultContract,
+          "symVault"
+        );
       }
 
       // Cache the result
@@ -124,7 +132,11 @@ export class SymbioticClient {
    */
   async getEpochAt(vaultAddress: string, timestamp: number): Promise<number> {
     const symVaultContract = await this.getSymVaultContract(vaultAddress);
-    return await symVaultContract.epochAt(timestamp);
+    return await callContractMethod<number>(
+      symVaultContract,
+      "epochAt",
+      timestamp
+    );
   }
 
   /**
@@ -134,7 +146,7 @@ export class SymbioticClient {
    */
   async getEpochDuration(vaultAddress: string): Promise<number> {
     const symVaultContract = await this.getSymVaultContract(vaultAddress);
-    return await symVaultContract.epochDuration();
+    return await callContractMethod<number>(symVaultContract, "epochDuration");
   }
 
   /**
@@ -144,7 +156,10 @@ export class SymbioticClient {
    */
   async getCurrentEpoch(vaultAddress: string): Promise<number> {
     const symVaultContract = await this.getSymVaultContract(vaultAddress);
-    const epoch = await symVaultContract.currentEpoch();
+    const epoch = await callContractMethod<bigint>(
+      symVaultContract,
+      "currentEpoch"
+    );
     return Number(epoch);
   }
 
@@ -155,7 +170,10 @@ export class SymbioticClient {
    */
   async getCurrentEpochStart(vaultAddress: string): Promise<number> {
     const symVaultContract = await this.getSymVaultContract(vaultAddress);
-    return await symVaultContract.currentEpochStart();
+    return await callContractMethod<number>(
+      symVaultContract,
+      "currentEpochStart"
+    );
   }
 
   /**
@@ -165,7 +183,10 @@ export class SymbioticClient {
    */
   async getPreviousEpochStart(vaultAddress: string): Promise<number> {
     const symVaultContract = await this.getSymVaultContract(vaultAddress);
-    return await symVaultContract.previousEpochStart();
+    return await callContractMethod<number>(
+      symVaultContract,
+      "previousEpochStart"
+    );
   }
 
   /**
@@ -175,6 +196,6 @@ export class SymbioticClient {
    */
   async getNextEpochStart(vaultAddress: string): Promise<number> {
     const symVaultContract = await this.getSymVaultContract(vaultAddress);
-    return await symVaultContract.nextEpochStart();
+    return await callContractMethod<number>(symVaultContract, "nextEpochStart");
   }
 }

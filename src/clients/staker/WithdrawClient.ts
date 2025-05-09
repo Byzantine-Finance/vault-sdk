@@ -2,6 +2,7 @@ import { ethers } from "ethers";
 import { ERC20_VAULT_ABI } from "../../constants/abis";
 import { ETH_TOKEN_ADDRESS } from "../../constants";
 import {} from "ethers";
+import { callContractMethod, executeContractMethod } from "../../utils";
 
 export class WithdrawClient {
   private provider: ethers.Provider;
@@ -59,7 +60,7 @@ export class WithdrawClient {
       return true;
     } catch (error: any) {
       // The simulation failed, so the transaction would revert
-      console.log("Revert reason:", error.revert);
+      // console.log("Revert reason:", error);
       return false;
     }
   }
@@ -82,7 +83,13 @@ export class WithdrawClient {
     const signerAddress = await this.signer.getAddress();
 
     // Call withdraw function with the same address for receiver and owner
-    return await vaultContract.withdraw(amount, signerAddress, signerAddress);
+    return await executeContractMethod(
+      vaultContract,
+      "withdraw",
+      amount,
+      signerAddress,
+      signerAddress
+    );
   }
 
   /**
@@ -103,7 +110,13 @@ export class WithdrawClient {
     const signerAddress = await this.signer.getAddress();
 
     // Call redeem function with the same address for receiver and owner
-    return await vaultContract.redeem(shares, signerAddress, signerAddress);
+    return await executeContractMethod(
+      vaultContract,
+      "redeem",
+      shares,
+      signerAddress,
+      signerAddress
+    );
   }
 
   /**
@@ -124,7 +137,13 @@ export class WithdrawClient {
     const signerAddress = await this.signer.getAddress();
 
     // For native ETH withdrawal, call withdraw but with the assets value
-    return await vaultContract.withdraw(assets, signerAddress, signerAddress);
+    return await executeContractMethod(
+      vaultContract,
+      "withdraw",
+      assets,
+      signerAddress,
+      signerAddress
+    );
   }
 
   /**
@@ -145,7 +164,13 @@ export class WithdrawClient {
     const signerAddress = await this.signer.getAddress();
 
     // For native ETH redemption, call redeem with the shares value
-    return await vaultContract.redeem(shares, signerAddress, signerAddress);
+    return await executeContractMethod(
+      vaultContract,
+      "redeem",
+      shares,
+      signerAddress,
+      signerAddress
+    );
   }
 
   /**
@@ -163,6 +188,10 @@ export class WithdrawClient {
     }
 
     const vaultContract = this.getVaultContract(vaultAddress);
-    return await vaultContract.completeWithdrawal(requestId);
+    return await executeContractMethod(
+      vaultContract,
+      "completeWithdrawal",
+      requestId
+    );
   }
 }

@@ -30,34 +30,6 @@ export const SYM_ERC20_ABI = [
   },
   {
     type: "function",
-    name: "DEFAULT_ADMIN_ROLE",
-    inputs: [],
-    outputs: [{ name: "", type: "bytes32", internalType: "bytes32" }],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "DEPOSIT_LIMIT_MANAGER_ROLE",
-    inputs: [],
-    outputs: [{ name: "", type: "bytes32", internalType: "bytes32" }],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "DEPOSIT_WHITELIST_MANAGER_ROLE",
-    inputs: [],
-    outputs: [{ name: "", type: "bytes32", internalType: "bytes32" }],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "ETH",
-    inputs: [],
-    outputs: [{ name: "", type: "address", internalType: "address" }],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
     name: "NETWORK_MIDDLEWARE_SERVICE",
     inputs: [],
     outputs: [
@@ -67,13 +39,6 @@ export const SYM_ERC20_ABI = [
         internalType: "contract INetworkMiddlewareService",
       },
     ],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "VERSION_MANAGER_ROLE",
-    inputs: [],
-    outputs: [{ name: "", type: "bytes32", internalType: "bytes32" }],
     stateMutability: "view",
   },
   {
@@ -250,7 +215,7 @@ export const SYM_ERC20_ABI = [
     type: "function",
     name: "curatorFee",
     inputs: [],
-    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    outputs: [{ name: "", type: "uint16", internalType: "uint16" }],
     stateMutability: "view",
   },
   {
@@ -318,7 +283,7 @@ export const SYM_ERC20_ABI = [
       {
         name: "",
         type: "tuple",
-        internalType: "struct IBaseVault.WithdrawalRequest",
+        internalType: "struct BaseVaultLogicLib.WithdrawalRequest",
         components: [
           { name: "receiver", type: "address", internalType: "address" },
           { name: "owner", type: "address", internalType: "address" },
@@ -333,6 +298,16 @@ export const SYM_ERC20_ABI = [
       },
     ],
     stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "grantRole",
+    inputs: [
+      { name: "role", type: "bytes32", internalType: "bytes32" },
+      { name: "account", type: "address", internalType: "address" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
   },
   {
     type: "function",
@@ -376,8 +351,8 @@ export const SYM_ERC20_ABI = [
             type: "address",
             internalType: "address",
           },
-          { name: "curatorFee", type: "uint256", internalType: "uint256" },
           { name: "depositLimit", type: "uint256", internalType: "uint256" },
+          { name: "curatorFee", type: "uint16", internalType: "uint16" },
           { name: "isDepositLimit", type: "bool", internalType: "bool" },
           { name: "isPrivateVault", type: "bool", internalType: "bool" },
           { name: "isTokenized", type: "bool", internalType: "bool" },
@@ -386,7 +361,6 @@ export const SYM_ERC20_ABI = [
           { name: "metadataURI", type: "string", internalType: "string" },
         ],
       },
-      { name: "_symVault", type: "address", internalType: "contract IVault" },
     ],
     outputs: [],
     stateMutability: "nonpayable",
@@ -423,8 +397,8 @@ export const SYM_ERC20_ABI = [
             type: "address",
             internalType: "address",
           },
-          { name: "curatorFee", type: "uint256", internalType: "uint256" },
           { name: "depositLimit", type: "uint256", internalType: "uint256" },
+          { name: "curatorFee", type: "uint16", internalType: "uint16" },
           { name: "isDepositLimit", type: "bool", internalType: "bool" },
           { name: "isPrivateVault", type: "bool", internalType: "bool" },
           { name: "isTokenized", type: "bool", internalType: "bool" },
@@ -433,6 +407,7 @@ export const SYM_ERC20_ABI = [
           { name: "metadataURI", type: "string", internalType: "string" },
         ],
       },
+      { name: "_symVault", type: "address", internalType: "contract IVault" },
     ],
     outputs: [],
     stateMutability: "nonpayable",
@@ -520,6 +495,16 @@ export const SYM_ERC20_ABI = [
   },
   {
     type: "function",
+    name: "migrateSymVault",
+    inputs: [
+      { name: "newVersion", type: "uint64", internalType: "uint64" },
+      { name: "data", type: "bytes", internalType: "bytes" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
     name: "name",
     inputs: [],
     outputs: [{ name: "", type: "string", internalType: "string" }],
@@ -559,6 +544,16 @@ export const SYM_ERC20_ABI = [
   },
   {
     type: "function",
+    name: "revokeRole",
+    inputs: [
+      { name: "role", type: "bytes32", internalType: "bytes32" },
+      { name: "account", type: "address", internalType: "address" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
     name: "rewardsByIndex",
     inputs: [
       { name: "token", type: "address", internalType: "address" },
@@ -588,6 +583,13 @@ export const SYM_ERC20_ABI = [
       { name: "_stakers", type: "address[]", internalType: "address[]" },
       { name: "_canDeposit", type: "bool", internalType: "bool" },
     ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "setCuratorFee",
+    inputs: [{ name: "curatorFee_", type: "uint16", internalType: "uint16" }],
     outputs: [],
     stateMutability: "nonpayable",
   },
@@ -790,37 +792,6 @@ export const SYM_ERC20_ABI = [
   },
   {
     type: "event",
-    name: "Deposit",
-    inputs: [
-      {
-        name: "sender",
-        type: "address",
-        indexed: true,
-        internalType: "address",
-      },
-      {
-        name: "owner",
-        type: "address",
-        indexed: true,
-        internalType: "address",
-      },
-      {
-        name: "assets",
-        type: "uint256",
-        indexed: false,
-        internalType: "uint256",
-      },
-      {
-        name: "shares",
-        type: "uint256",
-        indexed: false,
-        internalType: "uint256",
-      },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
     name: "DistributeRewards",
     inputs: [
       {
@@ -927,44 +898,12 @@ export const SYM_ERC20_ABI = [
   },
   {
     type: "event",
-    name: "StakerDepositStatusChanged",
-    inputs: [
-      {
-        name: "staker",
-        type: "address",
-        indexed: true,
-        internalType: "address",
-      },
-      {
-        name: "canDeposit",
-        type: "bool",
-        indexed: false,
-        internalType: "bool",
-      },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
     name: "Transfer",
     inputs: [
       { name: "from", type: "address", indexed: true, internalType: "address" },
       { name: "to", type: "address", indexed: true, internalType: "address" },
       {
         name: "value",
-        type: "uint256",
-        indexed: false,
-        internalType: "uint256",
-      },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
-    name: "VaultDepositLimitChanged",
-    inputs: [
-      {
-        name: "depositLimit",
         type: "uint256",
         indexed: false,
         internalType: "uint256",
@@ -1050,43 +989,6 @@ export const SYM_ERC20_ABI = [
   },
   {
     type: "event",
-    name: "WithdrawalRequested",
-    inputs: [
-      {
-        name: "receiver",
-        type: "address",
-        indexed: true,
-        internalType: "address",
-      },
-      {
-        name: "owner",
-        type: "address",
-        indexed: true,
-        internalType: "address",
-      },
-      {
-        name: "assets",
-        type: "uint256",
-        indexed: false,
-        internalType: "uint256",
-      },
-      {
-        name: "shares",
-        type: "uint256",
-        indexed: false,
-        internalType: "uint256",
-      },
-      {
-        name: "requestId",
-        type: "bytes32",
-        indexed: false,
-        internalType: "bytes32",
-      },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
     name: "WithdrawalRequestedFromRestaking",
     inputs: [
       {
@@ -1111,7 +1013,6 @@ export const SYM_ERC20_ABI = [
     name: "CannotDeposit",
     inputs: [{ name: "addr", type: "address", internalType: "address" }],
   },
-  { type: "error", name: "DepositLimitReached", inputs: [] },
   {
     type: "error",
     name: "ERC20InsufficientAllowance",
@@ -1202,9 +1103,6 @@ export const SYM_ERC20_ABI = [
     name: "SafeERC20FailedOperation",
     inputs: [{ name: "token", type: "address", internalType: "address" }],
   },
-  { type: "error", name: "VaultDepositLimitNotEnabled", inputs: [] },
-  { type: "error", name: "VaultNotPrivate", inputs: [] },
-  { type: "error", name: "VaultNotTokenized", inputs: [] },
   {
     type: "error",
     name: "WithdrawalNotClaimable",

@@ -7,6 +7,7 @@
 import { ethers } from "ethers";
 import { GAS_LIMITS } from "../../constants";
 import { Metadata } from "../../types";
+import { callContractMethod, executeContractMethod } from "../../utils";
 
 /**
  * Get the metadata URI of the vault
@@ -19,8 +20,15 @@ export async function getVaultMetadata(
   // The contract may not have a direct method to get the metadata URI
   // We need to check the specific implementation
   if (typeof vaultContract.metadataURI === "function") {
-    const metadataURI = await vaultContract.metadataURI();
-    return await vaultContract.metadata(metadataURI);
+    const metadataURI = await callContractMethod<string>(
+      vaultContract,
+      "metadataURI"
+    );
+    return await callContractMethod<Metadata>(
+      vaultContract,
+      "metadata",
+      metadataURI
+    );
   } else {
     throw Error("This vault does not support direct metadataURI access");
   }
@@ -198,9 +206,12 @@ export async function setMetadata(
     console.log(`Using URI: ${metadataURI}`);
 
     // Update the vault's metadata URI
-    return await vaultContract.updateMetadataURI(metadataURI, {
-      gasLimit: GAS_LIMITS.setDepositLimit, // using a standard gas limit as reference
-    });
+    return await executeContractMethod(
+      vaultContract,
+      "updateMetadataURI",
+      metadataURI,
+      { gasLimit: GAS_LIMITS.setDepositLimit }
+    );
   } catch (error) {
     // Re-throw the error with a clean message and no stack trace
     if (error instanceof Error) {

@@ -1,6 +1,7 @@
 import { ethers } from "ethers";
 import { ERC20_VAULT_ABI, SUPER_ERC20_ABI } from "../../constants/abis";
 import { VaultTypeClient } from "./VaultType";
+import { callContractMethod, executeContractMethod } from "../../utils";
 
 interface VaultCache {
   isSupervault?: boolean;
@@ -66,8 +67,9 @@ export class EigenLayerClient {
       if (cacheEntry.isSupervault) {
         // For SuperVaults, we need to get the eigenVault from the SuperVault contract
         const superVaultContract = this.getSuperVaultContract(vaultAddress);
-        const [symVaultAddress, eigenVaultAddress] =
-          await superVaultContract.getUnderlyingVaults();
+        const [symVaultAddress, eigenVaultAddress] = await callContractMethod<
+          [string, string]
+        >(superVaultContract, "getUnderlyingVaults");
         eigenVaultAdd = eigenVaultAddress;
       } else {
         // For regular EigenLayer vaults, the address is the same
@@ -104,7 +106,7 @@ export class EigenLayerClient {
    */
   async getEigenOperator(vaultAddress: string): Promise<string> {
     const vaultContract = await this.getVaultContract(vaultAddress);
-    return await vaultContract.delegatedTo();
+    return await callContractMethod<string>(vaultContract, "delegatedTo");
   }
 
   /**
@@ -131,7 +133,9 @@ export class EigenLayerClient {
     }
 
     const vaultContract = await this.getVaultContract(vaultAddress);
-    return await vaultContract.delegateTo(
+    return await executeContractMethod(
+      vaultContract,
+      "delegateTo",
       operator,
       approverSignatureAndExpiry,
       approverSalt,

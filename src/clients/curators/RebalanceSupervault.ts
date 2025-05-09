@@ -9,6 +9,7 @@
 
 import { ethers } from "ethers";
 import { GAS_LIMITS } from "../../constants";
+import { callContractMethod, executeContractMethod } from "../../utils";
 
 // The role ID for the balancer manager (if applicable)
 // Note: This is a placeholder and needs to be confirmed
@@ -25,7 +26,10 @@ export async function getDistributionRatio(
 ): Promise<bigint> {
   // This assumes there's a method to get the distribution ratio
   if (typeof supervaultContract.getDistributionRatio === "function") {
-    return await supervaultContract.getDistributionRatio();
+    return await callContractMethod<bigint>(
+      supervaultContract,
+      "getDistributionRatio"
+    );
   } else {
     throw new Error(
       "This supervault does not support distribution ratio query"
@@ -46,7 +50,12 @@ export async function isBalancerManager(
   // This is a placeholder implementation
   // Need to verify if the role exists and what its ID is
   try {
-    return await supervaultContract.hasRole(ROLE_ID_BALANCER_MANAGER, address);
+    return await callContractMethod<boolean>(
+      supervaultContract,
+      "hasRole",
+      ROLE_ID_BALANCER_MANAGER,
+      address
+    );
   } catch (error) {
     throw new Error(
       "Balancer manager role check not supported by this contract"
@@ -65,7 +74,10 @@ export async function getRebalanceStatus(
   // This is a placeholder implementation
   // The actual method and return type depends on the implementation
   if (typeof supervaultContract.getRebalanceStatus === "function") {
-    return await supervaultContract.getRebalanceStatus();
+    return await callContractMethod<any>(
+      supervaultContract,
+      "getRebalanceStatus"
+    );
   } else {
     throw new Error("This supervault does not support rebalance status query");
   }
@@ -81,7 +93,10 @@ export async function getUnderlyingVaults(
 ): Promise<string[]> {
   // This assumes there's a method to get the underlying vaults
   if (typeof supervaultContract.getUnderlyingVaults === "function") {
-    return await supervaultContract.getUnderlyingVaults();
+    return await callContractMethod<string[]>(
+      supervaultContract,
+      "getUnderlyingVaults"
+    );
   } else {
     throw new Error("This supervault does not support underlying vaults query");
   }
@@ -102,9 +117,12 @@ export async function updateDistributionRatio(
   // This assumes there's a method to update the distribution ratio
   // and that the signer has the correct permissions
   if (typeof supervaultContract.updateDistributionRatio === "function") {
-    return await supervaultContract.updateDistributionRatio(ratio, {
-      gasLimit: GAS_LIMITS.setDepositLimit, // using a standard gas limit as reference
-    });
+    return await executeContractMethod(
+      supervaultContract,
+      "updateDistributionRatio",
+      ratio,
+      { gasLimit: GAS_LIMITS.setDepositLimit }
+    );
   } else {
     throw new Error(
       "This supervault does not support distribution ratio updates"
@@ -127,22 +145,31 @@ export async function setBalancerManager(
   // This is a placeholder implementation
   // Need to verify if this functionality exists
   if (typeof supervaultContract.setBalancerManager === "function") {
-    return await supervaultContract.setBalancerManager(newManagerAddress, {
-      gasLimit: GAS_LIMITS.grantRole,
-    });
+    return await executeContractMethod(
+      supervaultContract,
+      "setBalancerManager",
+      newManagerAddress,
+      { gasLimit: GAS_LIMITS.grantRole }
+    );
   } else {
     // Alternative: try using role-based access control if available
     try {
-      const adminRole = await supervaultContract.getRoleAdmin(
+      const adminRole = await callContractMethod<string>(
+        supervaultContract,
+        "getRoleAdmin",
         ROLE_ID_BALANCER_MANAGER
       );
+
       const signerAddress = await signer.getAddress();
 
       // Verify the signer has the admin role
-      const isAdmin = await supervaultContract.hasRole(
+      const isAdmin = await callContractMethod<boolean>(
+        supervaultContract,
+        "hasRole",
         adminRole,
         signerAddress
       );
+
       if (!isAdmin) {
         throw new Error(
           "Signer does not have the admin role required to transfer balancer manager role"
@@ -150,12 +177,12 @@ export async function setBalancerManager(
       }
 
       // Grant the role to the new manager
-      return await supervaultContract.grantRole(
+      return await executeContractMethod(
+        supervaultContract,
+        "grantRole",
         ROLE_ID_BALANCER_MANAGER,
         newManagerAddress,
-        {
-          gasLimit: GAS_LIMITS.grantRole,
-        }
+        { gasLimit: GAS_LIMITS.grantRole }
       );
     } catch (error) {
       throw new Error(
@@ -177,8 +204,8 @@ export async function forceRebalance(
 ): Promise<ethers.TransactionResponse> {
   // This assumes there's a method to force a rebalance
   if (typeof supervaultContract.rebalance === "function") {
-    return await supervaultContract.rebalance({
-      gasLimit: GAS_LIMITS.setDepositLimit * 3, // Using a higher gas limit for this complex operation
+    return await executeContractMethod(supervaultContract, "rebalance", {
+      gasLimit: GAS_LIMITS.setDepositLimit * 3,
     });
   } else {
     throw new Error("This supervault does not support forced rebalancing");

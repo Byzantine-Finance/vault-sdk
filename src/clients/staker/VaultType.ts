@@ -5,6 +5,7 @@ import {
   SUPER_ERC20_ABI,
 } from "../../constants/abis";
 import { RestakingProtocol } from "../../types";
+import { callContractMethod } from "../../utils";
 
 export class VaultTypeClient {
   private provider: ethers.Provider;
@@ -49,7 +50,7 @@ export class VaultTypeClient {
     try {
       const vaultContract = this.getContractWithSymABI(vaultAddress);
       // Try to access the symVault property, which only exists on Symbiotic vaults
-      await vaultContract.symVault();
+      await callContractMethod<string>(vaultContract, "symVault");
       return true;
     } catch (error) {
       return false;
@@ -65,13 +66,13 @@ export class VaultTypeClient {
     try {
       const vaultContract = this.getContractWithEigenABI(vaultAddress);
       // Try to access delegatedTo which only exists on EigenLayer vaults
-      await vaultContract.delegatedTo();
+      await callContractMethod<string>(vaultContract, "delegatedTo");
       return true;
     } catch (error) {
       // If that failed, try another EigenLayer-specific method
       try {
         const vaultContract = this.getContractWithEigenABI(vaultAddress);
-        await vaultContract.eigenStrategy();
+        await callContractMethod<string>(vaultContract, "eigenStrategy");
         return true;
       } catch (innerError) {
         return false;
@@ -88,9 +89,33 @@ export class VaultTypeClient {
   async isSupervault(vaultAddress: string): Promise<boolean> {
     try {
       const vaultContract = this.getContractWithSuperABI(vaultAddress);
-      // Check for SuperVault specific properties
-      const underlyingVaults = await vaultContract.getDistributionRatio();
-      return Array.isArray(underlyingVaults) && underlyingVaults.length > 0;
+
+      // Try multiple methods to determine if it's a SuperVault
+      try {
+        // First try getDistributionRatio
+        const distributionRatio = await callContractMethod<any>(
+          vaultContract,
+          "getDistributionRatio"
+        );
+        return true;
+      } catch (methodError) {
+        // If that fails, try with getUnderlyingVaults
+        try {
+          const underlyingVaults = await callContractMethod<[string, string]>(
+            vaultContract,
+            "getUnderlyingVaults"
+          );
+          return Array.isArray(underlyingVaults) && underlyingVaults.length > 0;
+        } catch (underlyingError) {
+          // Try a third method - symRatio
+          try {
+            await callContractMethod<bigint>(vaultContract, "symRatio");
+            return true;
+          } catch (ratioError) {
+            return false;
+          }
+        }
+      }
     } catch (error) {
       return false;
     }

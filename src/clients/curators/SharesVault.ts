@@ -4,6 +4,7 @@
 // Get symbol - The symbol of the vault share token
 
 import { ethers } from "ethers";
+import { callContractMethod } from "../../utils";
 
 /**
  * Check if the vault's shares are tokenized (transferable like ERC20)
@@ -13,7 +14,7 @@ import { ethers } from "ethers";
 export async function isTokenized(
   vaultContract: ethers.Contract
 ): Promise<boolean> {
-  return await vaultContract.isTokenized();
+  return await callContractMethod<boolean>(vaultContract, "isTokenized");
 }
 
 /**
@@ -24,7 +25,7 @@ export async function isTokenized(
 export async function getSharesName(
   vaultContract: ethers.Contract
 ): Promise<string> {
-  return await vaultContract.name();
+  return await callContractMethod<string>(vaultContract, "name");
 }
 
 /**
@@ -35,7 +36,7 @@ export async function getSharesName(
 export async function getSharesSymbol(
   vaultContract: ethers.Contract
 ): Promise<string> {
-  return await vaultContract.symbol();
+  return await callContractMethod<string>(vaultContract, "symbol");
 }
 
 /**
@@ -46,7 +47,7 @@ export async function getSharesSymbol(
 export async function getTotalShares(
   vaultContract: ethers.Contract
 ): Promise<bigint> {
-  return await vaultContract.totalSupply();
+  return await callContractMethod<bigint>(vaultContract, "totalSupply");
 }
 
 /**
@@ -59,7 +60,7 @@ export async function getSharesBalance(
   vaultContract: ethers.Contract,
   address: string
 ): Promise<bigint> {
-  return await vaultContract.balanceOf(address);
+  return await callContractMethod<bigint>(vaultContract, "balanceOf", address);
 }
 
 /**
@@ -72,7 +73,11 @@ export async function convertToShares(
   vaultContract: ethers.Contract,
   assets: bigint
 ): Promise<bigint> {
-  return await vaultContract.convertToShares(assets);
+  return await callContractMethod<bigint>(
+    vaultContract,
+    "convertToShares",
+    assets
+  );
 }
 
 /**
@@ -85,5 +90,9 @@ export async function convertToAssets(
   vaultContract: ethers.Contract,
   shares: bigint
 ): Promise<bigint> {
-  return await vaultContract.convertToAssets(shares);
+  return await callContractMethod<bigint>(
+    vaultContract,
+    "convertToAssets",
+    shares
+  );
 }

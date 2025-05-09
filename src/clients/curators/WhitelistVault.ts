@@ -9,6 +9,7 @@
 
 import { ethers } from "ethers";
 import { GAS_LIMITS } from "../../constants";
+import { callContractMethod, executeContractMethod } from "../../utils";
 
 // Role identifier constants
 const ROLE_ID_WHITELIST_MANAGER =
@@ -24,7 +25,11 @@ export async function isAddressWhitelisted(
   vaultContract: ethers.Contract,
   address: string
 ): Promise<boolean> {
-  return await vaultContract.canDeposit(address);
+  return await callContractMethod<boolean>(
+    vaultContract,
+    "canDeposit",
+    address
+  );
 }
 
 /**
@@ -35,7 +40,7 @@ export async function isAddressWhitelisted(
 export async function isVaultPrivate(
   vaultContract: ethers.Contract
 ): Promise<boolean> {
-  return await vaultContract.isPrivateVault();
+  return await callContractMethod<boolean>(vaultContract, "isPrivateVault");
 }
 
 /**
@@ -48,7 +53,12 @@ export async function isWhitelistManager(
   vaultContract: ethers.Contract,
   address: string
 ): Promise<boolean> {
-  return await vaultContract.hasRole(ROLE_ID_WHITELIST_MANAGER, address);
+  return await callContractMethod<boolean>(
+    vaultContract,
+    "hasRole",
+    ROLE_ID_WHITELIST_MANAGER,
+    address
+  );
 }
 
 /**
@@ -68,18 +78,25 @@ export async function setAddressesWhitelistStatus(
   const signerAddress = await signer.getAddress();
 
   // Verify the signer has the whitelist manager role
-  const isManager = await vaultContract.hasRole(
+  const isManager = await callContractMethod<boolean>(
+    vaultContract,
+    "hasRole",
     ROLE_ID_WHITELIST_MANAGER,
     signerAddress
   );
+
   if (!isManager) {
     throw new Error("Signer does not have the whitelist manager role");
   }
 
   // Set whitelist status for the provided addresses
-  return await vaultContract.setCanDeposit(addresses, canDeposit, {
-    gasLimit: GAS_LIMITS.setDepositWhitelistedStatus,
-  });
+  return await executeContractMethod(
+    vaultContract,
+    "setCanDeposit",
+    addresses,
+    canDeposit,
+    { gasLimit: GAS_LIMITS.setDepositWhitelistedStatus }
+  );
 }
 
 /**
@@ -97,18 +114,24 @@ export async function setVaultPrivateStatus(
   const signerAddress = await signer.getAddress();
 
   // Verify the signer has the whitelist manager role
-  const isManager = await vaultContract.hasRole(
+  const isManager = await callContractMethod<boolean>(
+    vaultContract,
+    "hasRole",
     ROLE_ID_WHITELIST_MANAGER,
     signerAddress
   );
+
   if (!isManager) {
     throw new Error("Signer does not have the whitelist manager role");
   }
 
   // Set private status
-  return await vaultContract.setIsPrivateVault(isPrivate, {
-    gasLimit: GAS_LIMITS.setIsPrivateVault,
-  });
+  return await executeContractMethod(
+    vaultContract,
+    "setIsPrivateVault",
+    isPrivate,
+    { gasLimit: GAS_LIMITS.setIsPrivateVault }
+  );
 }
 
 /**
@@ -126,10 +149,20 @@ export async function transferWhitelistManagerRole(
   const signerAddress = await signer.getAddress();
 
   // Get the admin role for whitelist manager
-  const adminRole = await vaultContract.getRoleAdmin(ROLE_ID_WHITELIST_MANAGER);
+  const adminRole = await callContractMethod<string>(
+    vaultContract,
+    "getRoleAdmin",
+    ROLE_ID_WHITELIST_MANAGER
+  );
 
   // Verify the signer has the admin role
-  const isAdmin = await vaultContract.hasRole(adminRole, signerAddress);
+  const isAdmin = await callContractMethod<boolean>(
+    vaultContract,
+    "hasRole",
+    adminRole,
+    signerAddress
+  );
+
   if (!isAdmin) {
     throw new Error(
       "Signer does not have the admin role required to transfer whitelist manager role"
@@ -137,11 +170,11 @@ export async function transferWhitelistManagerRole(
   }
 
   // Grant the role to the new manager
-  return await vaultContract.grantRole(
+  return await executeContractMethod(
+    vaultContract,
+    "grantRole",
     ROLE_ID_WHITELIST_MANAGER,
     newManagerAddress,
-    {
-      gasLimit: GAS_LIMITS.grantRole,
-    }
+    { gasLimit: GAS_LIMITS.grantRole }
   );
 }

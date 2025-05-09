@@ -35,7 +35,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "npm run generate-error-mapping && tsc",
     "clean": "rm -rf dist",
     "prebuild": "npm run clean",
     "pretest": "npm run build",
@@ -48,7 +48,8 @@
     "test:vault-read-data": "ts-node test/vault-read-data.js",
     "test:vault-operation": "ts-node test/vault-operation.js",
     "test:vault-metadata": "ts-node test/vault-metadata.js",
-    "test:vault-claim-withdrawals": "ts-node test/vault-claim-withdrawals.js"
+    "test:vault-claim-withdrawals": "ts-node test/vault-claim-withdrawals.js",
+    "generate-error-mapping": "ts-node scripts/generateErrorMapping.ts"
   },
   "dependencies": {
     "dotenv": "^16.5.0",

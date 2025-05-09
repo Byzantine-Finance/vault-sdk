@@ -12,7 +12,6 @@ export const BYZANTINE_FACTORY_ABI = [
         type: "address",
         internalType: "contract IStrategyFactory",
       },
-      { name: "_byzETH", type: "address", internalType: "contract IByzETH" },
       {
         name: "_burnerRouterFactory",
         type: "address",
@@ -51,13 +50,6 @@ export const BYZANTINE_FACTORY_ABI = [
   },
   {
     type: "function",
-    name: "byzETH",
-    inputs: [],
-    outputs: [{ name: "", type: "address", internalType: "contract IByzETH" }],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
     name: "createEigenByzVault",
     inputs: [
       {
@@ -88,8 +80,8 @@ export const BYZANTINE_FACTORY_ABI = [
             type: "address",
             internalType: "address",
           },
-          { name: "curatorFee", type: "uint256", internalType: "uint256" },
           { name: "depositLimit", type: "uint256", internalType: "uint256" },
+          { name: "curatorFee", type: "uint16", internalType: "uint16" },
           { name: "isDepositLimit", type: "bool", internalType: "bool" },
           { name: "isPrivateVault", type: "bool", internalType: "bool" },
           { name: "isTokenized", type: "bool", internalType: "bool" },
@@ -133,41 +125,67 @@ export const BYZANTINE_FACTORY_ABI = [
     name: "createEigenByzVault",
     inputs: [
       {
-        name: "_byzVaultParams",
+        name: "_nativeByzVaultParams",
         type: "tuple",
-        internalType: "struct IByzantineFactory.ByzVaultParams",
+        internalType: "struct IByzantineFactory.NativeByzVaultParams",
         components: [
-          { name: "token", type: "address", internalType: "contract IERC20" },
-          { name: "roleManager", type: "address", internalType: "address" },
-          { name: "versionManager", type: "address", internalType: "address" },
           {
-            name: "depositWhitelistManager",
-            type: "address",
-            internalType: "address",
+            name: "byzVaultParams",
+            type: "tuple",
+            internalType: "struct IByzantineFactory.ByzVaultParams",
+            components: [
+              {
+                name: "token",
+                type: "address",
+                internalType: "contract IERC20",
+              },
+              { name: "roleManager", type: "address", internalType: "address" },
+              {
+                name: "versionManager",
+                type: "address",
+                internalType: "address",
+              },
+              {
+                name: "depositWhitelistManager",
+                type: "address",
+                internalType: "address",
+              },
+              {
+                name: "depositLimitManager",
+                type: "address",
+                internalType: "address",
+              },
+              {
+                name: "curatorFeeClaimer",
+                type: "address",
+                internalType: "address",
+              },
+              {
+                name: "curatorFeeClaimerRoleAdmin",
+                type: "address",
+                internalType: "address",
+              },
+              {
+                name: "depositLimit",
+                type: "uint256",
+                internalType: "uint256",
+              },
+              { name: "curatorFee", type: "uint16", internalType: "uint16" },
+              { name: "isDepositLimit", type: "bool", internalType: "bool" },
+              { name: "isPrivateVault", type: "bool", internalType: "bool" },
+              { name: "isTokenized", type: "bool", internalType: "bool" },
+              { name: "name", type: "string", internalType: "string" },
+              { name: "symbol", type: "string", internalType: "string" },
+              { name: "metadataURI", type: "string", internalType: "string" },
+            ],
           },
+          { name: "operatorId", type: "bytes32", internalType: "bytes32" },
+          { name: "soloStakingFee", type: "uint16", internalType: "uint16" },
           {
-            name: "depositLimitManager",
-            type: "address",
-            internalType: "address",
+            name: "validatorManagers",
+            type: "address[]",
+            internalType: "address[]",
           },
-          {
-            name: "curatorFeeClaimer",
-            type: "address",
-            internalType: "address",
-          },
-          {
-            name: "curatorFeeClaimerRoleAdmin",
-            type: "address",
-            internalType: "address",
-          },
-          { name: "curatorFee", type: "uint256", internalType: "uint256" },
-          { name: "depositLimit", type: "uint256", internalType: "uint256" },
-          { name: "isDepositLimit", type: "bool", internalType: "bool" },
-          { name: "isPrivateVault", type: "bool", internalType: "bool" },
-          { name: "isTokenized", type: "bool", internalType: "bool" },
-          { name: "name", type: "string", internalType: "string" },
-          { name: "symbol", type: "string", internalType: "string" },
-          { name: "metadataURI", type: "string", internalType: "string" },
         ],
       },
       {
@@ -245,12 +263,12 @@ export const BYZANTINE_FACTORY_ABI = [
                 type: "address",
                 internalType: "address",
               },
-              { name: "curatorFee", type: "uint256", internalType: "uint256" },
               {
                 name: "depositLimit",
                 type: "uint256",
                 internalType: "uint256",
               },
+              { name: "curatorFee", type: "uint16", internalType: "uint16" },
               { name: "isDepositLimit", type: "bool", internalType: "bool" },
               { name: "isPrivateVault", type: "bool", internalType: "bool" },
               { name: "isTokenized", type: "bool", internalType: "bool" },
@@ -457,196 +475,14 @@ export const BYZANTINE_FACTORY_ABI = [
             type: "address",
             internalType: "address",
           },
-          { name: "curatorFee", type: "uint256", internalType: "uint256" },
           { name: "depositLimit", type: "uint256", internalType: "uint256" },
+          { name: "curatorFee", type: "uint16", internalType: "uint16" },
           { name: "isDepositLimit", type: "bool", internalType: "bool" },
           { name: "isPrivateVault", type: "bool", internalType: "bool" },
           { name: "isTokenized", type: "bool", internalType: "bool" },
           { name: "name", type: "string", internalType: "string" },
           { name: "symbol", type: "string", internalType: "string" },
           { name: "metadataURI", type: "string", internalType: "string" },
-        ],
-      },
-      {
-        name: "_symParams",
-        type: "tuple",
-        internalType: "struct IByzantineFactory.SymParams",
-        components: [
-          {
-            name: "burnerParams",
-            type: "tuple",
-            internalType: "struct IByzantineFactory.BurnerParams",
-            components: [
-              { name: "owner", type: "address", internalType: "address" },
-              { name: "delay", type: "uint48", internalType: "uint48" },
-              {
-                name: "globalReceiver",
-                type: "address",
-                internalType: "address",
-              },
-              {
-                name: "networkReceivers",
-                type: "tuple[]",
-                internalType: "struct IBurnerRouter.NetworkReceiver[]",
-                components: [
-                  { name: "network", type: "address", internalType: "address" },
-                  {
-                    name: "receiver",
-                    type: "address",
-                    internalType: "address",
-                  },
-                ],
-              },
-              {
-                name: "operatorNetworkReceivers",
-                type: "tuple[]",
-                internalType: "struct IBurnerRouter.OperatorNetworkReceiver[]",
-                components: [
-                  { name: "network", type: "address", internalType: "address" },
-                  {
-                    name: "operator",
-                    type: "address",
-                    internalType: "address",
-                  },
-                  {
-                    name: "receiver",
-                    type: "address",
-                    internalType: "address",
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            name: "vaultParams",
-            type: "tuple",
-            internalType: "struct IByzantineFactory.VaultParams",
-            components: [
-              { name: "version", type: "uint64", internalType: "uint64" },
-              { name: "epochDuration", type: "uint48", internalType: "uint48" },
-            ],
-          },
-          {
-            name: "delegatorParams",
-            type: "tuple",
-            internalType: "struct IByzantineFactory.DelegatorParams",
-            components: [
-              {
-                name: "delegatorType",
-                type: "uint8",
-                internalType: "enum IByzantineFactory.DelegatorType",
-              },
-              { name: "hook", type: "address", internalType: "address" },
-              {
-                name: "hookSetRoleHolder",
-                type: "address",
-                internalType: "address",
-              },
-              {
-                name: "networkLimitSetRoleHolders",
-                type: "address[]",
-                internalType: "address[]",
-              },
-              {
-                name: "operatorNetworkLimitOrSharesSetRoleHolders",
-                type: "address[]",
-                internalType: "address[]",
-              },
-              { name: "operator", type: "address", internalType: "address" },
-              { name: "network", type: "address", internalType: "address" },
-            ],
-          },
-          {
-            name: "slasherParams",
-            type: "tuple",
-            internalType: "struct IByzantineFactory.SlasherParams",
-            components: [
-              {
-                name: "slasherType",
-                type: "uint8",
-                internalType: "enum IByzantineFactory.SlasherType",
-              },
-              { name: "vetoDuration", type: "uint48", internalType: "uint48" },
-              {
-                name: "resolverSetEpochsDelay",
-                type: "uint256",
-                internalType: "uint256",
-              },
-            ],
-          },
-        ],
-      },
-    ],
-    outputs: [
-      { name: "symByzVault", type: "address", internalType: "address" },
-    ],
-    stateMutability: "nonpayable",
-  },
-  {
-    type: "function",
-    name: "createSymByzVault",
-    inputs: [
-      {
-        name: "_nativeByzVaultParams",
-        type: "tuple",
-        internalType: "struct IByzantineFactory.NativeByzVaultParams",
-        components: [
-          {
-            name: "byzVaultParams",
-            type: "tuple",
-            internalType: "struct IByzantineFactory.ByzVaultParams",
-            components: [
-              {
-                name: "token",
-                type: "address",
-                internalType: "contract IERC20",
-              },
-              { name: "roleManager", type: "address", internalType: "address" },
-              {
-                name: "versionManager",
-                type: "address",
-                internalType: "address",
-              },
-              {
-                name: "depositWhitelistManager",
-                type: "address",
-                internalType: "address",
-              },
-              {
-                name: "depositLimitManager",
-                type: "address",
-                internalType: "address",
-              },
-              {
-                name: "curatorFeeClaimer",
-                type: "address",
-                internalType: "address",
-              },
-              {
-                name: "curatorFeeClaimerRoleAdmin",
-                type: "address",
-                internalType: "address",
-              },
-              { name: "curatorFee", type: "uint256", internalType: "uint256" },
-              {
-                name: "depositLimit",
-                type: "uint256",
-                internalType: "uint256",
-              },
-              { name: "isDepositLimit", type: "bool", internalType: "bool" },
-              { name: "isPrivateVault", type: "bool", internalType: "bool" },
-              { name: "isTokenized", type: "bool", internalType: "bool" },
-              { name: "name", type: "string", internalType: "string" },
-              { name: "symbol", type: "string", internalType: "string" },
-              { name: "metadataURI", type: "string", internalType: "string" },
-            ],
-          },
-          { name: "operatorId", type: "bytes32", internalType: "bytes32" },
-          {
-            name: "validatorManagers",
-            type: "address[]",
-            internalType: "address[]",
-          },
         ],
       },
       {

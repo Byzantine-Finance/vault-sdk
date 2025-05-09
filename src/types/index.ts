@@ -56,7 +56,7 @@ export interface BaseParams {
   token_name: string;
   token_symbol: string;
 
-  curator_fee: number;
+  curator_fee: number; // Note: This is a uint16 in the ABI (basis points, e.g. 100 = 1%)
 
   role_manager: string;
   role_version_manager: string;
@@ -70,6 +70,9 @@ export interface NativeParams {
   byzVaultParams: BaseParams;
 
   operator_id: string;
+
+  // Added to match the ABI
+  solo_staking_fee?: number; // This is a uint16 in the ABI (basis points, e.g. 100 = 1%)
 
   roles_validator_manager: string[]; // List of addresses who can manage the validator manager, only when solo staker vault
 }
@@ -99,8 +102,12 @@ export interface SymbioticParams {
   slasher_number_epoch_to_set_delay: number; //       SLASHER: Number of epoch to set the delay, usually 3
   burner_delay_settings_applied: number; //           BURNER: If true, the delay settings are applied, in days, usually 21
   burner_global_receiver: string; //                  BURNER: Default receiver of the burner, best practice is to use the ones proposed by Symbiotic for the relevant token
-  burner_network_receiver: string[]; //               BURNER: Will be implemented later
-  burner_operator_network_receiver: string[]; //      BURNER: Will be implemented later
+  burner_network_receiver?: { network: string; receiver: string }[]; //               BURNER: Network receivers array
+  burner_operator_network_receiver?: {
+    network: string;
+    operator: string;
+    receiver: string;
+  }[]; //      BURNER: Operator network receivers array
   delegator_type: DelegatorType; //                   DELEGATOR: Type of the delegator
   delegator_hook: string; //                          DELEGATOR: Address of the hook of the delegator
   delegator_operator: string; //                      DELEGATOR: Address of the operator of the delegator, only for type 2 and 3, set to 0x0 if type 0 or 1
@@ -161,8 +168,8 @@ export interface SuperVault {
   base: BaseParams;
   symbiotic: SymbioticParams;
   eigenlayer: EigenlayerParams;
-  ratio: number;
-  curator: string;
+  ratio: number; // Proportion of assets to allocate to Symbiotic as a percentage (0-100)
+  curator: string; // Address of the curator of the vault
 }
 
 // ----------------------------------

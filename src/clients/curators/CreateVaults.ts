@@ -22,6 +22,11 @@ import {
 import { BYZANTINE_FACTORY_ABI } from "../../constants/abis";
 import { convertMetadataToURI } from "./MetadataVault";
 
+import {
+  executeContractMethod,
+  callContractMethod,
+} from "../../utils/contractErrorHandler";
+
 /**
  * Format base parameters to match the contract's expected format
  * @param params Base parameters
@@ -63,6 +68,7 @@ export async function formatNativeParams(params: NativeParams) {
   return {
     byzVaultParams: await formatBaseParams(params.byzVaultParams),
     operatorId: params.operator_id,
+    soloStakingFee: 0, // Add the soloStakingFee parameter based on the updated ABI
     validatorManagers: params.roles_validator_manager,
   };
 }
@@ -170,16 +176,29 @@ export async function createEigenlayerERC20Vault(
     // Merge default options with user-provided options (user options take precedence)
     const txOptions = { ...defaultOptions, ...options };
 
-    // Use an explicit function signature to avoid ambiguity
+    // Use an explicit function signature to avoid ambiguity with the overloaded functions
+    // Match the exact signature from the ABI
     const functionSignature =
-      "createEigenByzVault((address,address,address,address,address,address,address,uint256,uint256,bool,bool,bool,string,string,string),(address,address,(bytes,uint256),bytes32))";
+      "createEigenByzVault((address,address,address,address,address,address,address,uint256,uint16,bool,bool,bool,string,string,string),(address,address,(bytes,uint256),bytes32))";
 
-    // Call the contract method to create an Eigenlayer ERC20 vault with explicit function signature
-    const tx: TransactionResponse = await contract.getFunction(
-      functionSignature
-    )(formattedBaseParams, formattedEigenParams, txOptions);
-
-    return tx;
+    try {
+      // First attempt with executeContractMethod and explicit method signature
+      return await executeContractMethod(
+        contract,
+        functionSignature,
+        formattedBaseParams,
+        formattedEigenParams,
+        txOptions
+      );
+    } catch (methodError: any) {
+      // If that fails, use a direct approach with getFunction
+      console.log(
+        "Falling back to direct contract.getFunction call:",
+        methodError.message
+      );
+      const method = contract.getFunction(functionSignature);
+      return await method(formattedBaseParams, formattedEigenParams, txOptions);
+    }
   } catch (error: any) {
     console.error("Error creating Eigenlayer ERC20 vault:", error);
 
@@ -223,21 +242,33 @@ export async function createEigenlayerNativeVault(
       ...options,
     };
 
-    // Use an explicit function signature to avoid ambiguity
+    // Use an explicit function signature to avoid ambiguity with the overloaded functions
+    // Match the exact signature from the ABI
     const functionSignature =
-      "createEigenByzVault(((address,address,address,address,address,address,address,uint256,uint256,bool,bool,bool,string,string,string),bytes32,address[]),(address,address,(bytes,uint256),bytes32),(address))";
+      "createEigenByzVault(((address,address,address,address,address,address,address,uint256,uint16,bool,bool,bool,string,string,string),bytes32,uint16,address[]),(address,address,(bytes,uint256),bytes32))";
 
-    // Call the contract method to create an Eigenlayer Native vault with explicit function signature
-    const tx: TransactionResponse = await contract.getFunction(
-      functionSignature
-    )(
-      nativeByzVaultParams,
-      formattedEigenParams,
-      formattedEigenPodParams,
-      txOptions
-    );
-
-    return tx;
+    try {
+      // First attempt with executeContractMethod and explicit method signature
+      return await executeContractMethod(
+        contract,
+        functionSignature,
+        nativeByzVaultParams,
+        formattedEigenParams,
+        txOptions
+      );
+    } catch (methodError: any) {
+      // If that fails, use a direct approach with getFunction
+      console.log(
+        "Falling back to direct contract.getFunction call:",
+        methodError.message
+      );
+      const method = contract.getFunction(functionSignature);
+      return await method(
+        nativeByzVaultParams,
+        formattedEigenParams,
+        txOptions
+      );
+    }
   } catch (error: any) {
     console.error("Error creating Eigenlayer Native vault:", error);
 
@@ -282,14 +313,30 @@ export async function createSymbioticERC20Vault(
 
     // Use an explicit function signature to avoid ambiguity
     const functionSignature =
-      "createSymByzVault((address,address,address,address,address,address,address,uint256,uint256,bool,bool,bool,string,string,string),((address,uint48,address,(address,address)[],(address,address,address)[]),(uint64,uint48),(uint8,address,address,address[],address[],address,address),(uint8,uint48,uint256)))";
+      "createSymByzVault((address,address,address,address,address,address,address,uint256,uint16,bool,bool,bool,string,string,string),((address,uint48,address,(address,address)[],(address,address,address)[]),(uint64,uint48),(uint8,address,address,address[],address[],address,address),(uint8,uint48,uint256)))";
 
-    // Call with an alternative method that explicitly specifies the function to call
-    const tx: TransactionResponse = await contract.getFunction(
-      functionSignature
-    )(formattedBaseParams, formattedSymbioticParams, txOptions);
-
-    return tx;
+    try {
+      // First attempt with executeContractMethod and explicit method signature
+      return await executeContractMethod(
+        contract,
+        functionSignature,
+        formattedBaseParams,
+        formattedSymbioticParams,
+        txOptions
+      );
+    } catch (methodError: any) {
+      // If that fails, use a direct approach with getFunction
+      console.log(
+        "Falling back to direct contract.getFunction call:",
+        methodError.message
+      );
+      const method = contract.getFunction(functionSignature);
+      return await method(
+        formattedBaseParams,
+        formattedSymbioticParams,
+        txOptions
+      );
+    }
   } catch (error: any) {
     console.error("Error creating Symbiotic ERC20 vault:", error);
 
@@ -346,13 +393,13 @@ export async function createSuperVaultERC20(
 
     console.log("superVaultParams", superVaultParams);
 
-    // Call the contract method directly with the structured params
-    const tx = await contract.createSuperERC20Vault(
+    // Use executeContractMethod with the explicit function name
+    return await executeContractMethod(
+      contract,
+      "createSuperERC20Vault",
       superVaultParams,
       txOptions
     );
-
-    return tx;
   } catch (error: any) {
     console.error("Error creating SuperVault ERC20 vault:", error);
 
@@ -370,22 +417,6 @@ export async function createSuperVaultERC20(
     throw error;
   }
 }
-
-//
-// {
-//   type: "function",
-//   name: "setTokenToEigenStrategy",
-//   inputs: [
-//     { name: "_token", type: "address[]", internalType: "contract IERC20[]" },
-//     {
-//       name: "_strategy",
-//       type: "address[]",
-//       internalType: "contract IStrategy[]",
-//     },
-//   ],
-//   outputs: [],
-//   stateMutability: "nonpayable",
-// },
 
 /**
  * Set the token to Eigen strategy mapping
@@ -418,14 +449,14 @@ export async function setTokenToEigenStrategy(
       ...options,
     };
 
-    // Call the contract method directly with the structured params
-    const tx = await contract.setTokenToEigenStrategy(
+    // Use executeContractMethod to call the contract
+    return await executeContractMethod(
+      contract,
+      "setTokenToEigenStrategy",
       tokens,
       strategies,
       txOptions
     );
-
-    return tx;
   } catch (error: any) {
     console.error("Error setting token to Eigen strategy:", error);
 

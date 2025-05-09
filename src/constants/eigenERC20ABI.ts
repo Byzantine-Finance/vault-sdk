@@ -1,46 +1,14 @@
 export const ERC20_VAULT_ABI = [
-  { type: "constructor", inputs: [], stateMutability: "nonpayable" },
   {
-    type: "function",
-    name: "DEFAULT_ADMIN_ROLE",
-    inputs: [],
-    outputs: [{ name: "", type: "bytes32", internalType: "bytes32" }],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "DELEGATION_MANAGER_ROLE",
-    inputs: [],
-    outputs: [{ name: "", type: "bytes32", internalType: "bytes32" }],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "DEPOSIT_LIMIT_MANAGER_ROLE",
-    inputs: [],
-    outputs: [{ name: "", type: "bytes32", internalType: "bytes32" }],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "DEPOSIT_WHITELIST_MANAGER_ROLE",
-    inputs: [],
-    outputs: [{ name: "", type: "bytes32", internalType: "bytes32" }],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "ETH",
-    inputs: [],
-    outputs: [{ name: "", type: "address", internalType: "address" }],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "VERSION_MANAGER_ROLE",
-    inputs: [],
-    outputs: [{ name: "", type: "bytes32", internalType: "bytes32" }],
-    stateMutability: "view",
+    type: "constructor",
+    inputs: [
+      {
+        name: "_eigenRewards",
+        type: "address",
+        internalType: "contract IEigenRewards",
+      },
+    ],
+    stateMutability: "nonpayable",
   },
   {
     type: "function",
@@ -113,6 +81,13 @@ export const ERC20_VAULT_ABI = [
   },
   {
     type: "function",
+    name: "curatorFee",
+    inputs: [],
+    outputs: [{ name: "", type: "uint16", internalType: "uint16" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "decimals",
     inputs: [],
     outputs: [{ name: "", type: "uint8", internalType: "uint8" }],
@@ -151,7 +126,7 @@ export const ERC20_VAULT_ABI = [
       { name: "assets", type: "uint256", internalType: "uint256" },
       { name: "receiver", type: "address", internalType: "address" },
     ],
-    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    outputs: [{ name: "shares", type: "uint256", internalType: "uint256" }],
     stateMutability: "nonpayable",
   },
   {
@@ -159,6 +134,15 @@ export const ERC20_VAULT_ABI = [
     name: "depositLimit",
     inputs: [],
     outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "eigenRewards",
+    inputs: [],
+    outputs: [
+      { name: "", type: "address", internalType: "contract IEigenRewards" },
+    ],
     stateMutability: "view",
   },
   {
@@ -209,7 +193,7 @@ export const ERC20_VAULT_ABI = [
       {
         name: "",
         type: "tuple",
-        internalType: "struct IBaseVault.WithdrawalRequest",
+        internalType: "struct BaseVaultLogicLib.WithdrawalRequest",
         components: [
           { name: "receiver", type: "address", internalType: "address" },
           { name: "owner", type: "address", internalType: "address" },
@@ -224,6 +208,16 @@ export const ERC20_VAULT_ABI = [
       },
     ],
     stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "grantRole",
+    inputs: [
+      { name: "role", type: "bytes32", internalType: "bytes32" },
+      { name: "account", type: "address", internalType: "address" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
   },
   {
     type: "function",
@@ -267,8 +261,8 @@ export const ERC20_VAULT_ABI = [
             type: "address",
             internalType: "address",
           },
-          { name: "curatorFee", type: "uint256", internalType: "uint256" },
           { name: "depositLimit", type: "uint256", internalType: "uint256" },
+          { name: "curatorFee", type: "uint16", internalType: "uint16" },
           { name: "isDepositLimit", type: "bool", internalType: "bool" },
           { name: "isPrivateVault", type: "bool", internalType: "bool" },
           { name: "isTokenized", type: "bool", internalType: "bool" },
@@ -276,35 +270,6 @@ export const ERC20_VAULT_ABI = [
           { name: "symbol", type: "string", internalType: "string" },
           { name: "metadataURI", type: "string", internalType: "string" },
         ],
-      },
-      {
-        name: "_eigenParams",
-        type: "tuple",
-        internalType: "struct IByzantineFactory.EigenParams",
-        components: [
-          {
-            name: "delegationSetRoleHolder",
-            type: "address",
-            internalType: "address",
-          },
-          { name: "operator", type: "address", internalType: "address" },
-          {
-            name: "approverSignatureAndExpiry",
-            type: "tuple",
-            internalType:
-              "struct ISignatureUtilsMixinTypes.SignatureWithExpiry",
-            components: [
-              { name: "signature", type: "bytes", internalType: "bytes" },
-              { name: "expiry", type: "uint256", internalType: "uint256" },
-            ],
-          },
-          { name: "approverSalt", type: "bytes32", internalType: "bytes32" },
-        ],
-      },
-      {
-        name: "_strategy",
-        type: "address",
-        internalType: "contract IStrategy",
       },
     ],
     outputs: [],
@@ -342,8 +307,8 @@ export const ERC20_VAULT_ABI = [
             type: "address",
             internalType: "address",
           },
-          { name: "curatorFee", type: "uint256", internalType: "uint256" },
           { name: "depositLimit", type: "uint256", internalType: "uint256" },
+          { name: "curatorFee", type: "uint16", internalType: "uint16" },
           { name: "isDepositLimit", type: "bool", internalType: "bool" },
           { name: "isPrivateVault", type: "bool", internalType: "bool" },
           { name: "isTokenized", type: "bool", internalType: "bool" },
@@ -351,6 +316,35 @@ export const ERC20_VAULT_ABI = [
           { name: "symbol", type: "string", internalType: "string" },
           { name: "metadataURI", type: "string", internalType: "string" },
         ],
+      },
+      {
+        name: "_eigenParams",
+        type: "tuple",
+        internalType: "struct IByzantineFactory.EigenParams",
+        components: [
+          {
+            name: "delegationSetRoleHolder",
+            type: "address",
+            internalType: "address",
+          },
+          { name: "operator", type: "address", internalType: "address" },
+          {
+            name: "approverSignatureAndExpiry",
+            type: "tuple",
+            internalType:
+              "struct ISignatureUtilsMixinTypes.SignatureWithExpiry",
+            components: [
+              { name: "signature", type: "bytes", internalType: "bytes" },
+              { name: "expiry", type: "uint256", internalType: "uint256" },
+            ],
+          },
+          { name: "approverSalt", type: "bytes32", internalType: "bytes32" },
+        ],
+      },
+      {
+        name: "_strategy",
+        type: "address",
+        internalType: "contract IStrategy",
       },
     ],
     outputs: [],
@@ -460,11 +454,28 @@ export const ERC20_VAULT_ABI = [
   },
   {
     type: "function",
+    name: "revokeRole",
+    inputs: [
+      { name: "role", type: "bytes32", internalType: "bytes32" },
+      { name: "account", type: "address", internalType: "address" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
     name: "setCanDeposit",
     inputs: [
       { name: "_stakers", type: "address[]", internalType: "address[]" },
       { name: "_canDeposit", type: "bool", internalType: "bool" },
     ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "setCuratorFee",
+    inputs: [{ name: "_curatorFee", type: "uint16", internalType: "uint16" }],
     outputs: [],
     stateMutability: "nonpayable",
   },
@@ -594,37 +605,6 @@ export const ERC20_VAULT_ABI = [
   },
   {
     type: "event",
-    name: "Deposit",
-    inputs: [
-      {
-        name: "sender",
-        type: "address",
-        indexed: true,
-        internalType: "address",
-      },
-      {
-        name: "owner",
-        type: "address",
-        indexed: true,
-        internalType: "address",
-      },
-      {
-        name: "assets",
-        type: "uint256",
-        indexed: false,
-        internalType: "uint256",
-      },
-      {
-        name: "shares",
-        type: "uint256",
-        indexed: false,
-        internalType: "uint256",
-      },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
     name: "Initialized",
     inputs: [
       {
@@ -632,6 +612,20 @@ export const ERC20_VAULT_ABI = [
         type: "uint64",
         indexed: false,
         internalType: "uint64",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "RoleAdminChanged",
+    inputs: [
+      { name: "role", type: "bytes32", indexed: true, internalType: "bytes32" },
+      {
+        name: "newAdminRole",
+        type: "bytes32",
+        indexed: true,
+        internalType: "bytes32",
       },
     ],
     anonymous: false,
@@ -659,44 +653,12 @@ export const ERC20_VAULT_ABI = [
   },
   {
     type: "event",
-    name: "StakerDepositStatusChanged",
-    inputs: [
-      {
-        name: "staker",
-        type: "address",
-        indexed: true,
-        internalType: "address",
-      },
-      {
-        name: "canDeposit",
-        type: "bool",
-        indexed: false,
-        internalType: "bool",
-      },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
     name: "Transfer",
     inputs: [
       { name: "from", type: "address", indexed: true, internalType: "address" },
       { name: "to", type: "address", indexed: true, internalType: "address" },
       {
         name: "value",
-        type: "uint256",
-        indexed: false,
-        internalType: "uint256",
-      },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
-    name: "VaultDepositLimitChanged",
-    inputs: [
-      {
-        name: "depositLimit",
         type: "uint256",
         indexed: false,
         internalType: "uint256",
@@ -781,43 +743,6 @@ export const ERC20_VAULT_ABI = [
     anonymous: false,
   },
   {
-    type: "event",
-    name: "WithdrawalRequested",
-    inputs: [
-      {
-        name: "receiver",
-        type: "address",
-        indexed: true,
-        internalType: "address",
-      },
-      {
-        name: "owner",
-        type: "address",
-        indexed: true,
-        internalType: "address",
-      },
-      {
-        name: "assets",
-        type: "uint256",
-        indexed: false,
-        internalType: "uint256",
-      },
-      {
-        name: "shares",
-        type: "uint256",
-        indexed: false,
-        internalType: "uint256",
-      },
-      {
-        name: "requestId",
-        type: "bytes32",
-        indexed: false,
-        internalType: "bytes32",
-      },
-    ],
-    anonymous: false,
-  },
-  {
     type: "error",
     name: "AccessControlUnauthorizedAccount",
     inputs: [
@@ -830,7 +755,6 @@ export const ERC20_VAULT_ABI = [
     name: "CannotDeposit",
     inputs: [{ name: "addr", type: "address", internalType: "address" }],
   },
-  { type: "error", name: "DepositLimitReached", inputs: [] },
   {
     type: "error",
     name: "ERC20InsufficientAllowance",
@@ -910,9 +834,6 @@ export const ERC20_VAULT_ABI = [
     name: "SafeERC20FailedOperation",
     inputs: [{ name: "token", type: "address", internalType: "address" }],
   },
-  { type: "error", name: "VaultDepositLimitNotEnabled", inputs: [] },
-  { type: "error", name: "VaultNotPrivate", inputs: [] },
-  { type: "error", name: "VaultNotTokenized", inputs: [] },
   {
     type: "error",
     name: "WithdrawalNotClaimable",

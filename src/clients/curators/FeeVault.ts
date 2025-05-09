@@ -8,6 +8,7 @@
 
 import { ethers } from "ethers";
 import { GAS_LIMITS } from "../../constants";
+import { callContractMethod, executeContractMethod } from "../../utils";
 
 // The role ID for the fee manager (curator fee claimer)
 // Note: This might need to be updated with the actual role ID
@@ -25,7 +26,7 @@ export async function getVaultFeePercentage(
   // This function assumes there's a method to get the curator fee
   // The actual method name might differ depending on the implementation
   if (typeof vaultContract.curatorFee === "function") {
-    return await vaultContract.curatorFee();
+    return await callContractMethod<bigint>(vaultContract, "curatorFee");
   } else {
     throw new Error("This vault does not support direct fee access");
   }
@@ -41,7 +42,12 @@ export async function isFeeManager(
   vaultContract: ethers.Contract,
   address: string
 ): Promise<boolean> {
-  return await vaultContract.hasRole(ROLE_ID_FEE_MANAGER, address);
+  return await callContractMethod<boolean>(
+    vaultContract,
+    "hasRole",
+    ROLE_ID_FEE_MANAGER,
+    address
+  );
 }
 
 /**
@@ -55,7 +61,7 @@ export async function getUnclaimedFees(
   // The implementation depends on the specific contract design
   // This is a placeholder that needs to be updated with actual implementation
   if (typeof vaultContract.getUnclaimedFees === "function") {
-    return await vaultContract.getUnclaimedFees();
+    return await callContractMethod<bigint>(vaultContract, "getUnclaimedFees");
   } else {
     throw new Error("This vault does not support unclaimed fees query");
   }
@@ -76,10 +82,13 @@ export async function setVaultFeePercentage(
   const signerAddress = await signer.getAddress();
 
   // Verify the signer has the fee manager role
-  const isManager = await vaultContract.hasRole(
+  const isManager = await callContractMethod<boolean>(
+    vaultContract,
+    "hasRole",
     ROLE_ID_FEE_MANAGER,
     signerAddress
   );
+
   if (!isManager) {
     throw new Error("Signer does not have the fee manager role");
   }
@@ -87,9 +96,12 @@ export async function setVaultFeePercentage(
   // Set the fee percentage
   // The actual method name might differ depending on the implementation
   if (typeof vaultContract.setCuratorFee === "function") {
-    return await vaultContract.setCuratorFee(feePercentage, {
-      gasLimit: GAS_LIMITS.setCuratorFee || GAS_LIMITS.setDepositLimit, // fallback to a known gas limit
-    });
+    return await executeContractMethod(
+      vaultContract,
+      "setCuratorFee",
+      feePercentage,
+      { gasLimit: GAS_LIMITS.setCuratorFee || GAS_LIMITS.setDepositLimit }
+    );
   } else {
     throw new Error("This vault does not support fee updates");
   }
@@ -108,10 +120,13 @@ export async function claimVaultFees(
   const signerAddress = await signer.getAddress();
 
   // Verify the signer has the fee manager role
-  const isManager = await vaultContract.hasRole(
+  const isManager = await callContractMethod<boolean>(
+    vaultContract,
+    "hasRole",
     ROLE_ID_FEE_MANAGER,
     signerAddress
   );
+
   if (!isManager) {
     throw new Error("Signer does not have the fee manager role");
   }
@@ -119,8 +134,8 @@ export async function claimVaultFees(
   // Claim the fees
   // The actual method name might differ depending on the implementation
   if (typeof vaultContract.claimFees === "function") {
-    return await vaultContract.claimFees({
-      gasLimit: GAS_LIMITS.setDepositLimit, // using a standard gas limit as reference
+    return await executeContractMethod(vaultContract, "claimFees", {
+      gasLimit: GAS_LIMITS.setDepositLimit,
     });
   } else {
     throw new Error("This vault does not support fee claiming");
@@ -142,10 +157,20 @@ export async function transferFeeManagerRole(
   const signerAddress = await signer.getAddress();
 
   // Get the admin role for fee manager
-  const adminRole = await vaultContract.getRoleAdmin(ROLE_ID_FEE_MANAGER);
+  const adminRole = await callContractMethod<string>(
+    vaultContract,
+    "getRoleAdmin",
+    ROLE_ID_FEE_MANAGER
+  );
 
   // Verify the signer has the admin role
-  const isAdmin = await vaultContract.hasRole(adminRole, signerAddress);
+  const isAdmin = await callContractMethod<boolean>(
+    vaultContract,
+    "hasRole",
+    adminRole,
+    signerAddress
+  );
+
   if (!isAdmin) {
     throw new Error(
       "Signer does not have the admin role required to transfer fee manager role"
@@ -153,7 +178,11 @@ export async function transferFeeManagerRole(
   }
 
   // Grant the role to the new manager
-  return await vaultContract.grantRole(ROLE_ID_FEE_MANAGER, newManagerAddress, {
-    gasLimit: GAS_LIMITS.grantRole,
-  });
+  return await executeContractMethod(
+    vaultContract,
+    "grantRole",
+    ROLE_ID_FEE_MANAGER,
+    newManagerAddress,
+    { gasLimit: GAS_LIMITS.grantRole }
+  );
 }

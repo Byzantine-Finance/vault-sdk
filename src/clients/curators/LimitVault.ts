@@ -8,6 +8,7 @@
 
 import { ethers } from "ethers";
 import { GAS_LIMITS } from "../../constants";
+import { callContractMethod, executeContractMethod } from "../../utils";
 
 // Role identifier constants
 const ROLE_ID_LIMIT_MANAGER =
@@ -21,7 +22,7 @@ const ROLE_ID_LIMIT_MANAGER =
 export async function getVaultDepositLimit(
   vaultContract: ethers.Contract
 ): Promise<bigint> {
-  return await vaultContract.depositLimit();
+  return await callContractMethod<bigint>(vaultContract, "depositLimit");
 }
 
 /**
@@ -32,7 +33,7 @@ export async function getVaultDepositLimit(
 export async function isDepositLimitEnabled(
   vaultContract: ethers.Contract
 ): Promise<boolean> {
-  return await vaultContract.isDepositLimit();
+  return await callContractMethod<boolean>(vaultContract, "isDepositLimit");
 }
 
 /**
@@ -45,7 +46,12 @@ export async function isLimitManager(
   vaultContract: ethers.Contract,
   address: string
 ): Promise<boolean> {
-  return await vaultContract.hasRole(ROLE_ID_LIMIT_MANAGER, address);
+  return await callContractMethod<boolean>(
+    vaultContract,
+    "hasRole",
+    ROLE_ID_LIMIT_MANAGER,
+    address
+  );
 }
 
 /**
@@ -63,16 +69,19 @@ export async function setVaultDepositLimit(
   const signerAddress = await signer.getAddress();
 
   // Verify the signer has the limit manager role
-  const isManager = await vaultContract.hasRole(
+  const isManager = await callContractMethod<boolean>(
+    vaultContract,
+    "hasRole",
     ROLE_ID_LIMIT_MANAGER,
     signerAddress
   );
+
   if (!isManager) {
     throw new Error("Signer does not have the limit manager role");
   }
 
   // Set the deposit limit
-  return await vaultContract.setDepositLimit(limit, {
+  return await executeContractMethod(vaultContract, "setDepositLimit", limit, {
     gasLimit: GAS_LIMITS.setDepositLimit,
   });
 }
@@ -92,18 +101,24 @@ export async function setDepositLimitStatus(
   const signerAddress = await signer.getAddress();
 
   // Verify the signer has the limit manager role
-  const isManager = await vaultContract.hasRole(
+  const isManager = await callContractMethod<boolean>(
+    vaultContract,
+    "hasRole",
     ROLE_ID_LIMIT_MANAGER,
     signerAddress
   );
+
   if (!isManager) {
     throw new Error("Signer does not have the limit manager role");
   }
 
   // Set deposit limit status
-  return await vaultContract.setIsDepositLimit(enabled, {
-    gasLimit: GAS_LIMITS.setDepositLimit,
-  });
+  return await executeContractMethod(
+    vaultContract,
+    "setIsDepositLimit",
+    enabled,
+    { gasLimit: GAS_LIMITS.setDepositLimit }
+  );
 }
 
 /**
@@ -121,10 +136,20 @@ export async function transferLimitManagerRole(
   const signerAddress = await signer.getAddress();
 
   // Get the admin role for limit manager
-  const adminRole = await vaultContract.getRoleAdmin(ROLE_ID_LIMIT_MANAGER);
+  const adminRole = await callContractMethod<string>(
+    vaultContract,
+    "getRoleAdmin",
+    ROLE_ID_LIMIT_MANAGER
+  );
 
   // Verify the signer has the admin role
-  const isAdmin = await vaultContract.hasRole(adminRole, signerAddress);
+  const isAdmin = await callContractMethod<boolean>(
+    vaultContract,
+    "hasRole",
+    adminRole,
+    signerAddress
+  );
+
   if (!isAdmin) {
     throw new Error(
       "Signer does not have the admin role required to transfer limit manager role"
@@ -132,11 +157,11 @@ export async function transferLimitManagerRole(
   }
 
   // Grant the role to the new manager
-  return await vaultContract.grantRole(
+  return await executeContractMethod(
+    vaultContract,
+    "grantRole",
     ROLE_ID_LIMIT_MANAGER,
     newManagerAddress,
-    {
-      gasLimit: GAS_LIMITS.grantRole,
-    }
+    { gasLimit: GAS_LIMITS.grantRole }
   );
 }
