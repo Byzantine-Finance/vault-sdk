@@ -9,7 +9,8 @@ Byzantine Finance is the first native restaking aggregation and abstraction laye
 This SDK provides a simple interface to interact with the Byzantine Factory contract deployed on:
 
 - _Ethereum Mainnet -> Soon_
-- [Holesky Testnet](https://holesky.etherscan.io/address/0xe0f5fc7913C4aDC0975bD21d20DF7FC27360a267)
+- [Holesky Testnet](https://holesky.etherscan.io/address/0xa9dcf24B1463c57a442a0dE274607C2b4B952634)
+- [Sepolia Testnet](https://sepolia.etherscan.io/address/0xE92cCdA7bfA1D7f50Fbb97c8Da746A18387C47F6)
 - _Hoodi Testnet -> Soon_
 
 The factory contract allows users to:
@@ -38,7 +39,7 @@ MNEMONIC=your_wallet_mnemonic
 # OR
 PRIVATE_KEY=your_wallet_private_key_without_0x_prefix
 
-DEFAULT_CHAIN_ID=17000  # 17000 for Holesky testnet, 1 for Ethereum Mainnet, 560048 for Hoodi Testnet
+DEFAULT_CHAIN_ID=17000  # 17000 for Holesky testnet, 1 for Ethereum Mainnet, 11155111 for Sepolia, 560048 for Hoodi Testnet
 ```
 
 2. Import and initialize the client:
@@ -59,7 +60,7 @@ const wallet = ethers.Wallet.fromPhrase(process.env.MNEMONIC).connect(provider);
 // OR const wallet = new ethers.Wallet(process.env.PRIVATE_KEY).connect(provider);
 
 const client = new ByzantineClient({
-  chainId: 17000, // 17000 for Holesky, 1 for Mainnet, 560048 for Hoodi
+  chainId: 17000, // 17000 for Holesky, 11155111 for Sepolia, 1 for Mainnet, 560048 for Hoodi
   provider: provider,
   signer: wallet,
 });
@@ -260,7 +261,87 @@ const receipt = await tx.wait();
 ### Creating a ERC20 SuperVault
 
 ```ts
-// Not available yet
+// -
+// All import and initialize client as shown above
+// -
+
+// Define vault parameters
+const baseParams = {
+  metadata: {
+    name: "SuperVault osETH",
+    description: "A SuperVault for osETH with high yields",
+  },
+
+  token_address: networkConfig.osETHAddress, // osETH addresss
+
+  is_deposit_limit: true,
+  deposit_limit: ethers.parseUnits("1000000", 18), // 1M osETH (18 decimals)
+
+  is_private: false, // Private SuperVault
+
+  is_tokenized: true,
+  token_name: "Byzantine osETH SuperVault",
+  token_symbol: "bsosETHs",
+
+  curator_fee: 600, // 6% (600 basis points)
+
+  // Roles - replace with actual addresses in production
+  role_manager: address,
+  role_version_manager: address,
+  role_deposit_limit_manager: address,
+  role_deposit_whitelist_manager: address,
+  role_curator_fee_claimer: address,
+  role_curator_fee_claimer_admin: address,
+};
+
+const symbioticParams = {
+  vault_version: 1,
+  vault_epoch_duration: 604800, // 7 days in seconds
+  slasher_type: SlasherType.VETO,
+  slasher_veto_duration: 86400, // 1 day in seconds
+  slasher_number_epoch_to_set_delay: 3,
+  burner_delay_settings_applied: 21, // 21 days
+  burner_global_receiver: "0x25133c2c49A343F8312bb6e896C1ea0Ad8CD0EBd", // Global receiver for wstETH
+  burner_network_receiver: [],
+  burner_operator_network_receiver: [],
+  delegator_type: DelegatorType.NETWORK_RESTAKE,
+  delegator_hook: "0x0000000000000000000000000000000000000001", // Delegator hook address
+  delegator_operator: "0x0000000000000000000000000000000000000000", // Not used for NETWORK_RESTAKE
+  delegator_network: "0x0000000000000000000000000000000000000000", // Not used for NETWORK_RESTAKE
+
+  role_delegator_set_hook: address,
+  role_delegator_set_network_limit: [address],
+  role_delegator_set_operator_network_limit: [address],
+  role_burner_owner_burner: address,
+};
+
+const eigenlayerParams = {
+  // Eigenlayer specific params
+  delegation_set_role_holder: address,
+  operator: "0xb564e795f9877b416cd1af86c98cf8d3d94d760d", // Blockshard
+
+  approver_signature_and_expiry: {
+    signature: "0x", // null signature
+    expiry: 0, // no expiry
+  },
+  approver_salt:
+    "0x0000000000000000000000000000000000000000000000000000000000000000", // null salt
+};
+
+const ratio = 500; // 5%
+const curator = address;
+
+// Create the vault
+const tx = await client.createSuperVaultERC20({
+  base: baseParams,
+  symbiotic: symbioticParams,
+  eigenlayer: eigenlayerParams,
+  ratio: ratio,
+  curator: curator,
+});
+
+// Wait for confirmation
+const receipt = await tx.wait();
 ```
 
 ## Available Functions
@@ -409,9 +490,10 @@ npm run test:vault-claim-withdrawals # Test withdrawal claim process
 
 - _Ethereum Mainnet (Chain ID: 1) -> Soon_
 - **Holesky Testnet (Chain ID: 17000)**
+- **Sepolia Testnet (Chain ID: 11155111)**
 - _Hoodi Testnet (Chain ID: 560048) -> Soon_
 
-By default, the SDK is configured to use Holesky testnet (Chain ID: 17000). To use Ethereum Mainnet, specify `chainId: 1` when initializing the client. Or `chainId: 560048` for Hoodi Testnet.
+By default, the SDK is configured to use Holesky testnet (Chain ID: 17000). To use Ethereum Mainnet, specify `chainId: 1` when initializing the client. `chainId: 11155111` for Sepolia Testnet. `chainId: 560048` for Hoodi Testnet.
 
 ## NPM Package
 

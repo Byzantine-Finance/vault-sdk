@@ -175,7 +175,7 @@ async function runTests() {
         "0x0000000000000000000000000000000000000000000000000000000000000000", // null salt
     };
 
-    const ratio = 50;
+    const ratio = 500; // 5%
     const curator = address;
 
     // Test parameter validation
