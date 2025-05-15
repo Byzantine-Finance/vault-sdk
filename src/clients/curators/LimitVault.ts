@@ -42,17 +42,17 @@ export async function isDepositLimitEnabled(
  * @param address - Address to check
  * @returns True if the address is the limit manager
  */
-export async function isLimitManager(
-  vaultContract: ethers.Contract,
-  address: string
-): Promise<boolean> {
-  return await callContractMethod<boolean>(
-    vaultContract,
-    "hasRole",
-    ROLE_ID_LIMIT_MANAGER,
-    address
-  );
-}
+// export async function isLimitManager(
+//   vaultContract: ethers.Contract,
+//   address: string
+// ): Promise<boolean> {
+//   return await callContractMethod<boolean>(
+//     vaultContract,
+//     "hasRole",
+//     ROLE_ID_LIMIT_MANAGER,
+//     address
+//   );
+// }
 
 /**
  * Set the deposit limit for the vault

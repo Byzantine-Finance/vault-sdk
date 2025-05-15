@@ -10,3 +10,5 @@ export * from "./LimitVault";
 export * from "./MetadataVault";
 export * from "./FeeVault";
 export * from "./RebalanceSupervault";
+export * from "./SharesVault";
+export * from "./AccessControl";

@@ -1,5 +1,6 @@
 export * from "./networks";
-export * from "./byzantineFactoryABI";
+export * from "./AbiByzantineFactory";
+export * from "./AbiDelegator";
 
 /**
  * Constants used across the SDK

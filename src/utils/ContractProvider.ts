@@ -1,42 +1,63 @@
 import { ethers } from "ethers";
+import { VaultTypeClient } from "../clients/staker/VaultType";
 import {
   SYM_ERC20_ABI,
   SYM_VAULT_ABI,
   SUPER_ERC20_ABI,
   DELEGATOR_ABI,
-} from "../../constants/abis";
-import { VaultTypeClient } from "./VaultType";
-import { callContractMethod } from "../../utils";
-import { ContractProvider } from "../../utils/ContractProvider";
-import { DelegatorType } from "../../types";
+  BURNER_ABI,
+} from "../constants/abis";
+import { callContractMethod } from "./contractErrorHandler";
 
+/**
+ * Cache interface for vault addresses and related contracts
+ */
 interface VaultCache {
   isSupervault?: boolean;
   symVaultAddress?: string;
   delegatorAddress?: string;
+  burnerAddress?: string;
 }
 
-export class SymbioticClient {
+/**
+ * Contract Provider for handling contract instances with caching
+ */
+export class ContractProvider {
   private provider: ethers.Provider;
   private signer?: ethers.Signer;
-  private contractProvider: ContractProvider;
   private vaultTypeClient: VaultTypeClient;
   private vaultCache: Map<string, VaultCache>;
 
+  /**
+   * Creates a new ContractProvider instance
+   * @param provider Ethereum provider
+   * @param signer Optional signer for transactions
+   */
   constructor(provider: ethers.Provider, signer?: ethers.Signer) {
     this.provider = provider;
     this.signer = signer;
-    this.contractProvider = new ContractProvider(provider, signer);
     this.vaultTypeClient = new VaultTypeClient(provider);
     this.vaultCache = new Map();
   }
 
   /**
-   * Get the ERC20 contract instance
+   * Clear the cache for a specific vault or all vaults
+   * @param vaultAddress Optional address of the vault to clear from cache
+   */
+  public clearCache(vaultAddress?: string): void {
+    if (vaultAddress) {
+      this.vaultCache.delete(vaultAddress);
+    } else {
+      this.vaultCache.clear();
+    }
+  }
+
+  /**
+   * Get the ERC20 Byzantine vault contract instance
    * @param vaultAddress The address of the ERC20 vault
    * @returns The ERC20 contract instance
    */
-  private getByzVaultContract(vaultAddress: string): ethers.Contract {
+  public getByzVaultContract(vaultAddress: string): ethers.Contract {
     return new ethers.Contract(
       vaultAddress,
       SYM_ERC20_ABI,
@@ -49,7 +70,7 @@ export class SymbioticClient {
    * @param vaultAddress The address of the SuperVault
    * @returns The SuperVault contract instance
    */
-  private getSuperVaultContract(vaultAddress: string): ethers.Contract {
+  public getSuperVaultContract(vaultAddress: string): ethers.Contract {
     return new ethers.Contract(
       vaultAddress,
       SUPER_ERC20_ABI,
@@ -62,7 +83,7 @@ export class SymbioticClient {
    * @param vaultAddress The address of the Symbiotic vault or SuperVault
    * @returns The Vault contract instance
    */
-  private async getSymVaultContract(
+  public async getSymVaultContract(
     vaultAddress: string
   ): Promise<ethers.Contract> {
     // Check if we have cached information for this vault
@@ -124,95 +145,8 @@ export class SymbioticClient {
    * @returns The sym vault address
    */
   public async getSymVaultAddress(vaultAddress: string): Promise<string> {
-    return await this.contractProvider.getSymVaultAddress(vaultAddress);
-  }
-
-  /**
-   * Clear the cache for a specific vault or all vaults
-   * @param vaultAddress Optional address of the vault to clear from cache
-   */
-  public clearCache(vaultAddress?: string): void {
-    this.contractProvider.clearCache(vaultAddress);
-    if (vaultAddress) {
-      this.vaultCache.delete(vaultAddress);
-    } else {
-      this.vaultCache.clear();
-    }
-  }
-
-  /**
-   * Get the epoch at a specific timestamp for a Symbiotic vault
-   * @param vaultAddress The address of the vault
-   * @param timestamp The timestamp to check
-   * @returns The epoch number
-   */
-  async getEpochAt(vaultAddress: string, timestamp: number): Promise<number> {
     const symVaultContract = await this.getSymVaultContract(vaultAddress);
-    return await callContractMethod<number>(
-      symVaultContract,
-      "epochAt",
-      timestamp
-    );
-  }
-
-  /**
-   * Get the epoch duration for a Symbiotic vault
-   * @param vaultAddress The address of the vault
-   * @returns The epoch duration
-   */
-  async getEpochDuration(vaultAddress: string): Promise<number> {
-    const symVaultContract = await this.getSymVaultContract(vaultAddress);
-    return await callContractMethod<number>(symVaultContract, "epochDuration");
-  }
-
-  /**
-   * Get the current epoch for a Symbiotic vault
-   * @param vaultAddress The address of the vault
-   * @returns The current epoch number
-   */
-  async getCurrentEpoch(vaultAddress: string): Promise<number> {
-    const symVaultContract = await this.getSymVaultContract(vaultAddress);
-    const epoch = await callContractMethod<bigint>(
-      symVaultContract,
-      "currentEpoch"
-    );
-    return Number(epoch);
-  }
-
-  /**
-   * Get the start timestamp of the current epoch for a Symbiotic vault
-   * @param vaultAddress The address of the vault
-   * @returns The start timestamp of the current epoch
-   */
-  async getCurrentEpochStart(vaultAddress: string): Promise<number> {
-    const symVaultContract = await this.getSymVaultContract(vaultAddress);
-    return await callContractMethod<number>(
-      symVaultContract,
-      "currentEpochStart"
-    );
-  }
-
-  /**
-   * Get the start timestamp of the previous epoch for a Symbiotic vault
-   * @param vaultAddress The address of the vault
-   * @returns The start timestamp of the previous epoch
-   */
-  async getPreviousEpochStart(vaultAddress: string): Promise<number> {
-    const symVaultContract = await this.getSymVaultContract(vaultAddress);
-    return await callContractMethod<number>(
-      symVaultContract,
-      "previousEpochStart"
-    );
-  }
-
-  /**
-   * Get the start timestamp of the next epoch for a Symbiotic vault
-   * @param vaultAddress The address of the vault
-   * @returns The start timestamp of the next epoch
-   */
-  async getNextEpochStart(vaultAddress: string): Promise<number> {
-    const symVaultContract = await this.getSymVaultContract(vaultAddress);
-    return await callContractMethod<number>(symVaultContract, "nextEpochStart");
+    return await symVaultContract.getAddress();
   }
 
   /**
@@ -220,7 +154,7 @@ export class SymbioticClient {
    * @param vaultAddress The address of the vault
    * @returns The Delegator contract instance
    */
-  private async getDelegatorContract(
+  public async getDelegatorContract(
     vaultAddress: string
   ): Promise<ethers.Contract> {
     // Check if we have the delegator address in cache
@@ -261,17 +195,67 @@ export class SymbioticClient {
    * @returns The delegator address
    */
   public async getDelegatorAddress(vaultAddress: string): Promise<string> {
-    return await this.contractProvider.getDelegatorAddress(vaultAddress);
+    const cache = this.vaultCache.get(vaultAddress);
+    if (cache?.delegatorAddress) {
+      return cache.delegatorAddress;
+    }
+
+    // First get the symVault contract
+    const symVaultContract = await this.getSymVaultContract(vaultAddress);
+
+    // Get the delegator address from the symVault contract
+    const delegatorAddress = await callContractMethod<string>(
+      symVaultContract,
+      "delegator"
+    );
+
+    // Update cache
+    this.vaultCache.set(vaultAddress, {
+      ...cache,
+      delegatorAddress,
+    });
+
+    return delegatorAddress;
   }
 
   /**
-   * Get the delegator type for a Symbiotic vault
+   * Get the Burner contract instance
    * @param vaultAddress The address of the vault
-   * @returns The delegator type
+   * @returns The Burner contract instance
    */
-  async getDelegatorType(vaultAddress: string): Promise<DelegatorType> {
-    const delegatorContract = await this.getDelegatorContract(vaultAddress);
-    return await callContractMethod<DelegatorType>(delegatorContract, "TYPE");
+  public async getBurnerContract(
+    vaultAddress: string
+  ): Promise<ethers.Contract> {
+    // Check if we have the burner address in cache
+    const cache = this.vaultCache.get(vaultAddress);
+    if (cache?.burnerAddress) {
+      return new ethers.Contract(
+        cache.burnerAddress,
+        BURNER_ABI, // Use appropriate ABI for burner
+        this.signer || this.provider
+      );
+    }
+
+    // First get the symVault contract
+    const symVaultContract = await this.getSymVaultContract(vaultAddress);
+
+    // Get the burner address from the symVault contract
+    const burnerAddress = await callContractMethod<string>(
+      symVaultContract,
+      "burner"
+    );
+
+    // Update cache
+    this.vaultCache.set(vaultAddress, {
+      ...cache,
+      burnerAddress,
+    });
+
+    return new ethers.Contract(
+      burnerAddress,
+      BURNER_ABI, // Use appropriate ABI for burner
+      this.signer || this.provider
+    );
   }
 
   /**
@@ -280,6 +264,26 @@ export class SymbioticClient {
    * @returns The burner address
    */
   public async getBurnerAddress(vaultAddress: string): Promise<string> {
-    return await this.contractProvider.getBurnerAddress(vaultAddress);
+    const cache = this.vaultCache.get(vaultAddress);
+    if (cache?.burnerAddress) {
+      return cache.burnerAddress;
+    }
+
+    // First get the symVault contract
+    const symVaultContract = await this.getSymVaultContract(vaultAddress);
+
+    // Get the burner address from the symVault contract
+    const burnerAddress = await callContractMethod<string>(
+      symVaultContract,
+      "burner"
+    );
+
+    // Update cache
+    this.vaultCache.set(vaultAddress, {
+      ...cache,
+      burnerAddress,
+    });
+
+    return burnerAddress;
   }
 }

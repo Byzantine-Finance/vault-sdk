@@ -401,6 +401,14 @@ await client.getTotalShares(vaultAddress);
 await client.getSharesBalance(vaultAddress, userAddress);
 await client.convertToShares(vaultAddress, assets);
 await client.convertToAssets(vaultAddress, shares);
+
+// Role Management
+await client.isRoleManager(userAddress);
+await client.isVersionManager(userAddress);
+//... add all the others
+await client.setRoleManager(userAddress);
+await client.setVersionManager(userAddress);
+//... add all the others
 ```
 
 ### Staker
@@ -440,6 +448,9 @@ await client.getCurrentEpoch(vaultAddress);
 await client.getCurrentEpochStart(vaultAddress);
 await client.getPreviousEpochStart(vaultAddress);
 await client.getNextEpochStart(vaultAddress);
+await client.getSymVaultAddress(vaultAddress);
+await client.getBurnerAddress(vaultAddress);
+await client.getDelegatorAddress(vaultAddress);
 ```
 
 ## Vault Types
@@ -484,6 +495,7 @@ npm run test:vault-read-data        # Test reading vault data
 npm run test:vault-operation        # Test vault operations (deposit/withdraw)
 npm run test:vault-metadata         # Test vault metadata operations
 npm run test:vault-claim-withdrawals # Test withdrawal claim process
+npm run test:vault-roles           # Test role management operations
 ```
 
 ## Supported Networks

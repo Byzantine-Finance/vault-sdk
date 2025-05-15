@@ -102,7 +102,7 @@ async function runTests() {
 
   // Test vault addresses - add your own or use these examples
 
-  const VAULT_ADDRESS = "0x26b1086c36Cf1Ee780005937C30Cb58d6E0Fc960"; // Eigen stETH vault
+  const VAULT_ADDRESS = "0x4b22252caedabe081b92c3c9e169901a590e4571"; // Eigen stETH vault
   const REQUEST_ID =
     "0xBBB5C00413D3D0541A8B48189AA3652F4F3A2AAA820FD9ED044F9B83503F4A1B";
 
@@ -111,17 +111,36 @@ async function runTests() {
   console.log("Vault address:", VAULT_ADDRESS);
 
   try {
+    // ---- Check roles
+    const isCuratorFeeClaimerAdmin = await client.isCuratorFeeClaimerAdmin(
+      VAULT_ADDRESS,
+      userAddress
+    );
+    logResult(
+      "Is curator fee claimer admin",
+      isCuratorFeeClaimerAdmin,
+      isCuratorFeeClaimerAdmin ? "true" : "false"
+    );
+
+    const tx = await client.setCuratorFeeClaimerAdmin(
+      VAULT_ADDRESS,
+      userAddress,
+      true
+    );
+    await tx.wait();
+    logResult("Set curator fee claimer admin", true, tx.hash);
+
     // const claimable = await client.isClaimable(VAULT_ADDRESS, REQUEST_ID);
     // logResult("Claimable", true, claimable);
 
     //deposit 0.1 dans le vault
-    const tx = await client.depositToVault(
-      VAULT_ADDRESS,
-      ethers.parseEther("0.1"),
-      true
-    );
-    await tx.wait();
-    logResult("Deposit", true, tx.hash);
+    // const tx = await client.depositToVault(
+    //   VAULT_ADDRESS,
+    //   ethers.parseEther("0.1"),
+    //   true
+    // );
+    // const receipt = await tx.wait();
+    // logResult("Deposit", true, receipt?.hash);
 
     // completeWithdrawal
     // const tx = await client.completeWithdrawal(VAULT_ADDRESS, REQUEST_ID);

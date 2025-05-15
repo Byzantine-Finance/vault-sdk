@@ -21,6 +21,7 @@ import {
   ChainsOptions,
   Metadata,
   RestakingProtocol,
+  DelegatorType,
 } from "../types";
 import { getNetworkConfig } from "../constants/networks";
 import { BYZANTINE_FACTORY_ABI, ERC20_VAULT_ABI } from "../constants/abis";
@@ -36,6 +37,8 @@ import {
   createSymbioticERC20Vault,
   createSuperVaultERC20,
   setTokenToEigenStrategy,
+  AccessControlClient,
+  RoleType,
 } from "./curators";
 
 // Import specialized clients
@@ -67,7 +70,7 @@ export class ByzantineClient {
   private eigenLayerClient: EigenLayerClient;
   private symbioticClient: SymbioticClient;
   private vaultTypeClient: VaultTypeClient;
-
+  private accessControlClient: AccessControlClient;
   /**
    * Initialize a new ByzantineClient
    * @param options Client configuration options
@@ -116,6 +119,10 @@ export class ByzantineClient {
     this.eigenLayerClient = new EigenLayerClient(this.provider, this.signer);
     this.symbioticClient = new SymbioticClient(this.provider, this.signer);
     this.vaultTypeClient = new VaultTypeClient(this.provider);
+    this.accessControlClient = new AccessControlClient(
+      this.provider,
+      this.signer
+    );
   }
 
   // ===========================
@@ -713,13 +720,13 @@ export class ByzantineClient {
    * Deposit assets into a vault
    * @param vaultAddress The address of the vault
    * @param amount The amount to deposit
-   * @param autoApprove Whether to automatically approve if needed, true by default
+   * @param autoApprove Whether to automatically approve if needed, false by default
    * @returns Transaction response
    */
   async depositToVault(
     vaultAddress: string,
     amount: bigint,
-    autoApprove: boolean = true
+    autoApprove: boolean = false
   ): Promise<TransactionResponse> {
     return await this.depositClient.depositToVault(
       vaultAddress,
@@ -889,6 +896,41 @@ export class ByzantineClient {
     return await this.symbioticClient.getNextEpochStart(vaultAddress);
   }
 
+  /**
+   * Get the sym vault address of a Symbiotic vault
+   * @param vaultAddress The address of the vault
+   * @returns The sym vault address
+   */
+  async getSymVaultAddress(vaultAddress: string): Promise<string> {
+    return await this.symbioticClient.getSymVaultAddress(vaultAddress);
+  }
+  /**
+   * Get the delegator address of a Symbiotic vault
+   * @param vaultAddress The address of the vault
+   * @returns The delegator address
+   */
+  async getDelegatorAddress(vaultAddress: string): Promise<string> {
+    return await this.symbioticClient.getDelegatorAddress(vaultAddress);
+  }
+
+  /**
+   * Get the burner address of a Symbiotic vault
+   * @param vaultAddress The address of the vault
+   * @returns The burner address
+   */
+  async getBurnerAddress(vaultAddress: string): Promise<string> {
+    return await this.symbioticClient.getBurnerAddress(vaultAddress);
+  }
+
+  /**
+   * Get the delegator type of a Symbiotic vault
+   * @param vaultAddress The address of the vault
+   * @returns The delegator type
+   */
+  async getDelegatorType(vaultAddress: string): Promise<DelegatorType> {
+    return await this.symbioticClient.getDelegatorType(vaultAddress);
+  }
+
   // ===========================
   // Vault Type Functions
   // ===========================
@@ -929,5 +971,487 @@ export class ByzantineClient {
     vaultAddress: string
   ): Promise<RestakingProtocol | undefined> {
     return await this.vaultTypeClient.getVaultType(vaultAddress);
+  }
+
+  // ===========================
+  // Access Control Functions
+  // ===========================
+
+  /**
+   * Check if a user has the default admin role
+   * @param vaultAddress The address of the vault to check
+   * @param userAddress The address of the user to check
+   * @returns True if the user has the default admin role
+   */
+  async isRoleManager(
+    vaultAddress: string,
+    userAddress: string
+  ): Promise<boolean> {
+    return await this.accessControlClient.isManager(
+      vaultAddress,
+      RoleType.DEFAULT_ADMIN_ROLE,
+      userAddress
+    );
+  }
+
+  /**
+   * Grant or revoke the role manager role for a user
+   * @param vaultAddress The address of the vault to modify
+   * @param userAddress The address of the user to grant/revoke the role for
+   * @param enable True to grant the role, false to revoke it
+   * @returns Transaction response from the blockchain
+   */
+  async setRoleManager(
+    vaultAddress: string,
+    userAddress: string,
+    enable: boolean
+  ): Promise<TransactionResponse> {
+    return await this.accessControlClient.setManager(
+      vaultAddress,
+      RoleType.DEFAULT_ADMIN_ROLE,
+      userAddress,
+      enable
+    );
+  }
+
+  /**
+   * Check if a user has the validators manager role
+   * @param vaultAddress The address of the vault to check
+   * @param userAddress The address of the user to check
+   * @returns True if the user has the validators manager role
+   */
+  async isValidatorsManager(
+    vaultAddress: string,
+    userAddress: string
+  ): Promise<boolean> {
+    return await this.accessControlClient.isManager(
+      vaultAddress,
+      RoleType.VALIDATORS_MANAGER,
+      userAddress
+    );
+  }
+
+  /**
+   * Grant or revoke the validators manager role for a user
+   * @param vaultAddress The address of the vault to modify
+   * @param userAddress The address of the user to grant/revoke the role for
+   * @param enable True to grant the role, false to revoke it
+   * @returns Transaction response from the blockchain
+   */
+  async setValidatorsManager(
+    vaultAddress: string,
+    userAddress: string,
+    enable: boolean
+  ): Promise<TransactionResponse> {
+    return await this.accessControlClient.setManager(
+      vaultAddress,
+      RoleType.VALIDATORS_MANAGER,
+      userAddress,
+      enable
+    );
+  }
+
+  /**
+   * Check if a user has the version manager role
+   * @param vaultAddress The address of the vault to check
+   * @param userAddress The address of the user to check
+   * @returns True if the user has the version manager role
+   */
+  async isVersionManager(
+    vaultAddress: string,
+    userAddress: string
+  ): Promise<boolean> {
+    return await this.accessControlClient.isManager(
+      vaultAddress,
+      RoleType.VERSION_MANAGER,
+      userAddress
+    );
+  }
+
+  /**
+   * Grant or revoke the version manager role for a user
+   * @param vaultAddress The address of the vault to modify
+   * @param userAddress The address of the user to grant/revoke the role for
+   * @param enable True to grant the role, false to revoke it
+   * @returns Transaction response from the blockchain
+   */
+  async setVersionManager(
+    vaultAddress: string,
+    userAddress: string,
+    enable: boolean
+  ): Promise<TransactionResponse> {
+    return await this.accessControlClient.setManager(
+      vaultAddress,
+      RoleType.VERSION_MANAGER,
+      userAddress,
+      enable
+    );
+  }
+
+  /**
+   * Check if a user has the whitelist manager role
+   * @param vaultAddress The address of the vault to check
+   * @param userAddress The address of the user to check
+   * @returns True if the user has the whitelist manager role
+   */
+  async isWhitelistManager(
+    vaultAddress: string,
+    userAddress: string
+  ): Promise<boolean> {
+    return await this.accessControlClient.isManager(
+      vaultAddress,
+      RoleType.WHITELIST_MANAGER,
+      userAddress
+    );
+  }
+
+  /**
+   * Grant or revoke the whitelist manager role for a user
+   * @param vaultAddress The address of the vault to modify
+   * @param userAddress The address of the user to grant/revoke the role for
+   * @param enable True to grant the role, false to revoke it
+   * @returns Transaction response from the blockchain
+   */
+  async setWhitelistManager(
+    vaultAddress: string,
+    userAddress: string,
+    enable: boolean
+  ): Promise<TransactionResponse> {
+    return await this.accessControlClient.setManager(
+      vaultAddress,
+      RoleType.WHITELIST_MANAGER,
+      userAddress,
+      enable
+    );
+  }
+
+  /**
+   * Check if a user has the limit manager role
+   * @param vaultAddress The address of the vault to check
+   * @param userAddress The address of the user to check
+   * @returns True if the user has the limit manager role
+   */
+  async isLimitManager(
+    vaultAddress: string,
+    userAddress: string
+  ): Promise<boolean> {
+    return await this.accessControlClient.isManager(
+      vaultAddress,
+      RoleType.LIMIT_MANAGER,
+      userAddress
+    );
+  }
+
+  /**
+   * Grant or revoke the limit manager role for a user
+   * @param vaultAddress The address of the vault to modify
+   * @param userAddress The address of the user to grant/revoke the role for
+   * @param enable True to grant the role, false to revoke it
+   * @returns Transaction response from the blockchain
+   */
+  async setLimitManager(
+    vaultAddress: string,
+    userAddress: string,
+    enable: boolean
+  ): Promise<TransactionResponse> {
+    return await this.accessControlClient.setManager(
+      vaultAddress,
+      RoleType.LIMIT_MANAGER,
+      userAddress,
+      enable
+    );
+  }
+
+  /**
+   * Check if a user has the delegation manager role
+   * @param vaultAddress The address of the vault to check
+   * @param userAddress The address of the user to check
+   * @returns True if the user has the delegation manager role
+   */
+  async isDelegationManager(
+    vaultAddress: string,
+    userAddress: string
+  ): Promise<boolean> {
+    return await this.accessControlClient.isManager(
+      vaultAddress,
+      RoleType.DELEGATION_MANAGER,
+      userAddress
+    );
+  }
+
+  /**
+   * Grant or revoke the delegation manager role for a user
+   * @param vaultAddress The address of the vault to modify
+   * @param userAddress The address of the user to grant/revoke the role for
+   * @param enable True to grant the role, false to revoke it
+   * @returns Transaction response from the blockchain
+   */
+  async setDelegationManager(
+    vaultAddress: string,
+    userAddress: string,
+    enable: boolean
+  ): Promise<TransactionResponse> {
+    return await this.accessControlClient.setManager(
+      vaultAddress,
+      RoleType.DELEGATION_MANAGER,
+      userAddress,
+      enable
+    );
+  }
+
+  /**
+   * Check if a user has the operator network shares manager role
+   * @param vaultAddress The address of the vault to check
+   * @param userAddress The address of the user to check
+   * @returns True if the user has the operator network shares manager role
+   */
+  async isOperatorNetworkSharesManager(
+    vaultAddress: string,
+    userAddress: string
+  ): Promise<boolean> {
+    return await this.accessControlClient.isManager(
+      vaultAddress,
+      RoleType.OPERATOR_NETWORK_SHARES_SET,
+      userAddress
+    );
+  }
+
+  /**
+   * Grant or revoke the operator network shares manager role for a user
+   * @param vaultAddress The address of the vault to modify
+   * @param userAddress The address of the user to grant/revoke the role for
+   * @param enable True to grant the role, false to revoke it
+   * @returns Transaction response from the blockchain
+   */
+  async setOperatorNetworkSharesManager(
+    vaultAddress: string,
+    userAddress: string,
+    enable: boolean
+  ): Promise<TransactionResponse> {
+    return await this.accessControlClient.setManager(
+      vaultAddress,
+      RoleType.OPERATOR_NETWORK_SHARES_SET,
+      userAddress,
+      enable
+    );
+  }
+
+  /**
+   * Check if a user has the operator network limit manager role
+   * @param vaultAddress The address of the vault to check
+   * @param userAddress The address of the user to check
+   * @returns True if the user has the operator network limit manager role
+   */
+  async isOperatorNetworkLimitManager(
+    vaultAddress: string,
+    userAddress: string
+  ): Promise<boolean> {
+    return await this.accessControlClient.isManager(
+      vaultAddress,
+      RoleType.OPERATOR_NETWORK_LIMIT_SET,
+      userAddress
+    );
+  }
+
+  /**
+   * Grant or revoke the operator network limit manager role for a user
+   * @param vaultAddress The address of the vault to modify
+   * @param userAddress The address of the user to grant/revoke the role for
+   * @param enable True to grant the role, false to revoke it
+   * @returns Transaction response from the blockchain
+   */
+  async setOperatorNetworkLimitManager(
+    vaultAddress: string,
+    userAddress: string,
+    enable: boolean
+  ): Promise<TransactionResponse> {
+    return await this.accessControlClient.setManager(
+      vaultAddress,
+      RoleType.OPERATOR_NETWORK_LIMIT_SET,
+      userAddress,
+      enable
+    );
+  }
+
+  /**
+   * Check if a user has the network limit manager role
+   * @param vaultAddress The address of the vault to check
+   * @param userAddress The address of the user to check
+   * @returns True if the user has the network limit manager role
+   */
+  async isNetworkLimitManager(
+    vaultAddress: string,
+    userAddress: string
+  ): Promise<boolean> {
+    return await this.accessControlClient.isManager(
+      vaultAddress,
+      RoleType.NETWORK_LIMIT_SET,
+      userAddress
+    );
+  }
+
+  /**
+   * Grant or revoke the network limit manager role for a user
+   * @param vaultAddress The address of the vault to modify
+   * @param userAddress The address of the user to grant/revoke the role for
+   * @param enable True to grant the role, false to revoke it
+   * @returns Transaction response from the blockchain
+   */
+  async setNetworkLimitManager(
+    vaultAddress: string,
+    userAddress: string,
+    enable: boolean
+  ): Promise<TransactionResponse> {
+    return await this.accessControlClient.setManager(
+      vaultAddress,
+      RoleType.NETWORK_LIMIT_SET,
+      userAddress,
+      enable
+    );
+  }
+
+  /**
+   * Check if a user has the curator role
+   * @param vaultAddress The address of the vault to check
+   * @param userAddress The address of the user to check
+   * @returns True if the user has the curator role
+   */
+  async isCurator(vaultAddress: string, userAddress: string): Promise<boolean> {
+    return await this.accessControlClient.isManager(
+      vaultAddress,
+      RoleType.CURATOR,
+      userAddress
+    );
+  }
+
+  /**
+   * Grant or revoke the curator role for a user
+   * @param vaultAddress The address of the vault to modify
+   * @param userAddress The address of the user to grant/revoke the role for
+   * @param enable True to grant the role, false to revoke it
+   * @returns Transaction response from the blockchain
+   */
+  async setCurator(
+    vaultAddress: string,
+    userAddress: string,
+    enable: boolean
+  ): Promise<TransactionResponse> {
+    return await this.accessControlClient.setManager(
+      vaultAddress,
+      RoleType.CURATOR,
+      userAddress,
+      enable
+    );
+  }
+
+  /**
+   * Check if a user has the curator fee claimer role
+   * @param vaultAddress The address of the vault to check
+   * @param userAddress The address of the user to check
+   * @returns True if the user has the curator fee claimer role
+   */
+  async isCuratorFeeClaimer(
+    vaultAddress: string,
+    userAddress: string
+  ): Promise<boolean> {
+    return await this.accessControlClient.isManager(
+      vaultAddress,
+      RoleType.CURATOR_FEE_CLAIMER,
+      userAddress
+    );
+  }
+
+  /**
+   * Grant or revoke the curator fee claimer role for a user
+   * @param vaultAddress The address of the vault to modify
+   * @param userAddress The address of the user to grant/revoke the role for
+   * @param enable True to grant the role, false to revoke it
+   * @returns Transaction response from the blockchain
+   */
+  async setCuratorFeeClaimer(
+    vaultAddress: string,
+    userAddress: string,
+    enable: boolean
+  ): Promise<TransactionResponse> {
+    return await this.accessControlClient.setManager(
+      vaultAddress,
+      RoleType.CURATOR_FEE_CLAIMER,
+      userAddress,
+      enable
+    );
+  }
+
+  /**
+   * Check if a user has the curator fee claimer admin role
+   * @param vaultAddress The address of the vault to check
+   * @param userAddress The address of the user to check
+   * @returns True if the user has the curator fee claimer admin role
+   */
+  async isCuratorFeeClaimerAdmin(
+    vaultAddress: string,
+    userAddress: string
+  ): Promise<boolean> {
+    return await this.accessControlClient.isManager(
+      vaultAddress,
+      RoleType.CURATOR_FEE_CLAIMER_ADMIN,
+      userAddress
+    );
+  }
+
+  /**
+   * Grant or revoke the curator fee claimer admin role for a user
+   * @param vaultAddress The address of the vault to modify
+   * @param userAddress The address of the user to grant/revoke the role for
+   * @param enable True to grant the role, false to revoke it
+   * @returns Transaction response from the blockchain
+   */
+  async setCuratorFeeClaimerAdmin(
+    vaultAddress: string,
+    userAddress: string,
+    enable: boolean
+  ): Promise<TransactionResponse> {
+    return await this.accessControlClient.setManager(
+      vaultAddress,
+      RoleType.CURATOR_FEE_CLAIMER_ADMIN,
+      userAddress,
+      enable
+    );
+  }
+
+  /**
+   * Check if a user has the owner burner role
+   * @param vaultAddress The address of the vault to check
+   * @param userAddress The address of the user to check
+   * @returns True if the user has the owner burner role
+   */
+  async isOwnerBurner(
+    vaultAddress: string,
+    userAddress: string
+  ): Promise<boolean> {
+    return await this.accessControlClient.isManager(
+      vaultAddress,
+      RoleType.OWNER_BURNER,
+      userAddress
+    );
+  }
+
+  /**
+   * Grant or revoke the owner burner role for a user
+   * @param vaultAddress The address of the vault to modify
+   * @param userAddress The address of the user to grant/revoke the role for
+   * @param enable True to grant the role, false to revoke it
+   * @returns Transaction response from the blockchain
+   */
+  async setOwnerBurner(
+    vaultAddress: string,
+    userAddress: string,
+    enable: boolean
+  ): Promise<TransactionResponse> {
+    return await this.accessControlClient.setManager(
+      vaultAddress,
+      RoleType.OWNER_BURNER,
+      userAddress,
+      enable
+    );
   }
 }

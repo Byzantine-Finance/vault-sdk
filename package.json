@@ -40,7 +40,7 @@
     "prebuild": "npm run clean",
     "pretest": "npm run build",
     "test": "npm run test:all",
-    "test:all": "npm run test:eigen-erc20 && npm run test:eigen-native && npm run test:symbiotic-erc20 && npm run test:supervault-erc20",
+    "test:all": "npm run test:eigen-erc20 && npm run test:eigen-native && npm run test:symbiotic-erc20 && npm run test:supervault-erc20 && npm run test:vault-roles",
     "test:eigen-erc20": "node test/create-eigen-erc20.js",
     "test:eigen-native": "node test/create-eigen-native.js",
     "test:symbiotic-erc20": "node test/create-symbiotic-erc20.js",
@@ -49,6 +49,7 @@
     "test:vault-operation": "ts-node test/vault-operation.js",
     "test:vault-metadata": "ts-node test/vault-metadata.js",
     "test:vault-claim-withdrawals": "ts-node test/vault-claim-withdrawals.js",
+    "test:vault-roles": "ts-node test/vault-roles.js",
     "generate-error-mapping": "ts-node scripts/generateErrorMapping.ts"
   },
   "dependencies": {
@@ -57,7 +58,9 @@
     "viem": "^2.27.0"
   },
   "devDependencies": {
+    "@size-limit/preset-small-lib": "^11.2.0",
     "@types/node": "^22.14.1",
+    "size-limit": "^11.2.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.0.4"
   }
