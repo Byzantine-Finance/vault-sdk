@@ -403,12 +403,33 @@ await client.convertToShares(vaultAddress, assets);
 await client.convertToAssets(vaultAddress, shares);
 
 // Role Management
-await client.isRoleManager(userAddress);
-await client.isVersionManager(userAddress);
-//... add all the others
-await client.setRoleManager(userAddress);
-await client.setVersionManager(userAddress);
-//... add all the others
+await client.isRoleManager(vaultAddress, userAddress);
+await client.isVersionManager(vaultAddress, userAddress);
+await client.isWhitelistManager(vaultAddress, userAddress);
+await client.isLimitManager(vaultAddress, userAddress);
+await client.isDelegationManager(vaultAddress, userAddress);
+await client.isOperatorNetworkSharesManager(vaultAddress, userAddress);
+await client.isOperatorNetworkLimitManager(vaultAddress, userAddress);
+await client.isNetworkLimitManager(vaultAddress, userAddress);
+await client.isCurator(vaultAddress, userAddress);
+await client.isCuratorFeeClaimer(vaultAddress, userAddress);
+await client.isCuratorFeeClaimerAdmin(vaultAddress, userAddress);
+await client.isOwnerBurner(vaultAddress, userAddress);
+await client.isValidatorsManager(vaultAddress, userAddress);
+
+await client.setRoleManager(vaultAddress, userAddress, enable);
+await client.setVersionManager(vaultAddress, userAddress, enable);
+await client.setWhitelistManager(vaultAddress, userAddress, enable);
+await client.setLimitManager(vaultAddress, userAddress, enable);
+await client.setDelegationManager(vaultAddress, userAddress, enable);
+await client.setOperatorNetworkSharesManager(vaultAddress, userAddress, enable);
+await client.setOperatorNetworkLimitManager(vaultAddress, userAddress, enable);
+await client.setNetworkLimitManager(vaultAddress, userAddress, enable);
+await client.setCurator(vaultAddress, userAddress, enable);
+await client.setCuratorFeeClaimer(vaultAddress, userAddress, enable);
+await client.setCuratorFeeClaimerAdmin(vaultAddress, userAddress, enable);
+await client.setOwnerBurner(vaultAddress, userAddress, enable);
+await client.setValidatorsManager(vaultAddress, userAddress, enable);
 ```
 
 ### Staker
@@ -420,7 +441,10 @@ await client.getUserWalletBalance(assetAddress, userAddress);
 await client.getUserVaultBalance(vaultAddress, userAddress);
 await client.getVaultTVL(vaultAddress);
 await client.getUserAllowance(assetAddress, userAddress, vaultAddress);
-await client.getVaultType(vaultAddress);
+await client.getVaultType(vaultAddress); // Return RestakingProtocol ( "EigenLayer" | "Symbiotic" | "SuperVault" )
+await client.isSymbioticVault(vaultAddress);
+await client.isEigenVault(vaultAddress);
+await client.isSupervault(vaultAddress);
 
 // Deposit
 await client.approveVault(assetAddress, vaultAddress, amount);
@@ -451,6 +475,7 @@ await client.getNextEpochStart(vaultAddress);
 await client.getSymVaultAddress(vaultAddress);
 await client.getBurnerAddress(vaultAddress);
 await client.getDelegatorAddress(vaultAddress);
+await client.getDelegatorType(vaultAddress);
 ```
 
 ## Vault Types
