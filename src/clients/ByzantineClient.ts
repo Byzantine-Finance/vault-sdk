@@ -792,6 +792,21 @@ export class ByzantineClient {
     );
   }
 
+  /**
+   * Get a withdrawal request
+   * @param vaultAddress The address of the vault
+   * @param requestId The ID of the withdrawal request
+   * @returns Transaction response
+   */
+  async getWithdrawalRequest(
+    vaultAddress: string,
+    requestId: string
+  ): Promise<ethers.TransactionResponse> {
+    return await this.withdrawClient.getWithdrawalRequest(
+      vaultAddress,
+      requestId
+    );
+  }
   // ===========================
   // EigenLayer Functions
   // ===========================

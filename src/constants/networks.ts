@@ -21,7 +21,7 @@ export const NETWORKS: Record<number, NetworkConfig> = {
   // Holesky Testnet
   17000: {
     name: "Holesky",
-    factoryContractAddress: "0xa9dcf24B1463c57a442a0dE274607C2b4B952634",
+    factoryContractAddress: "0x8080e4C9a3dCdA4Ce832Ab1A0Bc971079f81338D",
     scanLink: "https://holesky.etherscan.io",
     stETHAddress: "0x3F1c547b21f65e10480dE3ad8E19fAAC46C95034",
     wstETHAddress: "0x8d09a4502Cc8Cf1547aD300E066060D043f6982D",
@@ -32,7 +32,7 @@ export const NETWORKS: Record<number, NetworkConfig> = {
   // Ethereum Sepolia
   11155111: {
     name: "Ethereum Sepolia",
-    factoryContractAddress: "0xE92cCdA7bfA1D7f50Fbb97c8Da746A18387C47F6",
+    factoryContractAddress: "0x4C4b2673a5dd0fe70eb7e9A85b45dFb7822e197e",
     scanLink: "https://sepolia.etherscan.io",
     stETHAddress: "0x3e3FE7dBc6B4C189E7128855dD526361c49b40Af",
     wstETHAddress: "0xB82381A3fBD3FaFA77B3a7bE693342618240067b",

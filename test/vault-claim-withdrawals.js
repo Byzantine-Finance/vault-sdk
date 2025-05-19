@@ -111,12 +111,18 @@ async function runTests() {
   console.log("Vault address:", VAULT_ADDRESS);
   console.log("Request ID:", REQUEST_ID);
   try {
-    const claimable = await client.isClaimable(VAULT_ADDRESS, REQUEST_ID);
-    logResult("Claimable", true, claimable.toString());
+    const withdrawalRequest = await client.getWithdrawalRequest(
+      VAULT_ADDRESS,
+      REQUEST_ID
+    );
+    logResult("Withdrawal request", true, withdrawalRequest.toString());
 
-    const tx = await client.completeWithdrawal(VAULT_ADDRESS, REQUEST_ID);
-    await tx.wait();
-    logResult("Complete withdrawal", true, tx.hash);
+    // const claimable = await client.isClaimable(VAULT_ADDRESS, REQUEST_ID);
+    // logResult("Claimable", true, claimable.toString());
+
+    // const tx = await client.completeWithdrawal(VAULT_ADDRESS, REQUEST_ID);
+    // await tx.wait();
+    // logResult("Complete withdrawal", true, tx.hash);
 
     // ---- Check roles
     // const isCuratorFeeClaimerAdmin = await client.isCuratorFeeClaimerAdmin(

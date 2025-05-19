@@ -194,4 +194,19 @@ export class WithdrawClient {
       requestId
     );
   }
+
+  /**
+   * getWithdrawalRequest
+   */
+  async getWithdrawalRequest(
+    vaultAddress: string,
+    requestId: string
+  ): Promise<ethers.TransactionResponse> {
+    const vaultContract = this.getVaultContract(vaultAddress);
+    return await callContractMethod(
+      vaultContract,
+      "getWithdrawalRequest",
+      requestId
+    );
+  }
 }
