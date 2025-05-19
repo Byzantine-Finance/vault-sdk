@@ -107,8 +107,7 @@ export function formatEigenParams(params: EigenlayerParams) {
  */
 export function formatEigenPodParams(params: EigenpodParams) {
   return {
-    eigenPodOwner: params.eigen_pod_owner,
-    proofSubmitter: params.proof_submitter,
+    eigenPodManager: params.eigen_pod_manager,
   };
 }
 
@@ -177,15 +176,15 @@ export async function createEigenlayerERC20Vault(
     const txOptions = { ...defaultOptions, ...options };
 
     // Use an explicit function signature to avoid ambiguity with the overloaded functions
-    // Match the exact signature from the ABI
-    const functionSignature =
-      "createEigenByzVault((address,address,address,address,address,address,address,uint256,uint16,bool,bool,bool,string,string,string),(address,address,(bytes,uint256),bytes32))";
+    // Function signature from ABI for createEigenByzVault with ByzVaultParams and EigenParams
+    const functionName =
+      "createEigenByzVault(tuple(address,address,address,address,address,address,address,uint256,uint16,bool,bool,bool,string,string,string),tuple(address,address,tuple(bytes,uint256),bytes32))";
 
     try {
       // First attempt with executeContractMethod and explicit method signature
       return await executeContractMethod(
         contract,
-        functionSignature,
+        functionName,
         formattedBaseParams,
         formattedEigenParams,
         txOptions
@@ -196,7 +195,7 @@ export async function createEigenlayerERC20Vault(
         "Falling back to direct contract.getFunction call:",
         methodError.message
       );
-      const method = contract.getFunction(functionSignature);
+      const method = contract.getFunction(functionName);
       return await method(formattedBaseParams, formattedEigenParams, txOptions);
     }
   } catch (error: any) {
@@ -243,17 +242,18 @@ export async function createEigenlayerNativeVault(
     };
 
     // Use an explicit function signature to avoid ambiguity with the overloaded functions
-    // Match the exact signature from the ABI
-    const functionSignature =
-      "createEigenByzVault(((address,address,address,address,address,address,address,uint256,uint16,bool,bool,bool,string,string,string),bytes32,uint16,address[]),(address,address,(bytes,uint256),bytes32))";
+    // Function signature from ABI for createEigenByzVault with NativeByzVaultParams, EigenParams, and EigenPodParams
+    const functionName =
+      "createEigenByzVault(tuple(tuple(address,address,address,address,address,address,address,uint256,uint16,bool,bool,bool,string,string,string),bytes32,uint16,address[]),tuple(address,address,tuple(bytes,uint256),bytes32),tuple(address))";
 
     try {
       // First attempt with executeContractMethod and explicit method signature
       return await executeContractMethod(
         contract,
-        functionSignature,
+        functionName,
         nativeByzVaultParams,
         formattedEigenParams,
+        formattedEigenPodParams,
         txOptions
       );
     } catch (methodError: any) {
@@ -262,10 +262,11 @@ export async function createEigenlayerNativeVault(
         "Falling back to direct contract.getFunction call:",
         methodError.message
       );
-      const method = contract.getFunction(functionSignature);
+      const method = contract.getFunction(functionName);
       return await method(
         nativeByzVaultParams,
         formattedEigenParams,
+        formattedEigenPodParams,
         txOptions
       );
     }
@@ -312,14 +313,14 @@ export async function createSymbioticERC20Vault(
     };
 
     // Use an explicit function signature to avoid ambiguity
-    const functionSignature =
-      "createSymByzVault((address,address,address,address,address,address,address,uint256,uint16,bool,bool,bool,string,string,string),((address,uint48,address,(address,address)[],(address,address,address)[]),(uint64,uint48),(uint8,address,address,address[],address[],address,address),(uint8,uint48,uint256)))";
+    // const functionName =
+    //   "createSymByzVault(tuple(address,address,address,address,address,address,address,uint256,uint16,bool,bool,bool,string,string,string),tuple(tuple(address,uint48,address,tuple(address,address)[],tuple(address,address,address)[]),tuple(uint64,uint48),tuple(uint8,address,address,address[],address[],address,address),tuple(uint8,uint48,uint256)))";
 
     try {
       // First attempt with executeContractMethod and explicit method signature
       return await executeContractMethod(
         contract,
-        functionSignature,
+        "createSymByzVault",
         formattedBaseParams,
         formattedSymbioticParams,
         txOptions
@@ -330,7 +331,7 @@ export async function createSymbioticERC20Vault(
         "Falling back to direct contract.getFunction call:",
         methodError.message
       );
-      const method = contract.getFunction(functionSignature);
+      const method = contract.getFunction("createSymByzVault");
       return await method(
         formattedBaseParams,
         formattedSymbioticParams,

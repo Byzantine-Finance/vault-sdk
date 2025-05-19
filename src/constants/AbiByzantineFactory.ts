@@ -57,9 +57,21 @@ export const BYZANTINE_FACTORY_ABI = [
         type: "tuple",
         internalType: "struct IByzantineFactory.ByzVaultParams",
         components: [
-          { name: "token", type: "address", internalType: "contract IERC20" },
-          { name: "roleManager", type: "address", internalType: "address" },
-          { name: "versionManager", type: "address", internalType: "address" },
+          {
+            name: "token",
+            type: "address",
+            internalType: "contract IERC20",
+          },
+          {
+            name: "roleManager",
+            type: "address",
+            internalType: "address",
+          },
+          {
+            name: "versionManager",
+            type: "address",
+            internalType: "address",
+          },
           {
             name: "depositWhitelistManager",
             type: "address",
@@ -80,14 +92,34 @@ export const BYZANTINE_FACTORY_ABI = [
             type: "address",
             internalType: "address",
           },
-          { name: "depositLimit", type: "uint256", internalType: "uint256" },
-          { name: "curatorFee", type: "uint16", internalType: "uint16" },
-          { name: "isDepositLimit", type: "bool", internalType: "bool" },
-          { name: "isPrivateVault", type: "bool", internalType: "bool" },
+          {
+            name: "depositLimit",
+            type: "uint256",
+            internalType: "uint256",
+          },
+          {
+            name: "curatorFee",
+            type: "uint16",
+            internalType: "uint16",
+          },
+          {
+            name: "isDepositLimit",
+            type: "bool",
+            internalType: "bool",
+          },
+          {
+            name: "isPrivateVault",
+            type: "bool",
+            internalType: "bool",
+          },
           { name: "isTokenized", type: "bool", internalType: "bool" },
           { name: "name", type: "string", internalType: "string" },
           { name: "symbol", type: "string", internalType: "string" },
-          { name: "metadataURI", type: "string", internalType: "string" },
+          {
+            name: "metadataURI",
+            type: "string",
+            internalType: "string",
+          },
         ],
       },
       {
@@ -100,23 +132,43 @@ export const BYZANTINE_FACTORY_ABI = [
             type: "address",
             internalType: "address",
           },
-          { name: "operator", type: "address", internalType: "address" },
+          {
+            name: "operator",
+            type: "address",
+            internalType: "address",
+          },
           {
             name: "approverSignatureAndExpiry",
             type: "tuple",
             internalType:
               "struct ISignatureUtilsMixinTypes.SignatureWithExpiry",
             components: [
-              { name: "signature", type: "bytes", internalType: "bytes" },
-              { name: "expiry", type: "uint256", internalType: "uint256" },
+              {
+                name: "signature",
+                type: "bytes",
+                internalType: "bytes",
+              },
+              {
+                name: "expiry",
+                type: "uint256",
+                internalType: "uint256",
+              },
             ],
           },
-          { name: "approverSalt", type: "bytes32", internalType: "bytes32" },
+          {
+            name: "approverSalt",
+            type: "bytes32",
+            internalType: "bytes32",
+          },
         ],
       },
     ],
     outputs: [
-      { name: "eigenByzVault", type: "address", internalType: "address" },
+      {
+        name: "eigenByzVault",
+        type: "address",
+        internalType: "address",
+      },
     ],
     stateMutability: "nonpayable",
   },
@@ -139,7 +191,11 @@ export const BYZANTINE_FACTORY_ABI = [
                 type: "address",
                 internalType: "contract IERC20",
               },
-              { name: "roleManager", type: "address", internalType: "address" },
+              {
+                name: "roleManager",
+                type: "address",
+                internalType: "address",
+              },
               {
                 name: "versionManager",
                 type: "address",
@@ -170,17 +226,49 @@ export const BYZANTINE_FACTORY_ABI = [
                 type: "uint256",
                 internalType: "uint256",
               },
-              { name: "curatorFee", type: "uint16", internalType: "uint16" },
-              { name: "isDepositLimit", type: "bool", internalType: "bool" },
-              { name: "isPrivateVault", type: "bool", internalType: "bool" },
-              { name: "isTokenized", type: "bool", internalType: "bool" },
+              {
+                name: "curatorFee",
+                type: "uint16",
+                internalType: "uint16",
+              },
+              {
+                name: "isDepositLimit",
+                type: "bool",
+                internalType: "bool",
+              },
+              {
+                name: "isPrivateVault",
+                type: "bool",
+                internalType: "bool",
+              },
+              {
+                name: "isTokenized",
+                type: "bool",
+                internalType: "bool",
+              },
               { name: "name", type: "string", internalType: "string" },
-              { name: "symbol", type: "string", internalType: "string" },
-              { name: "metadataURI", type: "string", internalType: "string" },
+              {
+                name: "symbol",
+                type: "string",
+                internalType: "string",
+              },
+              {
+                name: "metadataURI",
+                type: "string",
+                internalType: "string",
+              },
             ],
           },
-          { name: "operatorId", type: "bytes32", internalType: "bytes32" },
-          { name: "soloStakingFee", type: "uint16", internalType: "uint16" },
+          {
+            name: "operatorId",
+            type: "bytes32",
+            internalType: "bytes32",
+          },
+          {
+            name: "soloStakingFee",
+            type: "uint16",
+            internalType: "uint16",
+          },
           {
             name: "validatorManagers",
             type: "address[]",
@@ -198,23 +286,55 @@ export const BYZANTINE_FACTORY_ABI = [
             type: "address",
             internalType: "address",
           },
-          { name: "operator", type: "address", internalType: "address" },
+          {
+            name: "operator",
+            type: "address",
+            internalType: "address",
+          },
           {
             name: "approverSignatureAndExpiry",
             type: "tuple",
             internalType:
               "struct ISignatureUtilsMixinTypes.SignatureWithExpiry",
             components: [
-              { name: "signature", type: "bytes", internalType: "bytes" },
-              { name: "expiry", type: "uint256", internalType: "uint256" },
+              {
+                name: "signature",
+                type: "bytes",
+                internalType: "bytes",
+              },
+              {
+                name: "expiry",
+                type: "uint256",
+                internalType: "uint256",
+              },
             ],
           },
-          { name: "approverSalt", type: "bytes32", internalType: "bytes32" },
+          {
+            name: "approverSalt",
+            type: "bytes32",
+            internalType: "bytes32",
+          },
+        ],
+      },
+      {
+        name: "_eigenPodParams",
+        type: "tuple",
+        internalType: "struct IByzantineFactory.EigenPodParams",
+        components: [
+          {
+            name: "eigenPodManager",
+            type: "address",
+            internalType: "address",
+          },
         ],
       },
     ],
     outputs: [
-      { name: "eigenByzVault", type: "address", internalType: "address" },
+      {
+        name: "eigenByzVault",
+        type: "address",
+        internalType: "address",
+      },
     ],
     stateMutability: "nonpayable",
   },
@@ -237,7 +357,11 @@ export const BYZANTINE_FACTORY_ABI = [
                 type: "address",
                 internalType: "contract IERC20",
               },
-              { name: "roleManager", type: "address", internalType: "address" },
+              {
+                name: "roleManager",
+                type: "address",
+                internalType: "address",
+              },
               {
                 name: "versionManager",
                 type: "address",
@@ -268,16 +392,44 @@ export const BYZANTINE_FACTORY_ABI = [
                 type: "uint256",
                 internalType: "uint256",
               },
-              { name: "curatorFee", type: "uint16", internalType: "uint16" },
-              { name: "isDepositLimit", type: "bool", internalType: "bool" },
-              { name: "isPrivateVault", type: "bool", internalType: "bool" },
-              { name: "isTokenized", type: "bool", internalType: "bool" },
+              {
+                name: "curatorFee",
+                type: "uint16",
+                internalType: "uint16",
+              },
+              {
+                name: "isDepositLimit",
+                type: "bool",
+                internalType: "bool",
+              },
+              {
+                name: "isPrivateVault",
+                type: "bool",
+                internalType: "bool",
+              },
+              {
+                name: "isTokenized",
+                type: "bool",
+                internalType: "bool",
+              },
               { name: "name", type: "string", internalType: "string" },
-              { name: "symbol", type: "string", internalType: "string" },
-              { name: "metadataURI", type: "string", internalType: "string" },
+              {
+                name: "symbol",
+                type: "string",
+                internalType: "string",
+              },
+              {
+                name: "metadataURI",
+                type: "string",
+                internalType: "string",
+              },
             ],
           },
-          { name: "symRatio", type: "uint256", internalType: "uint256" },
+          {
+            name: "symRatio",
+            type: "uint256",
+            internalType: "uint256",
+          },
           {
             name: "eigenParams",
             type: "tuple",
@@ -288,15 +440,27 @@ export const BYZANTINE_FACTORY_ABI = [
                 type: "address",
                 internalType: "address",
               },
-              { name: "operator", type: "address", internalType: "address" },
+              {
+                name: "operator",
+                type: "address",
+                internalType: "address",
+              },
               {
                 name: "approverSignatureAndExpiry",
                 type: "tuple",
                 internalType:
                   "struct ISignatureUtilsMixinTypes.SignatureWithExpiry",
                 components: [
-                  { name: "signature", type: "bytes", internalType: "bytes" },
-                  { name: "expiry", type: "uint256", internalType: "uint256" },
+                  {
+                    name: "signature",
+                    type: "bytes",
+                    internalType: "bytes",
+                  },
+                  {
+                    name: "expiry",
+                    type: "uint256",
+                    internalType: "uint256",
+                  },
                 ],
               },
               {
@@ -316,8 +480,16 @@ export const BYZANTINE_FACTORY_ABI = [
                 type: "tuple",
                 internalType: "struct IByzantineFactory.BurnerParams",
                 components: [
-                  { name: "owner", type: "address", internalType: "address" },
-                  { name: "delay", type: "uint48", internalType: "uint48" },
+                  {
+                    name: "owner",
+                    type: "address",
+                    internalType: "address",
+                  },
+                  {
+                    name: "delay",
+                    type: "uint48",
+                    internalType: "uint48",
+                  },
                   {
                     name: "globalReceiver",
                     type: "address",
@@ -370,7 +542,11 @@ export const BYZANTINE_FACTORY_ABI = [
                 type: "tuple",
                 internalType: "struct IByzantineFactory.VaultParams",
                 components: [
-                  { name: "version", type: "uint64", internalType: "uint64" },
+                  {
+                    name: "version",
+                    type: "uint64",
+                    internalType: "uint64",
+                  },
                   {
                     name: "epochDuration",
                     type: "uint48",
@@ -388,7 +564,11 @@ export const BYZANTINE_FACTORY_ABI = [
                     type: "uint8",
                     internalType: "enum IByzantineFactory.DelegatorType",
                   },
-                  { name: "hook", type: "address", internalType: "address" },
+                  {
+                    name: "hook",
+                    type: "address",
+                    internalType: "address",
+                  },
                   {
                     name: "hookSetRoleHolder",
                     type: "address",
@@ -409,7 +589,11 @@ export const BYZANTINE_FACTORY_ABI = [
                     type: "address",
                     internalType: "address",
                   },
-                  { name: "network", type: "address", internalType: "address" },
+                  {
+                    name: "network",
+                    type: "address",
+                    internalType: "address",
+                  },
                 ],
               },
               {
@@ -452,9 +636,21 @@ export const BYZANTINE_FACTORY_ABI = [
         type: "tuple",
         internalType: "struct IByzantineFactory.ByzVaultParams",
         components: [
-          { name: "token", type: "address", internalType: "contract IERC20" },
-          { name: "roleManager", type: "address", internalType: "address" },
-          { name: "versionManager", type: "address", internalType: "address" },
+          {
+            name: "token",
+            type: "address",
+            internalType: "contract IERC20",
+          },
+          {
+            name: "roleManager",
+            type: "address",
+            internalType: "address",
+          },
+          {
+            name: "versionManager",
+            type: "address",
+            internalType: "address",
+          },
           {
             name: "depositWhitelistManager",
             type: "address",
@@ -475,14 +671,34 @@ export const BYZANTINE_FACTORY_ABI = [
             type: "address",
             internalType: "address",
           },
-          { name: "depositLimit", type: "uint256", internalType: "uint256" },
-          { name: "curatorFee", type: "uint16", internalType: "uint16" },
-          { name: "isDepositLimit", type: "bool", internalType: "bool" },
-          { name: "isPrivateVault", type: "bool", internalType: "bool" },
+          {
+            name: "depositLimit",
+            type: "uint256",
+            internalType: "uint256",
+          },
+          {
+            name: "curatorFee",
+            type: "uint16",
+            internalType: "uint16",
+          },
+          {
+            name: "isDepositLimit",
+            type: "bool",
+            internalType: "bool",
+          },
+          {
+            name: "isPrivateVault",
+            type: "bool",
+            internalType: "bool",
+          },
           { name: "isTokenized", type: "bool", internalType: "bool" },
           { name: "name", type: "string", internalType: "string" },
           { name: "symbol", type: "string", internalType: "string" },
-          { name: "metadataURI", type: "string", internalType: "string" },
+          {
+            name: "metadataURI",
+            type: "string",
+            internalType: "string",
+          },
         ],
       },
       {
@@ -495,7 +711,11 @@ export const BYZANTINE_FACTORY_ABI = [
             type: "tuple",
             internalType: "struct IByzantineFactory.BurnerParams",
             components: [
-              { name: "owner", type: "address", internalType: "address" },
+              {
+                name: "owner",
+                type: "address",
+                internalType: "address",
+              },
               { name: "delay", type: "uint48", internalType: "uint48" },
               {
                 name: "globalReceiver",
@@ -507,7 +727,11 @@ export const BYZANTINE_FACTORY_ABI = [
                 type: "tuple[]",
                 internalType: "struct IBurnerRouter.NetworkReceiver[]",
                 components: [
-                  { name: "network", type: "address", internalType: "address" },
+                  {
+                    name: "network",
+                    type: "address",
+                    internalType: "address",
+                  },
                   {
                     name: "receiver",
                     type: "address",
@@ -520,7 +744,11 @@ export const BYZANTINE_FACTORY_ABI = [
                 type: "tuple[]",
                 internalType: "struct IBurnerRouter.OperatorNetworkReceiver[]",
                 components: [
-                  { name: "network", type: "address", internalType: "address" },
+                  {
+                    name: "network",
+                    type: "address",
+                    internalType: "address",
+                  },
                   {
                     name: "operator",
                     type: "address",
@@ -540,8 +768,16 @@ export const BYZANTINE_FACTORY_ABI = [
             type: "tuple",
             internalType: "struct IByzantineFactory.VaultParams",
             components: [
-              { name: "version", type: "uint64", internalType: "uint64" },
-              { name: "epochDuration", type: "uint48", internalType: "uint48" },
+              {
+                name: "version",
+                type: "uint64",
+                internalType: "uint64",
+              },
+              {
+                name: "epochDuration",
+                type: "uint48",
+                internalType: "uint48",
+              },
             ],
           },
           {
@@ -554,7 +790,11 @@ export const BYZANTINE_FACTORY_ABI = [
                 type: "uint8",
                 internalType: "enum IByzantineFactory.DelegatorType",
               },
-              { name: "hook", type: "address", internalType: "address" },
+              {
+                name: "hook",
+                type: "address",
+                internalType: "address",
+              },
               {
                 name: "hookSetRoleHolder",
                 type: "address",
@@ -570,8 +810,16 @@ export const BYZANTINE_FACTORY_ABI = [
                 type: "address[]",
                 internalType: "address[]",
               },
-              { name: "operator", type: "address", internalType: "address" },
-              { name: "network", type: "address", internalType: "address" },
+              {
+                name: "operator",
+                type: "address",
+                internalType: "address",
+              },
+              {
+                name: "network",
+                type: "address",
+                internalType: "address",
+              },
             ],
           },
           {
@@ -584,7 +832,11 @@ export const BYZANTINE_FACTORY_ABI = [
                 type: "uint8",
                 internalType: "enum IByzantineFactory.SlasherType",
               },
-              { name: "vetoDuration", type: "uint48", internalType: "uint48" },
+              {
+                name: "vetoDuration",
+                type: "uint48",
+                internalType: "uint48",
+              },
               {
                 name: "resolverSetEpochsDelay",
                 type: "uint256",
@@ -604,7 +856,11 @@ export const BYZANTINE_FACTORY_ABI = [
     type: "function",
     name: "initialize",
     inputs: [
-      { name: "_initialOwner", type: "address", internalType: "address" },
+      {
+        name: "_initialOwner",
+        type: "address",
+        internalType: "address",
+      },
     ],
     outputs: [],
     stateMutability: "nonpayable",
@@ -642,7 +898,11 @@ export const BYZANTINE_FACTORY_ABI = [
     type: "function",
     name: "setTokenToEigenStrategy",
     inputs: [
-      { name: "_token", type: "address[]", internalType: "contract IERC20[]" },
+      {
+        name: "_token",
+        type: "address[]",
+        internalType: "contract IERC20[]",
+      },
       {
         name: "_strategy",
         type: "address[]",
@@ -657,7 +917,11 @@ export const BYZANTINE_FACTORY_ABI = [
     name: "stakingOracle",
     inputs: [],
     outputs: [
-      { name: "", type: "address", internalType: "contract IStakingOracle" },
+      {
+        name: "",
+        type: "address",
+        internalType: "contract IStakingOracle",
+      },
     ],
     stateMutability: "view",
   },
@@ -666,7 +930,11 @@ export const BYZANTINE_FACTORY_ABI = [
     name: "strategyFactory",
     inputs: [],
     outputs: [
-      { name: "", type: "address", internalType: "contract IStrategyFactory" },
+      {
+        name: "",
+        type: "address",
+        internalType: "contract IStrategyFactory",
+      },
     ],
     stateMutability: "view",
   },
@@ -675,7 +943,11 @@ export const BYZANTINE_FACTORY_ABI = [
     name: "strategyManager",
     inputs: [],
     outputs: [
-      { name: "", type: "address", internalType: "contract IStrategyManager" },
+      {
+        name: "",
+        type: "address",
+        internalType: "contract IStrategyManager",
+      },
     ],
     stateMutability: "view",
   },

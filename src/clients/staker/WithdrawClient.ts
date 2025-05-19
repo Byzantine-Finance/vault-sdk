@@ -196,7 +196,10 @@ export class WithdrawClient {
   }
 
   /**
-   * getWithdrawalRequest
+   * Get a withdrawal request
+   * @param vaultAddress The address of the vault
+   * @param requestId The ID of the withdrawal request
+   * @returns The withdrawal request
    */
   async getWithdrawalRequest(
     vaultAddress: string,

@@ -9,8 +9,8 @@ Byzantine Finance is the first native restaking aggregation and abstraction laye
 This SDK provides a simple interface to interact with the Byzantine Factory contract deployed on:
 
 - _Ethereum Mainnet -> Soon_
-- [Holesky Testnet](https://holesky.etherscan.io/address/0xa9dcf24B1463c57a442a0dE274607C2b4B952634)
-- [Sepolia Testnet](https://sepolia.etherscan.io/address/0xE92cCdA7bfA1D7f50Fbb97c8Da746A18387C47F6)
+- [Holesky Testnet](https://holesky.etherscan.io/address/0x8080e4C9a3dCdA4Ce832Ab1A0Bc971079f81338D)
+- [Sepolia Testnet](https://sepolia.etherscan.io/address/0x4C4b2673a5dd0fe70eb7e9A85b45dFb7822e197e)
 - _Hoodi Testnet -> Soon_
 
 The factory contract allows users to:
@@ -184,8 +184,7 @@ const eigenlayerParams: EigenlayerParams = {
 };
 
 const eigenPodParams: EigenpodParams = {
-  eigen_pod_owner: address,
-  proof_submitter: address,
+  eigen_pod_manager: address,
 };
 
 // Create the vault
@@ -455,6 +454,7 @@ await client.withdrawFromVault(vaultAddress, amount);
 await client.redeemSharesFromVault(vaultAddress, shares);
 await client.isClaimable(vaultAddress, requestId);
 await client.completeWithdrawal(vaultAddress, requestId);
+await client.getWithdrawalRequest(vaultAddress, requestId);
 
 // Eigenlayer
 await client.getEigenOperator(vaultAddress);

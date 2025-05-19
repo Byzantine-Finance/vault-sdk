@@ -8,9 +8,9 @@ export interface NetworkConfig {
   scanLink: string;
   stETHAddress: string;
   wstETHAddress: string;
-  osETHAddress: string;
-  mETHAddress: string;
-  ETHxAddress: string;
+  osETHAddress?: string;
+  mETHAddress?: string;
+  ETHxAddress?: string;
 }
 
 /**
@@ -145,8 +145,7 @@ export interface EigenlayerParams {
 }
 
 export interface EigenpodParams {
-  eigen_pod_owner: string; // Address of the owner of the eigen pod
-  proof_submitter: string; // Address of the proof submitter
+  eigen_pod_manager: string; // Address of the owner of the eigen pod
 }
 
 export interface EigenlayerVault {

@@ -36,9 +36,9 @@ export const NETWORKS: Record<number, NetworkConfig> = {
     scanLink: "https://sepolia.etherscan.io",
     stETHAddress: "0x3e3FE7dBc6B4C189E7128855dD526361c49b40Af",
     wstETHAddress: "0xB82381A3fBD3FaFA77B3a7bE693342618240067b",
-    osETHAddress: "",
+    osETHAddress: undefined,
     mETHAddress: "0x072d71b257ECa6B60b5333626F6a55ea1B0c451c",
-    ETHxAddress: "",
+    ETHxAddress: undefined,
   },
   // Hoodie Testnet
   // 560048: {
@@ -48,8 +48,8 @@ export const NETWORKS: Record<number, NetworkConfig> = {
   //   stETHAddress: "0x3508A952176b3c15387C97BE809eaffB1982176a",
   //   wstETHAddress: "0x7E99eE3C66636DE415D2d7C880938F2f40f94De4",
   //   osETHAddress: "0x7345fC8268459413beE9e9dd327f31283C65Ee7e",
-  //   mETHAddress: "",
-  //   ETHxAddress: "",
+  //   mETHAddress: undefined,
+  //   ETHxAddress: undefined,
   // },
 };
 

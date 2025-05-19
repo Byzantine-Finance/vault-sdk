@@ -1,5 +1,6 @@
 export { BYZANTINE_FACTORY_ABI } from "./AbiByzantineFactory";
 export { ERC20_VAULT_ABI } from "./AbiEigenERC20";
+export { EIGEN_NATIVE_ABI } from "./AbiEigenNative";
 export { SYM_ERC20_ABI } from "./AbiSymERC20";
 export { SYM_VAULT_ABI } from "./AbiSymVault";
 export { SUPER_ERC20_ABI } from "./AbiSuperERC20";

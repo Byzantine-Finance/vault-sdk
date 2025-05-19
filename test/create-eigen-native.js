@@ -1,3 +1,5 @@
+// @ts-check
+
 /**
  * Test for creating an Eigenlayer Native vault with Byzantine Factory SDK
  *
@@ -155,8 +157,7 @@ async function runTests() {
 
     // EigenPod parameters
     const eigenPodParams = {
-      eigen_pod_owner: address,
-      proof_submitter: address,
+      eigen_pod_manager: address,
     };
 
     // Test parameter validation

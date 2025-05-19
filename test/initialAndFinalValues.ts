@@ -76,8 +76,7 @@
 // };
 
 // const EIGENPOD_PARAMS: EigenpodParams = {
-//   eigen_pod_owner: YOUR_ADDRESS,
-//   proof_submitter: YOUR_ADDRESS,
+//   eigen_pod_manager: YOUR_ADDRESS,
 // };
 
 // const SYMBIOTIC_PARAMS: SymbioticParams = {

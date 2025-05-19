@@ -7,7 +7,7 @@ export * from "./AbiDelegator";
  */
 
 // Special token address to represent native ETH in operations
-export const ETH_TOKEN_ADDRESS = "0xEeeeeEeEeEeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+export const ETH_TOKEN_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 
 // Gas limits for different operations
 export const GAS_LIMITS = {

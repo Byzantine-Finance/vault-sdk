@@ -105,28 +105,27 @@ async function runTests() {
     // Define vault parameters
     const baseParams = {
       metadata: {
-        name: "Symbiotic mETH Vault",
-        description: "A Symbiotic vault for mETH restaking",
+        name: "Symbiotic wstETH Vault",
+        description: "A Symbiotic vault for wstETH restaking",
         image_url: "https://example.com/updated-vault-image.png",
         social_twitter: "https://x.com/byzantine_fi",
         social_discord: "https://discord.gg/byzantine",
-        social_telegram: "https://t.me/byzantine",
         social_website: "https://byzantine.fi",
         social_github: "https://github.com/byzantine-finance",
       },
 
-      token_address: networkConfig.mETHAddress, // mETH address
+      token_address: networkConfig.wstETHAddress, // wstETH address
 
       is_deposit_limit: true,
-      deposit_limit: ethers.parseUnits("500", 18), // 500 mETH
+      deposit_limit: ethers.parseUnits("500", 18), // 500 wstETH
 
       is_private: false,
 
       is_tokenized: true,
-      token_name: "Byzantine mETH Symbiotic Vault",
-      token_symbol: "bmETHs",
+      token_name: "Byzantine wstETH Symbiotic Vault",
+      token_symbol: "bwstETHs",
 
-      curator_fee: 200, // 2% (200 basis points)
+      curator_fee: 300, // 2% (200 basis points)
 
       // Roles - replace with actual addresses in production
       role_manager: address,
@@ -144,7 +143,7 @@ async function runTests() {
       slasher_veto_duration: 86400, // 1 day in seconds
       slasher_number_epoch_to_set_delay: 3,
       burner_delay_settings_applied: 21, // 21 days
-      burner_global_receiver: "0x58D347334A5E6bDE7279696abE59a11873294FA4", // Global receiver for wstETH
+      burner_global_receiver: "0x25133c2c49A343F8312bb6e896C1ea0Ad8CD0EBd", // Global receiver for wstETH
       burner_network_receiver: [],
       burner_operator_network_receiver: [],
       delegator_type: DelegatorType.NETWORK_RESTAKE,

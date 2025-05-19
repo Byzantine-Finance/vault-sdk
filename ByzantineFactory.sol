@@ -264,12 +264,7 @@
 //         ///     - verify validator withdrawal credentials
 //         ///     - set / change the pod proof submitter
 //         ///     - recover lost ERC20 in the pod contract
-//         address eigenPodOwner;
-//         /// @notice (optional) The address of the proof submitter tied to the EigenPod
-//         /// @dev This address can:
-//         ///     - start a pod checkpoint
-//         ///     - verify validator withdrawal credentials
-//         address proofSubmitter;
+//         address eigenPodManager;
 //     }
 
 //     /// @notice Init struct for the Symbiotic parameters (used for the Sym Byz Vaults)

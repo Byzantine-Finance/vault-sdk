@@ -102,23 +102,37 @@ async function runTests() {
 
   // Test vault addresses - add your own or use these examples
 
-  const VAULT_ADDRESS = "0x554e7002cf1604f01681771f5d74991427f93ad0"; // Symbiotic wstETH Vault
+  const VAULT_ADDRESS = "0x56d8b9536552cd17af1a7dcc72dc506a168a950c"; // Symbiotic wstETH Vault
   const REQUEST_ID =
-    "0x8EE5C07BD0FEE9E6F2E203B7A2149CCD14EFF87B38A5752DAFA496BC5F71EDD7";
+    "0x8464CDF1DF874AF88F771A069DFB5FB1724EFC234B53FEA0129AC2696C40EBDB";
 
   console.log("Network:", networkConfig.name, `(Chain ID: ${chainId})`);
   console.log("User address:", userAddress);
   console.log("Vault address:", VAULT_ADDRESS);
   console.log("Request ID:", REQUEST_ID);
   try {
-    const withdrawalRequest = await client.getWithdrawalRequest(
-      VAULT_ADDRESS,
-      REQUEST_ID
-    );
-    logResult("Withdrawal request", true, withdrawalRequest.toString());
+    // const deposit = await client.depositToVault(
+    //   VAULT_ADDRESS,
+    //   ethers.parseEther("0.15"),
+    //   true
+    // );
+    // const tx = await deposit.wait();
+    // logResult("Deposit", true, tx?.hash);
+    // const deposit = await client.withdrawFromVault(
+    //   VAULT_ADDRESS,
+    //   ethers.parseEther("0.01")
+    // );
+    // const tx = await deposit.wait();
+    // logResult("Withdrawal", true, tx?.hash);
 
-    // const claimable = await client.isClaimable(VAULT_ADDRESS, REQUEST_ID);
-    // logResult("Claimable", true, claimable.toString());
+    // const withdrawalRequest = await client.getWithdrawalRequest(
+    //   VAULT_ADDRESS,
+    //   REQUEST_ID
+    // );
+    // logResult("Withdrawal request", true, withdrawalRequest.toString());
+
+    const claimable = await client.isClaimable(VAULT_ADDRESS, REQUEST_ID);
+    logResult("Claimable", true, claimable.toString());
 
     // const tx = await client.completeWithdrawal(VAULT_ADDRESS, REQUEST_ID);
     // await tx.wait();
