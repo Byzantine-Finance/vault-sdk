@@ -69,7 +69,7 @@ async function generateErrorMapping() {
   // Read all TS files in the constants directory
   const files = fs
     .readdirSync(ABI_DIR)
-    .filter((file) => file.endsWith("ABI.ts"));
+    .filter((file) => file.startsWith("Abi") && file.endsWith(".ts"));
 
   for (const file of files) {
     const filePath = path.join(ABI_DIR, file);

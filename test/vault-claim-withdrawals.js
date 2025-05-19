@@ -102,33 +102,40 @@ async function runTests() {
 
   // Test vault addresses - add your own or use these examples
 
-  const VAULT_ADDRESS = "0x4b22252caedabe081b92c3c9e169901a590e4571"; // Eigen stETH vault
+  const VAULT_ADDRESS = "0x554e7002cf1604f01681771f5d74991427f93ad0"; // Symbiotic wstETH Vault
   const REQUEST_ID =
-    "0xBBB5C00413D3D0541A8B48189AA3652F4F3A2AAA820FD9ED044F9B83503F4A1B";
+    "0x8EE5C07BD0FEE9E6F2E203B7A2149CCD14EFF87B38A5752DAFA496BC5F71EDD7";
 
   console.log("Network:", networkConfig.name, `(Chain ID: ${chainId})`);
   console.log("User address:", userAddress);
   console.log("Vault address:", VAULT_ADDRESS);
-
+  console.log("Request ID:", REQUEST_ID);
   try {
-    // ---- Check roles
-    const isCuratorFeeClaimerAdmin = await client.isCuratorFeeClaimerAdmin(
-      VAULT_ADDRESS,
-      userAddress
-    );
-    logResult(
-      "Is curator fee claimer admin",
-      isCuratorFeeClaimerAdmin,
-      isCuratorFeeClaimerAdmin ? "true" : "false"
-    );
+    const claimable = await client.isClaimable(VAULT_ADDRESS, REQUEST_ID);
+    logResult("Claimable", true, claimable.toString());
 
-    const tx = await client.setCuratorFeeClaimerAdmin(
-      VAULT_ADDRESS,
-      userAddress,
-      true
-    );
+    const tx = await client.completeWithdrawal(VAULT_ADDRESS, REQUEST_ID);
     await tx.wait();
-    logResult("Set curator fee claimer admin", true, tx.hash);
+    logResult("Complete withdrawal", true, tx.hash);
+
+    // ---- Check roles
+    // const isCuratorFeeClaimerAdmin = await client.isCuratorFeeClaimerAdmin(
+    //   VAULT_ADDRESS,
+    //   userAddress
+    // );
+    // logResult(
+    //   "Is curator fee claimer admin",
+    //   isCuratorFeeClaimerAdmin,
+    //   isCuratorFeeClaimerAdmin ? "true" : "false"
+    // );
+
+    // const tx = await client.setCuratorFeeClaimerAdmin(
+    //   VAULT_ADDRESS,
+    //   userAddress,
+    //   true
+    // );
+    // await tx.wait();
+    // logResult("Set curator fee claimer admin", true, tx.hash);
 
     // const claimable = await client.isClaimable(VAULT_ADDRESS, REQUEST_ID);
     // logResult("Claimable", true, claimable);
@@ -147,7 +154,7 @@ async function runTests() {
     // await tx.wait();
     // logResult("Complete withdrawal", true, tx);
   } catch (error) {
-    console.error("❌ Test failed:", error);
+    console.error("❌ Test failed:", error.message);
   }
 }
 

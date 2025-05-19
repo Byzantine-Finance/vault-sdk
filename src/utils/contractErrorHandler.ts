@@ -5,6 +5,7 @@
  */
 
 import { ethers, TransactionResponse } from "ethers";
+import { ErrorCodeMapping } from "./errorCodeMapping";
 
 /**
  * Execute a contract method with proper error handling
@@ -59,6 +60,14 @@ export async function callContractMethod<T>(
  * @returns Error with improved message
  */
 export function formatContractError(method: string, error: any): Error {
+  // console.log("Going to format contract error", method, error);
+  // console.log("Error revert", error.revert);
+  // console.log("Error reason", error.reason);
+  // console.log("Error message", error.message);
+  // console.log("Error stack", error.stack);
+  // console.log("Error code", error.code);
+  // console.log("Error data", error.data);
+  // console.log("Error error", error.error);
   // Extract error reason from revert data if available
   if (error.revert) {
     const errorName = error.revert.name;
@@ -85,6 +94,11 @@ export function formatContractError(method: string, error: any): Error {
   // If we got a standard reason
   if (error.reason) {
     return new Error(`Contract error: ${error.reason}`);
+  }
+
+  // Check if error has data property and it's in our error mapping
+  if (error.data && ErrorCodeMapping[error.data]) {
+    return new Error(`Contract error: ${ErrorCodeMapping[error.data]}`);
   }
 
   // For any other error
