@@ -993,6 +993,47 @@ export class ByzantineClient {
   // ===========================
 
   /**
+   * Check if a user has a specific role
+   * @param vaultAddress The address of the vault
+   * @param roleType The role type
+   * @param address The address of the user to check
+   * @returns True if the user has the role, false otherwise
+   */
+  async isManager(
+    vaultAddress: string,
+    roleType: RoleType,
+    address: string
+  ): Promise<boolean> {
+    return await this.accessControlClient.isManager(
+      vaultAddress,
+      roleType,
+      address
+    );
+  }
+
+  /**
+   * Set a manager for a vault
+   * @param vaultAddress The address of the vault
+   * @param roleType The role type
+   * @param address The address of the user to set the role for
+   * @param enable True to grant the role, false to revoke it
+   * @returns Transaction response
+   */
+  async setManager(
+    vaultAddress: string,
+    roleType: RoleType,
+    address: string,
+    enable: boolean
+  ): Promise<TransactionResponse> {
+    return await this.accessControlClient.setManager(
+      vaultAddress,
+      roleType,
+      address,
+      enable
+    );
+  }
+
+  /**
    * Check if a user has the default admin role
    * @param vaultAddress The address of the vault to check
    * @param userAddress The address of the user to check

@@ -402,6 +402,7 @@ await client.convertToShares(vaultAddress, assets);
 await client.convertToAssets(vaultAddress, shares);
 
 // Role Management
+await client.isManager(vaultAddress, RoleType.CURATOR, userAddress); // Global getter of the roles
 await client.isRoleManager(vaultAddress, userAddress);
 await client.isVersionManager(vaultAddress, userAddress);
 await client.isWhitelistManager(vaultAddress, userAddress);
@@ -416,6 +417,7 @@ await client.isCuratorFeeClaimerAdmin(vaultAddress, userAddress);
 await client.isOwnerBurner(vaultAddress, userAddress);
 await client.isValidatorsManager(vaultAddress, userAddress);
 
+await client.setManager(vaultAddress, RoleType.CURATOR, userAddress); // Global setter of the roles
 await client.setRoleManager(vaultAddress, userAddress, enable);
 await client.setVersionManager(vaultAddress, userAddress, enable);
 await client.setWhitelistManager(vaultAddress, userAddress, enable);
