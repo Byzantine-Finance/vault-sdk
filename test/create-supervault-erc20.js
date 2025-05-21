@@ -115,22 +115,22 @@ async function runTests() {
     // Define vault parameters
     const baseParams = {
       metadata: {
-        name: "SuperVault osETH",
-        description: "A SuperVault for osETH with high yields",
+        name: "SuperVault wstETH",
+        description: "A SuperVault for wstETH with high yields",
       },
 
-      token_address: networkConfig.osETHAddress, // osETH address
+      token_address: networkConfig.wstETHAddress, // wstETH address
 
       is_deposit_limit: true,
-      deposit_limit: ethers.parseUnits("1000000", 18), // 1M osETH (18 decimals)
+      deposit_limit: ethers.parseUnits("10000000", 18), // 10M osETH (18 decimals)
 
       is_private: false, // Private SuperVault
 
       is_tokenized: true,
-      token_name: "Byzantine osETH SuperVault",
-      token_symbol: "bsosETHs",
+      token_name: "Byzantine wstETH SuperVault",
+      token_symbol: "bwstETHs",
 
-      curator_fee: 600, // 6% (600 basis points)
+      curator_fee: 500, // 5% (500 basis points)
 
       // Roles - replace with actual addresses in production
       role_manager: address,

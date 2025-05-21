@@ -6,18 +6,26 @@ import { ContractProvider } from "../../utils/ContractProvider";
 
 export enum RoleType {
   DEFAULT_ADMIN_ROLE = "RoleManager",
-  VALIDATORS_MANAGER = "ValidatorsManager",
   VERSION_MANAGER = "VersionManager",
   WHITELIST_MANAGER = "WhitelistManager",
   LIMIT_MANAGER = "LimitManager",
+  CURATOR_FEE_CLAIMER = "CuratorFeeClaimer",
+  CURATOR_FEE_CLAIMER_ADMIN = "CuratorFeeClaimerAdmin",
+
+  // For native vaults
+  VALIDATORS_MANAGER = "ValidatorsManager",
+
+  // For SuperVaults
+  CURATOR = "Curator",
+
+  // For EigenLayer vaults
   DELEGATION_MANAGER = "DelegationManager",
+
+  // For Symbiotic vaults
   OPERATOR_NETWORK_SHARES_SET = "OperatorNetworkSharesSet",
   OPERATOR_NETWORK_LIMIT_SET = "OperatorNetworkLimitSet",
   NETWORK_LIMIT_SET = "NetworkLimitSet",
-  CURATOR = "Curator",
-  CURATOR_FEE_CLAIMER = "CuratorFeeClaimer",
-  CURATOR_FEE_CLAIMER_ADMIN = "CuratorFeeClaimerAdmin",
-  OWNER_BURNER = "OwnerBurner",
+  OWNER_BURNER = "OwnerBurner", // Only 1 address can be set
 }
 
 // Role identifiers constants

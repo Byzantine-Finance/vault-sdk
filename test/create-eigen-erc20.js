@@ -108,7 +108,6 @@ async function runTests() {
         image_url: "https://example.com/updated-vault-image.png",
         social_twitter: "https://x.com/byzantine_fi",
         social_discord: "https://discord.gg/byzantine",
-        social_telegram: "https://t.me/byzantine",
         social_website: "https://byzantine.fi",
         social_github: "https://github.com/byzantine-finance",
       },

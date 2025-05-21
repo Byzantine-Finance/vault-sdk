@@ -90,7 +90,6 @@ async function runMetadataTests() {
   console.log("Network:", networkConfig.name, `(Chain ID: ${chainId})`);
   console.log("Vault address:", VAULT_ADDRESS);
   console.log("User address:", userAddress);
-  console.log("Vault address:", VAULT_ADDRESS);
 
   try {
     // =============================================
@@ -157,7 +156,6 @@ async function runMetadataTests() {
       image_url: "https://example.com/updated-vault-image.png",
       social_twitter: "https://x.com/byzantine_fi",
       social_discord: "https://discord.gg/byzantine",
-      social_telegram: "https://t.me/byzantine",
       social_website: "https://byzantine.fi",
       social_github: "https://github.com/byzantine-finance",
     };
@@ -174,6 +172,108 @@ async function runMetadataTests() {
     } catch (error) {
       const errorMessage = error.message || "Unknown error";
       logResult("Valid metadata update test", false, errorMessage);
+    }
+
+    // =============================================
+    // 0. Invalid Metadata Scenarios (should fail)
+    // =============================================
+    logTitle("Invalid Metadata Scenarios");
+
+    const invalidScenarios = [
+      {
+        label: "Name too long",
+        metadata: {
+          name: "A".repeat(101), // 101 chars, max is 100
+          description: "desc",
+          image_url: "https://example.com/image.png",
+        },
+        expect: "Name exceeds maximum length",
+      },
+      {
+        label: "Description too long",
+        metadata: {
+          name: "Valid Name",
+          description: "D".repeat(5001), // 5001 chars, max is 5000
+          image_url: "https://example.com/image.png",
+        },
+        expect: "Description exceeds maximum length",
+      },
+      {
+        label: "Image with unsupported extension (.svg)",
+        metadata: {
+          name: "Valid Name",
+          description: "desc",
+          image_url: "https://example.com/image.svg",
+        },
+        expect: "Image URL must end with one of the following extensions",
+      },
+      {
+        label: "Image with unsupported extension on raw.githubusercontent.com",
+        metadata: {
+          name: "Valid Name",
+          description: "desc",
+          image_url:
+            "https://raw.githubusercontent.com/user/repo/main/image.svg",
+        },
+        expect: "Image URL must end with one of the following extensions",
+      },
+      {
+        label: "Image with non-URL string",
+        metadata: {
+          name: "Valid Name",
+          description: "desc",
+          image_url: "not-a-url",
+        },
+        expect: "Image URL must be a valid HTTP/HTTPS URL",
+      },
+      {
+        label: "Invalid Twitter URL",
+        metadata: {
+          name: "Valid Name",
+          description: "desc",
+          image_url: "https://example.com/image.png",
+          social_twitter: "https://notwitter.com/user",
+        },
+        expect: "Twitter URL must be a valid Twitter URL format",
+      },
+      {
+        label: "Invalid Website URL",
+        metadata: {
+          name: "Valid Name",
+          description: "desc",
+          image_url: "https://example.com/image.png",
+          social_website: "notaurl",
+        },
+        expect: "Website URL must be a valid HTTP/HTTPS URL",
+      },
+      {
+        label: "Invalid GitHub URL",
+        metadata: {
+          name: "Valid Name",
+          description: "desc",
+          image_url: "https://example.com/image.png",
+          social_github: "https://notgithub.com/user",
+        },
+        expect: "GitHub URL must be a valid GitHub URL format",
+      },
+    ];
+
+    for (const scenario of invalidScenarios) {
+      try {
+        await client.updateVaultMetadata(VAULT_ADDRESS, scenario.metadata);
+        logResult(scenario.label, false, "Should have failed but succeeded");
+      } catch (error) {
+        const errorMessage = error.message || "Unknown error";
+        if (errorMessage.includes(scenario.expect)) {
+          logResult(
+            scenario.label,
+            true,
+            `Validation failed as expected: ${errorMessage}`
+          );
+        } else {
+          logResult(scenario.label, false, `Unexpected error: ${errorMessage}`);
+        }
+      }
     }
   } catch (error) {
     const errorMessage = error.message || "Unknown error";
