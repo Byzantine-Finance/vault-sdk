@@ -478,6 +478,8 @@ await client.getSymVaultAddress(vaultAddress);
 await client.getBurnerAddress(vaultAddress);
 await client.getDelegatorAddress(vaultAddress);
 await client.getDelegatorType(vaultAddress);
+await client.getDelegatorOperator(vaultAddress); // Only for OSD
+await client.getDelegatorNetwork(vaultAddress); // Only for OSD & ONSD
 ```
 
 ## Vault Types

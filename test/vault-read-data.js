@@ -14,7 +14,7 @@
  */
 
 const { ethers } = require("ethers");
-const { ByzantineClient } = require("../dist");
+const { ByzantineClient, DelegatorType } = require("../dist");
 const { getNetworkConfig } = require("../dist/constants");
 const { logTitle, logResult, assert, getWalletBalances } = require("./utils");
 require("dotenv").config();
@@ -100,7 +100,7 @@ async function runTests() {
   assert(client !== undefined, "Client initialization");
 
   // Test vault addresses - add your own or use these examples
-  const VAULT_ADDRESS = "0x9DDfc5bFFA0dA3Fb17471712450160722b2fe970";
+  const VAULT_ADDRESS = "0x880adc6d3841a5ec8e902398c974894f9c1a7445";
 
   console.log("Network:", networkConfig.name, `(Chain ID: ${chainId})`);
   console.log("User address:", userAddress);
@@ -152,7 +152,54 @@ async function runTests() {
     if (isSymbiotic) {
       logTitle("Symbiotic Information");
 
+      const delegatorType = Number(
+        await client.getDelegatorType(VAULT_ADDRESS)
+      );
+      logResult("Delegator Type", true, delegatorType);
+
       try {
+        // Get important addresses for Symbiotic vaults
+        try {
+          const symVaultAddress = await client.getSymVaultAddress(
+            VAULT_ADDRESS
+          );
+          logResult("SymVault Address", true, symVaultAddress);
+
+          const burnerAddress = await client.getBurnerAddress(VAULT_ADDRESS);
+          logResult("Burner Address", true, burnerAddress);
+
+          const delegatorAddress = await client.getDelegatorAddress(
+            VAULT_ADDRESS
+          );
+          logResult("Delegator Address", true, delegatorAddress);
+
+          const slasherAddress = await client.getSlasherAddress(VAULT_ADDRESS);
+          logResult("Slasher Address", true, slasherAddress);
+
+          if (
+            delegatorType === DelegatorType.OPERATOR_SPECIFIC ||
+            delegatorType === DelegatorType.OPERATOR_NETWORK_SPECIFIC
+          ) {
+            const delegatorOperator = await client.getDelegatorOperator(
+              VAULT_ADDRESS
+            );
+            logResult("Delegator Operator", true, "-> " + delegatorOperator);
+          }
+
+          if (delegatorType === DelegatorType.OPERATOR_NETWORK_SPECIFIC) {
+            const delegatorNetwork = await client.getDelegatorNetwork(
+              VAULT_ADDRESS
+            );
+            logResult("Delegator Network", true, "-> " + delegatorNetwork);
+          }
+        } catch (error) {
+          logResult(
+            "Symbiotic addresses",
+            false,
+            "Failed to get Symbiotic addresses"
+          );
+        }
+
         // Get epoch at a specific timestamp
         const epoch = await client.getEpochAt(
           VAULT_ADDRESS,
@@ -162,7 +209,13 @@ async function runTests() {
 
         // Get epoch duration
         const epochDuration = await client.getEpochDuration(VAULT_ADDRESS);
-        logResult("Epoch duration", true, epochDuration.toString());
+        logResult(
+          "Epoch duration",
+          true,
+          `${epochDuration.toString()} seconds -> ${
+            epochDuration.toString() / 60 / 60 / 24
+          } days`
+        );
 
         // Get current epoch
         const currentEpoch = await client.getCurrentEpoch(VAULT_ADDRESS);

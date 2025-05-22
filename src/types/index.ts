@@ -4,7 +4,7 @@ export type ChainsOptions = 1 | 17000;
 
 export interface NetworkConfig {
   name: string;
-  factoryContractAddress: string;
+  byzantineFactoryAddress: string;
   scanLink: string;
   stETHAddress: string;
   wstETHAddress: string;

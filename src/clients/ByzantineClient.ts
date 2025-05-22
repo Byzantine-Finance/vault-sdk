@@ -84,7 +84,7 @@ export class ByzantineClient {
       throw new Error(`Unsupported chain ID: ${this.chainId}`);
     }
 
-    this.contractAddress = networkConfig.factoryContractAddress;
+    this.contractAddress = networkConfig.byzantineFactoryAddress;
 
     // Set up provider and signer
     if (options.provider) {
@@ -929,12 +929,39 @@ export class ByzantineClient {
   }
 
   /**
+   * Get the slasher address of a Symbiotic vault
+   * @param vaultAddress The address of the vault
+   * @returns The slasher address
+   */
+  async getSlasherAddress(vaultAddress: string): Promise<string> {
+    return await this.symbioticClient.getSlasherAddress(vaultAddress);
+  }
+
+  /**
    * Get the burner address of a Symbiotic vault
    * @param vaultAddress The address of the vault
    * @returns The burner address
    */
   async getBurnerAddress(vaultAddress: string): Promise<string> {
     return await this.symbioticClient.getBurnerAddress(vaultAddress);
+  }
+
+  /**
+   * Get the delegator operator for a vault
+   * @param vaultAddress The address of the vault
+   * @returns The delegator operator
+   */
+  async getDelegatorOperator(vaultAddress: string): Promise<string> {
+    return await this.symbioticClient.getDelegatorOperator(vaultAddress);
+  }
+
+  /**
+   * Get the delegator network for a vault
+   * @param vaultAddress The address of the vault
+   * @returns The delegator network
+   */
+  async getDelegatorNetwork(vaultAddress: string): Promise<string> {
+    return await this.symbioticClient.getDelegatorNetwork(vaultAddress);
   }
 
   /**

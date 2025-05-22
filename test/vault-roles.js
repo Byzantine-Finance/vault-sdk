@@ -142,7 +142,7 @@ async function runTests() {
   assert(client !== undefined, "Client initialization");
 
   // Test vault addresses - add your own or use these examples
-  const VAULT_ADDRESS = "0x48dd844c631b1ff219775449fffedb69ae142e48";
+  const VAULT_ADDRESS = "0x92bc5ec4e156e6dfcb40a8e04628fb211e2ad56e";
 
   console.log("Network:", networkConfig.name, `(Chain ID: ${chainId})`);
   console.log("User address:", userAddress);

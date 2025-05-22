@@ -6,3 +6,4 @@ export { SYM_VAULT_ABI } from "./AbiSymVault";
 export { SUPER_ERC20_ABI } from "./AbiSuperERC20";
 export { DELEGATOR_ABI } from "./AbiDelegator";
 export { BURNER_ABI } from "./AbiBurner";
+export { SLASHER_ABI } from "./AbiSlasher";

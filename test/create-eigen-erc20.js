@@ -87,7 +87,7 @@ async function runTests() {
     logResult("Wallet address", true, address);
 
     const networkConfig = getNetworkConfig(chainId);
-    logResult("Factory address", true, networkConfig.factoryContractAddress);
+    logResult("Factory address", true, networkConfig.byzantineFactoryAddress);
 
     const client = new ByzantineClient({
       chainId: chainId,

@@ -265,6 +265,15 @@ export class SymbioticClient {
   }
 
   /**
+   * Get the slasher address for a Symbiotic vault
+   * @param vaultAddress The address of the vault
+   * @returns The slasher address
+   */
+  async getSlasherAddress(vaultAddress: string): Promise<string> {
+    return await this.contractProvider.getSlasherAddress(vaultAddress);
+  }
+
+  /**
    * Get the delegator type for a Symbiotic vault
    * @param vaultAddress The address of the vault
    * @returns The delegator type
@@ -281,5 +290,25 @@ export class SymbioticClient {
    */
   public async getBurnerAddress(vaultAddress: string): Promise<string> {
     return await this.contractProvider.getBurnerAddress(vaultAddress);
+  }
+
+  /**
+   * Get the delegator operator for a vault
+   * @param vaultAddress The address of the vault
+   * @returns The delegator operator
+   */
+  public async getDelegatorOperator(vaultAddress: string): Promise<string> {
+    const delegatorContract = await this.getDelegatorContract(vaultAddress);
+    return await callContractMethod<string>(delegatorContract, "operator");
+  }
+
+  /**
+   * Get the delegator network for a vault
+   * @param vaultAddress The address of the vault
+   * @returns The delegator network
+   */
+  public async getDelegatorNetwork(vaultAddress: string): Promise<string> {
+    const delegatorContract = await this.getDelegatorContract(vaultAddress);
+    return await callContractMethod<string>(delegatorContract, "network");
   }
 }

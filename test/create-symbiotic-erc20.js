@@ -87,7 +87,7 @@ async function runTests() {
     logResult("Wallet address", true, address);
 
     const networkConfig = getNetworkConfig(chainId);
-    logResult("Factory address", true, networkConfig.factoryContractAddress);
+    logResult("Factory address", true, networkConfig.byzantineFactoryAddress);
 
     const client = new ByzantineClient({
       chainId: chainId,
@@ -105,9 +105,9 @@ async function runTests() {
     // Define vault parameters
     const baseParams = {
       metadata: {
-        name: "Symbiotic wstETH OSD",
+        name: "Symbiotic wstETH OSND PxH",
         description:
-          "A Symbiotic vault for wstETH with operator specific delegation",
+          "A Symbiotic vault for wstETH with operator network specific delegation. And P2P as operator, and Human Network as network.",
         image_url: "https://example.com/updated-vault-image.png",
         social_twitter: "https://x.com/byzantine_fi",
         social_discord: "https://discord.gg/byzantine",
@@ -123,8 +123,8 @@ async function runTests() {
       is_private: false,
 
       is_tokenized: true,
-      token_name: "Byzantine wstETH OSD",
-      token_symbol: "bwstETHosd",
+      token_name: "Byzantine wstETH OSND PxH",
+      token_symbol: "bwstETHosndpxh",
 
       curator_fee: 500, // 5% (500 basis points)
 
@@ -147,10 +147,10 @@ async function runTests() {
       burner_global_receiver: "0x25133c2c49A343F8312bb6e896C1ea0Ad8CD0EBd", // Global receiver for wstETH
       burner_network_receiver: [],
       burner_operator_network_receiver: [],
-      delegator_type: DelegatorType.OPERATOR_SPECIFIC,
+      delegator_type: DelegatorType.OPERATOR_NETWORK_SPECIFIC,
       delegator_hook: "0x0000000000000000000000000000000000000001", // Delegator hook address
-      delegator_operator: "0x0000000000000000000000000000000000000000", // Not used for NETWORK_RESTAKE
-      delegator_network: "0x0000000000000000000000000000000000000000", // Not used for NETWORK_RESTAKE
+      delegator_operator: "0x7f73b81b37D0CbBE814dfeC40ca9719f2113a980", // Only used in OPERATOR_SPECIFIC and OPERATOR_NETWORK_SPECIFIC
+      delegator_network: "0xe87ff321f5721a9285ec651d01c0c0b857430c2c", // Only used in OPERATOR_NETWORK_SPECIFIC
 
       role_delegator_set_hook: address,
       role_delegator_set_network_limit: [address],

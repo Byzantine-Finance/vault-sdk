@@ -6,6 +6,7 @@ import {
   SUPER_ERC20_ABI,
   DELEGATOR_ABI,
   BURNER_ABI,
+  SLASHER_ABI,
 } from "../constants/abis";
 import { callContractMethod } from "./contractErrorHandler";
 
@@ -17,6 +18,7 @@ interface VaultCache {
   symVaultAddress?: string;
   delegatorAddress?: string;
   burnerAddress?: string;
+  slasherAddress?: string;
 }
 
 /**
@@ -285,5 +287,74 @@ export class ContractProvider {
     });
 
     return burnerAddress;
+  }
+
+  /**
+   * Get the Slasher contract instance
+   * @param vaultAddress The address of the vault
+   * @returns The Slasher contract instance
+   */
+  public async getSlasherContract(
+    vaultAddress: string
+  ): Promise<ethers.Contract> {
+    // Check if we have the burner address in cache
+    const cache = this.vaultCache.get(vaultAddress);
+    if (cache?.slasherAddress) {
+      return new ethers.Contract(
+        cache.slasherAddress,
+        SLASHER_ABI, // Use appropriate ABI for slasher
+        this.signer || this.provider
+      );
+    }
+
+    // First get the symVault contract
+    const symVaultContract = await this.getSymVaultContract(vaultAddress);
+
+    // Get the burner address from the symVault contract
+    const slasherAddress = await callContractMethod<string>(
+      symVaultContract,
+      "slasher"
+    );
+
+    // Update cache
+    this.vaultCache.set(vaultAddress, {
+      ...cache,
+      slasherAddress,
+    });
+
+    return new ethers.Contract(
+      slasherAddress,
+      SLASHER_ABI, // Use appropriate ABI for slasher
+      this.signer || this.provider
+    );
+  }
+
+  /**
+   * Get the slasher address for a vault
+   * @param vaultAddress The address of the vault
+   * @returns The slasher address
+   */
+  public async getSlasherAddress(vaultAddress: string): Promise<string> {
+    const cache = this.vaultCache.get(vaultAddress);
+    if (cache?.slasherAddress) {
+      return cache.slasherAddress;
+    }
+
+    // First get the symVault contract
+    const symVaultContract = await this.getSymVaultContract(vaultAddress);
+
+    // Get the burner address from the symVault contract
+    const slasherAddress = await callContractMethod<string>(
+      symVaultContract,
+      "slasher"
+    );
+
+    // Update cache
+    this.vaultCache.set(vaultAddress, {
+      ...cache,
+      slasherAddress,
+    });
+
+    return slasherAddress;
   }
 }
