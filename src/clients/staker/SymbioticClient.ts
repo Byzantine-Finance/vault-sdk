@@ -293,22 +293,30 @@ export class SymbioticClient {
   }
 
   /**
-   * Get the delegator operator for a vault
+   * Get the delegator operator for a vault, only for OSN and ONSD vaults
    * @param vaultAddress The address of the vault
    * @returns The delegator operator
    */
   public async getDelegatorOperator(vaultAddress: string): Promise<string> {
     const delegatorContract = await this.getDelegatorContract(vaultAddress);
-    return await callContractMethod<string>(delegatorContract, "operator");
+    try {
+      return await callContractMethod<string>(delegatorContract, "operator");
+    } catch (error) {
+      throw new Error("Not an OSN or ONSD vault");
+    }
   }
 
   /**
-   * Get the delegator network for a vault
+   * Get the delegator network for a vault, only for ONSD vaults
    * @param vaultAddress The address of the vault
    * @returns The delegator network
    */
   public async getDelegatorNetwork(vaultAddress: string): Promise<string> {
     const delegatorContract = await this.getDelegatorContract(vaultAddress);
-    return await callContractMethod<string>(delegatorContract, "network");
+    try {
+      return await callContractMethod<string>(delegatorContract, "network");
+    } catch (error) {
+      throw new Error("Not an ONSD vault");
+    }
   }
 }

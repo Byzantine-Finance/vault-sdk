@@ -100,7 +100,8 @@ async function runTests() {
   assert(client !== undefined, "Client initialization");
 
   // Test vault addresses - add your own or use these examples
-  const VAULT_ADDRESS = "0x880adc6d3841a5ec8e902398c974894f9c1a7445";
+  const vaultAddress = "0xd25f44aec8d2815e22176f2008b2fd2c27331345";
+  const VAULT_ADDRESS = vaultAddress.toLowerCase();
 
   console.log("Network:", networkConfig.name, `(Chain ID: ${chainId})`);
   console.log("User address:", userAddress);
@@ -176,21 +177,22 @@ async function runTests() {
           const slasherAddress = await client.getSlasherAddress(VAULT_ADDRESS);
           logResult("Slasher Address", true, slasherAddress);
 
-          if (
-            delegatorType === DelegatorType.OPERATOR_SPECIFIC ||
-            delegatorType === DelegatorType.OPERATOR_NETWORK_SPECIFIC
-          ) {
+          try {
             const delegatorOperator = await client.getDelegatorOperator(
               VAULT_ADDRESS
             );
             logResult("Delegator Operator", true, "-> " + delegatorOperator);
+          } catch (error) {
+            logResult("Delegator Operator", false, error.message);
           }
 
-          if (delegatorType === DelegatorType.OPERATOR_NETWORK_SPECIFIC) {
+          try {
             const delegatorNetwork = await client.getDelegatorNetwork(
               VAULT_ADDRESS
             );
             logResult("Delegator Network", true, "-> " + delegatorNetwork);
+          } catch (error) {
+            logResult("Delegator Network", false, error.message);
           }
         } catch (error) {
           logResult(
