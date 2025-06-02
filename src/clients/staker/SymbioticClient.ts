@@ -1,60 +1,20 @@
 import { ethers } from "ethers";
-import {
-  SYM_ERC20_ABI,
-  SYM_VAULT_ABI,
-  SUPER_ERC20_ABI,
-  DELEGATOR_ABI,
-} from "../../constants/abis";
 import { VaultTypeClient } from "./VaultType";
 import { callContractMethod } from "../../utils";
 import { ContractProvider } from "../../utils/ContractProvider";
 import { DelegatorType } from "../../types";
-
-interface VaultCache {
-  isSupervault?: boolean;
-  symVaultAddress?: string;
-  delegatorAddress?: string;
-}
 
 export class SymbioticClient {
   private provider: ethers.Provider;
   private signer?: ethers.Signer;
   private contractProvider: ContractProvider;
   private vaultTypeClient: VaultTypeClient;
-  private vaultCache: Map<string, VaultCache>;
 
   constructor(provider: ethers.Provider, signer?: ethers.Signer) {
     this.provider = provider;
     this.signer = signer;
     this.contractProvider = new ContractProvider(provider, signer);
     this.vaultTypeClient = new VaultTypeClient(provider);
-    this.vaultCache = new Map();
-  }
-
-  /**
-   * Get the ERC20 contract instance
-   * @param vaultAddress The address of the ERC20 vault
-   * @returns The ERC20 contract instance
-   */
-  private getByzVaultContract(vaultAddress: string): ethers.Contract {
-    return new ethers.Contract(
-      vaultAddress,
-      SYM_ERC20_ABI,
-      this.signer || this.provider
-    );
-  }
-
-  /**
-   * Get the SuperVault contract instance
-   * @param vaultAddress The address of the SuperVault
-   * @returns The SuperVault contract instance
-   */
-  private getSuperVaultContract(vaultAddress: string): ethers.Contract {
-    return new ethers.Contract(
-      vaultAddress,
-      SUPER_ERC20_ABI,
-      this.signer || this.provider
-    );
   }
 
   /**
@@ -65,57 +25,7 @@ export class SymbioticClient {
   private async getSymVaultContract(
     vaultAddress: string
   ): Promise<ethers.Contract> {
-    // Check if we have cached information for this vault
-    let cacheEntry = this.vaultCache.get(vaultAddress);
-
-    if (!cacheEntry) {
-      cacheEntry = {};
-      this.vaultCache.set(vaultAddress, cacheEntry);
-    }
-
-    // If we don't know if it's a SuperVault yet, check it
-    if (cacheEntry.isSupervault === undefined) {
-      cacheEntry.isSupervault = await this.vaultTypeClient.isSupervault(
-        vaultAddress
-      );
-    }
-
-    let symVaultAdd: string;
-
-    // If we've already determined the symVault address, use it
-    if (cacheEntry.symVaultAddress) {
-      symVaultAdd = cacheEntry.symVaultAddress;
-    } else {
-      // Otherwise, retrieve it based on the vault type
-      if (cacheEntry.isSupervault) {
-        // For SuperVaults, we need to get the symVault from the SuperVault contract
-        const superVaultContract = this.getSuperVaultContract(vaultAddress);
-        const [symVaultAddress, eigenVaultAddress] = await callContractMethod<
-          [string, string]
-        >(superVaultContract, "getUnderlyingVaults");
-        const byzVaultContract = this.getByzVaultContract(symVaultAddress);
-        symVaultAdd = await callContractMethod<string>(
-          byzVaultContract,
-          "symVault"
-        );
-      } else {
-        // For regular Symbiotic vaults, proceed as before
-        const byzVaultContract = this.getByzVaultContract(vaultAddress);
-        symVaultAdd = await callContractMethod<string>(
-          byzVaultContract,
-          "symVault"
-        );
-      }
-
-      // Cache the result
-      cacheEntry.symVaultAddress = symVaultAdd;
-    }
-
-    return new ethers.Contract(
-      symVaultAdd,
-      SYM_VAULT_ABI,
-      this.signer || this.provider
-    );
+    return await this.contractProvider.getSymVaultContract(vaultAddress);
   }
 
   /**
@@ -133,11 +43,6 @@ export class SymbioticClient {
    */
   public clearCache(vaultAddress?: string): void {
     this.contractProvider.clearCache(vaultAddress);
-    if (vaultAddress) {
-      this.vaultCache.delete(vaultAddress);
-    } else {
-      this.vaultCache.clear();
-    }
   }
 
   /**
@@ -223,36 +128,7 @@ export class SymbioticClient {
   private async getDelegatorContract(
     vaultAddress: string
   ): Promise<ethers.Contract> {
-    // Check if we have the delegator address in cache
-    const cache = this.vaultCache.get(vaultAddress);
-    if (cache?.delegatorAddress) {
-      return new ethers.Contract(
-        cache.delegatorAddress,
-        DELEGATOR_ABI,
-        this.signer || this.provider
-      );
-    }
-
-    // First get the symVault contract
-    const symVaultContract = await this.getSymVaultContract(vaultAddress);
-
-    // Get the delegator address from the symVault contract
-    const delegatorAddress = await callContractMethod<string>(
-      symVaultContract,
-      "delegator"
-    );
-
-    // Update cache
-    this.vaultCache.set(vaultAddress, {
-      ...cache,
-      delegatorAddress,
-    });
-
-    return new ethers.Contract(
-      delegatorAddress,
-      DELEGATOR_ABI,
-      this.signer || this.provider
-    );
+    return await this.contractProvider.getDelegatorContract(vaultAddress);
   }
 
   /**
@@ -293,7 +169,7 @@ export class SymbioticClient {
   }
 
   /**
-   * Get the delegator operator for a vault, only for OSN and ONSD vaults
+   * Get the delegator operator for a vault, only for OSD and ONSD vaults
    * @param vaultAddress The address of the vault
    * @returns The delegator operator
    */
@@ -302,7 +178,7 @@ export class SymbioticClient {
     try {
       return await callContractMethod<string>(delegatorContract, "operator");
     } catch (error) {
-      throw new Error("Not an OSN or ONSD vault");
+      throw new Error("Not an OSD or ONSD vault");
     }
   }
 

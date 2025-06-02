@@ -147,7 +147,7 @@ async function runTests() {
       slasher_type: SlasherType.VETO,
       slasher_veto_duration: 86400, // 1 day in seconds
       slasher_number_epoch_to_set_delay: 3,
-      burner_delay_settings_applied: 21, // 21 days
+      burner_delay_settings_applied: 1814400, // 21 days
       burner_global_receiver: "0x25133c2c49A343F8312bb6e896C1ea0Ad8CD0EBd", // Global receiver for wstETH
       burner_network_receiver: [],
       burner_operator_network_receiver: [],

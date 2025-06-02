@@ -20,7 +20,7 @@ const ROLE_ID_FEE_MANAGER =
  * @param vaultContract - The vault contract instance
  * @returns The current fee percentage (in basis points, e.g. 100 = 1%)
  */
-export async function getVaultFeePercentage(
+export async function getCuratorFee(
   vaultContract: ethers.Contract
 ): Promise<bigint> {
   // This function assumes there's a method to get the curator fee
@@ -71,40 +71,14 @@ export async function getUnclaimedFees(
  * Set the fee percentage for the vault
  * @param signer - Ethereum signer (must be the fee manager)
  * @param vaultContract - The vault contract connected to signer
- * @param feePercentage - New fee percentage (in basis points, e.g. 100 = 1%)
+ * @param newFee - New fee (in basis points, e.g. 100 = 1%)
  * @returns Transaction response
  */
 export async function setVaultFeePercentage(
-  signer: ethers.Signer,
   vaultContract: ethers.Contract,
-  feePercentage: bigint
+  newFee: bigint
 ): Promise<ethers.TransactionResponse> {
-  const signerAddress = await signer.getAddress();
-
-  // Verify the signer has the fee manager role
-  const isManager = await callContractMethod<boolean>(
-    vaultContract,
-    "hasRole",
-    ROLE_ID_FEE_MANAGER,
-    signerAddress
-  );
-
-  if (!isManager) {
-    throw new Error("Signer does not have the fee manager role");
-  }
-
-  // Set the fee percentage
-  // The actual method name might differ depending on the implementation
-  if (typeof vaultContract.setCuratorFee === "function") {
-    return await executeContractMethod(
-      vaultContract,
-      "setCuratorFee",
-      feePercentage,
-      { gasLimit: GAS_LIMITS.setCuratorFee || GAS_LIMITS.setDepositLimit }
-    );
-  } else {
-    throw new Error("This vault does not support fee updates");
-  }
+  return await executeContractMethod(vaultContract, "setCuratorFee", newFee);
 }
 
 /**
@@ -114,32 +88,12 @@ export async function setVaultFeePercentage(
  * @returns Transaction response
  */
 export async function claimVaultFees(
-  signer: ethers.Signer,
   vaultContract: ethers.Contract
 ): Promise<ethers.TransactionResponse> {
-  const signerAddress = await signer.getAddress();
-
-  // Verify the signer has the fee manager role
-  const isManager = await callContractMethod<boolean>(
+  return await executeContractMethod(
     vaultContract,
-    "hasRole",
-    ROLE_ID_FEE_MANAGER,
-    signerAddress
+    "claimCuratorFee (0x22224b37)"
   );
-
-  if (!isManager) {
-    throw new Error("Signer does not have the fee manager role");
-  }
-
-  // Claim the fees
-  // The actual method name might differ depending on the implementation
-  if (typeof vaultContract.claimFees === "function") {
-    return await executeContractMethod(vaultContract, "claimFees", {
-      gasLimit: GAS_LIMITS.setDepositLimit,
-    });
-  } else {
-    throw new Error("This vault does not support fee claiming");
-  }
 }
 
 /**

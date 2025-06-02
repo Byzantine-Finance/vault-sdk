@@ -105,9 +105,9 @@ async function runTests() {
     // Define vault parameters
     const baseParams = {
       metadata: {
-        name: "Symbiotic wstETH OSND PxH",
+        name: "Symbiotic wstETH OSD Pier Two",
         description:
-          "A Symbiotic vault for wstETH with operator network specific delegation. And P2P as operator, and Human Network as network.",
+          "A Symbiotic vault for wstETH with operator specific delegation. With Pier Two as operator.",
         image_url: "https://example.com/updated-vault-image.png",
         social_twitter: "https://x.com/byzantine_fi",
         social_discord: "https://discord.gg/byzantine",
@@ -118,13 +118,13 @@ async function runTests() {
       token_address: networkConfig.wstETHAddress, // wstETH address
 
       is_deposit_limit: true,
-      deposit_limit: ethers.parseUnits("10000000", 18), // 10M wstETH (18 decimals)
+      deposit_limit: ethers.parseUnits("10000", 18), // 10k wstETH (18 decimals)
 
       is_private: false,
 
       is_tokenized: true,
-      token_name: "Byzantine wstETH OSND PxH",
-      token_symbol: "bwstETHosndpxh",
+      token_name: "Byzantine wstETH OSD PT",
+      token_symbol: "bwstETHosdpt",
 
       curator_fee: 500, // 5% (500 basis points)
 
@@ -143,14 +143,14 @@ async function runTests() {
       slasher_type: SlasherType.VETO,
       slasher_veto_duration: 86400, // 1 day in seconds
       slasher_number_epoch_to_set_delay: 3,
-      burner_delay_settings_applied: 21, // 21 days
+      burner_delay_settings_applied: 1814400, // 21 days
       burner_global_receiver: "0x25133c2c49A343F8312bb6e896C1ea0Ad8CD0EBd", // Global receiver for wstETH
       burner_network_receiver: [],
       burner_operator_network_receiver: [],
-      delegator_type: DelegatorType.OPERATOR_NETWORK_SPECIFIC,
-      delegator_hook: "0x0000000000000000000000000000000000000001", // Delegator hook address
-      delegator_operator: "0x7f73b81b37D0CbBE814dfeC40ca9719f2113a980", // Only used in OPERATOR_SPECIFIC and OPERATOR_NETWORK_SPECIFIC
-      delegator_network: "0xe87ff321f5721a9285ec651d01c0c0b857430c2c", // Only used in OPERATOR_NETWORK_SPECIFIC
+      delegator_type: DelegatorType.OPERATOR_SPECIFIC,
+      delegator_hook: "0x0000000000000000000000000000000000000000", // Delegator hook address
+      delegator_operator: "0x01DB45433dbd214D386857590A255ABFe6daD0fb", // Only used in OPERATOR_SPECIFIC and OPERATOR_NETWORK_SPECIFIC
+      delegator_network: "0x0000000000000000000000000000000000000000", // Only used in OPERATOR_NETWORK_SPECIFIC
 
       role_delegator_set_hook: address,
       role_delegator_set_network_limit: [address],

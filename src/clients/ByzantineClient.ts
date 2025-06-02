@@ -425,13 +425,13 @@ export class ByzantineClient {
   // Fee Management
 
   /**
-   * Get the fee percentage of a vault
+   * Get the curator fee of a vault
    * @param vaultAddress The address of the vault
-   * @returns The fee percentage
+   * @returns The curator fee in basis points, e.g. 1.4% = 140
    */
-  async getVaultFeePercentage(vaultAddress: string): Promise<bigint> {
+  async getCuratorFee(vaultAddress: string): Promise<bigint> {
     const vaultContract = this.getVaultContract(vaultAddress);
-    return await curatorFunctions.getVaultFeePercentage(vaultContract);
+    return await curatorFunctions.getCuratorFee(vaultContract);
   }
 
   /**
@@ -445,24 +445,17 @@ export class ByzantineClient {
   }
 
   /**
-   * Set the fee percentage for a vault
+   * Set the curator fee for a vault. Max is 10_000 (100%)
    * @param vaultAddress The address of the vault
-   * @param feePercentage The new fee percentage
+   * @param newFee The new curator fee in basis points, e.g. 1.4% = 140
    * @returns Transaction response
    */
-  async setVaultFeePercentage(
+  async setCuratorFee(
     vaultAddress: string,
-    feePercentage: bigint
+    newFee: bigint
   ): Promise<TransactionResponse> {
-    if (!this.signer) {
-      throw new Error("Signer is required for this operation");
-    }
     const vaultContract = this.getVaultContract(vaultAddress);
-    return await curatorFunctions.setVaultFeePercentage(
-      this.signer,
-      vaultContract,
-      feePercentage
-    );
+    return await curatorFunctions.setVaultFeePercentage(vaultContract, newFee);
   }
 
   /**
@@ -471,11 +464,8 @@ export class ByzantineClient {
    * @returns Transaction response
    */
   async claimVaultFees(vaultAddress: string): Promise<TransactionResponse> {
-    if (!this.signer) {
-      throw new Error("Signer is required for this operation");
-    }
     const vaultContract = this.getVaultContract(vaultAddress);
-    return await curatorFunctions.claimVaultFees(this.signer, vaultContract);
+    return await curatorFunctions.claimVaultFees(vaultContract);
   }
 
   // SuperVault Management

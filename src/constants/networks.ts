@@ -58,7 +58,7 @@ export const NETWORKS: Record<number, NetworkConfig> = {
  * @param chainId - The chain ID to get configuration for
  * @returns Network configuration or undefined if not supported
  */
-export function getNetworkConfig(chainId: 1 | 17000): NetworkConfig {
+export function getNetworkConfig(chainId: ChainsOptions): NetworkConfig {
   return NETWORKS[chainId];
 }
 

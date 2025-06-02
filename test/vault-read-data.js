@@ -100,7 +100,7 @@ async function runTests() {
   assert(client !== undefined, "Client initialization");
 
   // Test vault addresses - add your own or use these examples
-  const vaultAddress = "0xd25f44aec8d2815e22176f2008b2fd2c27331345";
+  const vaultAddress = "0xa3e29b3ac1a09af2677721336928b5b3f0d5e9fc";
   const VAULT_ADDRESS = vaultAddress.toLowerCase();
 
   console.log("Network:", networkConfig.name, `(Chain ID: ${chainId})`);
@@ -314,6 +314,9 @@ async function runTests() {
       true,
       ethers.formatEther(depositLimit) + " tokens"
     );
+
+    const curatorFee = await client.getCuratorFee(VAULT_ADDRESS);
+    logResult("Curator fee", true, curatorFee.toString() / 100 + "%");
 
     // Check if vault is private
     logResult("Vault is private", true, isPrivate.toString());

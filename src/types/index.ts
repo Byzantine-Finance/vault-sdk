@@ -100,7 +100,7 @@ export interface SymbioticParams {
   slasher_type: SlasherType; //                       SLASHER: Type of the slasher
   slasher_veto_duration: number; //                   SLASHER: Duration of the veto, in seconds, usually 24 hours, can't be equal or greater than epoch duration
   slasher_number_epoch_to_set_delay: number; //       SLASHER: Number of epoch to set the delay, usually 3
-  burner_delay_settings_applied: number; //           BURNER: If true, the delay settings are applied, in days, usually 21
+  burner_delay_settings_applied: number; //           BURNER: If true, the delay settings are applied, in seconds, usually 21 days, so 1814400 seconds
   burner_global_receiver: string; //                  BURNER: Default receiver of the burner, best practice is to use the ones proposed by Symbiotic for the relevant token
   burner_network_receiver?: { network: string; receiver: string }[]; //               BURNER: Network receivers array
   burner_operator_network_receiver?: {
