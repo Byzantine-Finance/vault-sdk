@@ -39,8 +39,7 @@ async function runTests() {
   try {
     // Check if environment variables are set
     const { RPC_URL, MNEMONIC, PRIVATE_KEY, DEFAULT_CHAIN_ID } = process.env;
-    const parsedId = DEFAULT_CHAIN_ID ? parseInt(DEFAULT_CHAIN_ID) : 17000;
-    const chainId = parsedId === 1 ? 1 : 17000;
+    const chainId = DEFAULT_CHAIN_ID ? parseInt(DEFAULT_CHAIN_ID) : 17000;
 
     let skipNetworkTests = false;
     if (!RPC_URL) {
@@ -63,6 +62,8 @@ async function runTests() {
           ? "Ethereum Mainnet"
           : chainId === 17000
           ? "Holesky Testnet"
+          : chainId === 11155111
+          ? "Ethereum Sepolia"
           : "Unknown"
       } (Chain ID: ${chainId})\n`
     );
@@ -105,9 +106,13 @@ async function runTests() {
     // Define vault parameters
     const baseParams = {
       metadata: {
-        name: "Symbiotic wstETH OSD Pier Two",
-        description:
-          "A Symbiotic vault for wstETH with operator specific delegation. With Pier Two as operator.",
+        name: "Sym Basic NRD strat",
+        description: `This is a Symbiotic vault for wstETH.
+      This is a NetworkRestakeDelegator (NRD) so we can have as many operators and networks as possible.
+      The vault's security is ensured by trusted institutional operators: P2P, Blockscape, InfraSingularity, and Everstake.
+      But Everstake will only run Ditto.
+        
+      In the event of slashing by the Primev network, any penalties will be directed to their own network as the receiver.`,
         image_url: "https://example.com/updated-vault-image.png",
         social_twitter: "https://x.com/byzantine_fi",
         social_discord: "https://discord.gg/byzantine",
@@ -123,8 +128,8 @@ async function runTests() {
       is_private: false,
 
       is_tokenized: true,
-      token_name: "Byzantine wstETH OSD PT",
-      token_symbol: "bwstETHosdpt",
+      token_name: "Sym Basic NRD",
+      token_symbol: "wstETHnrd",
 
       curator_fee: 500, // 5% (500 basis points)
 
@@ -139,18 +144,18 @@ async function runTests() {
 
     const symbioticParams = {
       vault_version: 1,
-      vault_epoch_duration: 604800, // 7 days in seconds
+      vault_epoch_duration: 604800, // 7 days
       slasher_type: SlasherType.VETO,
-      slasher_veto_duration: 86400, // 1 day in seconds
+      slasher_veto_duration: 86400, // 1 day
       slasher_number_epoch_to_set_delay: 3,
-      burner_delay_settings_applied: 1814400, // 21 days
+      burner_delay_settings_applied: 345600, // 4 days
       burner_global_receiver: "0x25133c2c49A343F8312bb6e896C1ea0Ad8CD0EBd", // Global receiver for wstETH
-      burner_network_receiver: [],
-      burner_operator_network_receiver: [],
-      delegator_type: DelegatorType.OPERATOR_SPECIFIC,
+      burner_network_receiver: [], // Edited by dataSymVaults.ts
+      burner_operator_network_receiver: [], // Edited by dataSymVaults.ts
+      delegator_type: DelegatorType.NETWORK_RESTAKE, // Edited by dataSymVaults.ts
       delegator_hook: "0x0000000000000000000000000000000000000000", // Delegator hook address
-      delegator_operator: "0x01DB45433dbd214D386857590A255ABFe6daD0fb", // Only used in OPERATOR_SPECIFIC and OPERATOR_NETWORK_SPECIFIC
-      delegator_network: "0x0000000000000000000000000000000000000000", // Only used in OPERATOR_NETWORK_SPECIFIC
+      delegator_operator: "0x0000000000000000000000000000000000000000", // Edited by dataSymVaults.ts
+      delegator_network: "0x0000000000000000000000000000000000000000", // Edited by dataSymVaults.ts
 
       role_delegator_set_hook: address,
       role_delegator_set_network_limit: [address],

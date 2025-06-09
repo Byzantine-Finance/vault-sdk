@@ -22,11 +22,35 @@ export async function executeContractMethod(
   ...args: any[]
 ): Promise<TransactionResponse> {
   try {
-    // First try with staticCall to get a meaningful error
-    await contract[method].staticCall(...args);
+    // Separate transaction options from method arguments
+    // The last argument might be transaction options if it has transaction properties
+    let methodArgs = args;
+    let txOptions = {};
 
-    // If staticCall succeeds, execute the real transaction
-    return await contract[method](...args);
+    // Check if the last argument looks like transaction options
+    if (args.length > 0) {
+      const lastArg = args[args.length - 1];
+      if (
+        lastArg &&
+        typeof lastArg === "object" &&
+        (lastArg.gasLimit ||
+          lastArg.gasPrice ||
+          lastArg.value ||
+          lastArg.nonce ||
+          lastArg.type ||
+          lastArg.maxFeePerGas ||
+          lastArg.maxPriorityFeePerGas)
+      ) {
+        txOptions = lastArg;
+        methodArgs = args.slice(0, -1);
+      }
+    }
+
+    // First try with staticCall to get a meaningful error (without tx options)
+    await contract[method].staticCall(...methodArgs);
+
+    // If staticCall succeeds, execute the real transaction with options
+    return await contract[method](...methodArgs, txOptions);
   } catch (error: any) {
     throw formatContractError(method, error);
   }

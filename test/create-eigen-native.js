@@ -35,8 +35,7 @@ async function runTests() {
   try {
     // Check if environment variables are set
     const { RPC_URL, MNEMONIC, PRIVATE_KEY, DEFAULT_CHAIN_ID } = process.env;
-    const parsedId = DEFAULT_CHAIN_ID ? parseInt(DEFAULT_CHAIN_ID) : 17000;
-    const chainId = parsedId === 1 ? 1 : 17000;
+    const chainId = DEFAULT_CHAIN_ID ? parseInt(DEFAULT_CHAIN_ID) : 17000;
 
     // Verify chain is supported
     if (!isChainSupported(chainId)) {
@@ -66,6 +65,8 @@ async function runTests() {
           ? "Ethereum Mainnet"
           : chainId === 17000
           ? "Holesky Testnet"
+          : chainId === 11155111
+          ? "Ethereum Sepolia"
           : "Unknown"
       } (Chain ID: ${chainId})\n`
     );

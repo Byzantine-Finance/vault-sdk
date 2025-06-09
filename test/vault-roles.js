@@ -76,8 +76,7 @@ async function runTests() {
   console.log("\n🧪 Byzantine Vault SDK - Role Management Test 🧪\n");
 
   // Check if environment variables are set
-  const parsedId = DEFAULT_CHAIN_ID ? parseInt(DEFAULT_CHAIN_ID) : 17000;
-  const chainId = parsedId === 1 ? 1 : 17000;
+  const chainId = DEFAULT_CHAIN_ID ? parseInt(DEFAULT_CHAIN_ID) : 17000;
 
   let skipNetworkTests = false;
   if (!RPC_URL) {

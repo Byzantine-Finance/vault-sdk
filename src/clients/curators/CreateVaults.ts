@@ -185,7 +185,12 @@ export async function createEigenlayerERC20Vault(
         methodError.message
       );
       const method = contract.getFunction(functionName);
-      return await method(formattedBaseParams, formattedEigenParams, options);
+      // For direct method calls, only pass options if they exist and are not empty
+      if (options && Object.keys(options).length > 0) {
+        return await method(formattedBaseParams, formattedEigenParams, options);
+      } else {
+        return await method(formattedBaseParams, formattedEigenParams);
+      }
     }
   } catch (error: any) {
     console.error("Error creating Eigenlayer ERC20 vault:", error);
@@ -243,12 +248,21 @@ export async function createEigenlayerNativeVault(
         methodError.message
       );
       const method = contract.getFunction(functionName);
-      return await method(
-        nativeByzVaultParams,
-        formattedEigenParams,
-        formattedEigenPodParams,
-        options
-      );
+      // For direct method calls, only pass options if they exist and are not empty
+      if (options && Object.keys(options).length > 0) {
+        return await method(
+          nativeByzVaultParams,
+          formattedEigenParams,
+          formattedEigenPodParams,
+          options
+        );
+      } else {
+        return await method(
+          nativeByzVaultParams,
+          formattedEigenParams,
+          formattedEigenPodParams
+        );
+      }
     }
   } catch (error: any) {
     console.error("Error creating Eigenlayer Native vault:", error);
@@ -303,11 +317,16 @@ export async function createSymbioticERC20Vault(
         methodError.message
       );
       const method = contract.getFunction("createSymByzVault");
-      return await method(
-        formattedBaseParams,
-        formattedSymbioticParams,
-        options
-      );
+      // For direct method calls, only pass options if they exist and are not empty
+      if (options && Object.keys(options).length > 0) {
+        return await method(
+          formattedBaseParams,
+          formattedSymbioticParams,
+          options
+        );
+      } else {
+        return await method(formattedBaseParams, formattedSymbioticParams);
+      }
     }
   } catch (error: any) {
     console.error("Error creating Symbiotic ERC20 vault:", error);

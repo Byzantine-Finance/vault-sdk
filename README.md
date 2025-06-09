@@ -10,7 +10,7 @@ This SDK provides a simple interface to interact with the Byzantine Factory cont
 
 - _Ethereum Mainnet -> Soon_
 - [Holesky Testnet](https://holesky.etherscan.io/address/0x8080e4C9a3dCdA4Ce832Ab1A0Bc971079f81338D)
-- [Sepolia Testnet](https://sepolia.etherscan.io/address/0x4C4b2673a5dd0fe70eb7e9A85b45dFb7822e197e)
+- [Sepolia Testnet](https://sepolia.etherscan.io/address/0x723ca960Dbe72041868eBD64f1aF27d47fdc2bC1)
 - _Hoodi Testnet -> Soon_
 
 The factory contract allows users to:
