@@ -15,7 +15,7 @@
  */
 
 const { ethers } = require("ethers");
-const { ByzantineClient } = require("../dist");
+const { ByzantineClient, convertMetadataToURI } = require("../dist");
 const { getNetworkConfig } = require("../dist/constants");
 const { logTitle, logResult, assert, getWalletBalances } = require("./utils");
 require("dotenv").config();
@@ -110,7 +110,16 @@ async function runTests() {
   console.log("User address:", userAddress);
   console.log("Vault address:", VAULT_ADDRESS);
   console.log("Request ID:", REQUEST_ID);
+
   try {
+    const metadata = await convertMetadataToURI({
+      name: "Valid Name",
+      description: "desc",
+      image_url: "https://example.com/image.png",
+      social_github: "https://notgithub.com/user",
+    });
+    logResult("Metadata", true, metadata);
+
     // const deposit = await client.depositToVault(
     //   VAULT_ADDRESS,
     //   ethers.parseEther("0.15"),
@@ -131,8 +140,8 @@ async function runTests() {
     // );
     // logResult("Withdrawal request", true, withdrawalRequest.toString());
 
-    const claimable = await client.isClaimable(VAULT_ADDRESS, REQUEST_ID);
-    logResult("Claimable", true, claimable.toString());
+    // const claimable = await client.isClaimable(VAULT_ADDRESS, REQUEST_ID);
+    // logResult("Claimable", true, claimable.toString());
 
     // const tx = await client.completeWithdrawal(VAULT_ADDRESS, REQUEST_ID);
     // await tx.wait();

@@ -8,7 +8,6 @@
 // Change the whitelist manager (only for the role owner)
 
 import { ethers } from "ethers";
-import { GAS_LIMITS } from "../../constants";
 import { callContractMethod, executeContractMethod } from "../../utils";
 
 // Role identifier constants
@@ -94,8 +93,7 @@ export async function setAddressesWhitelistStatus(
     vaultContract,
     "setCanDeposit",
     addresses,
-    canDeposit,
-    { gasLimit: GAS_LIMITS.setDepositWhitelistedStatus }
+    canDeposit
   );
 }
 
@@ -129,8 +127,7 @@ export async function setVaultPrivateStatus(
   return await executeContractMethod(
     vaultContract,
     "setIsPrivateVault",
-    isPrivate,
-    { gasLimit: GAS_LIMITS.setIsPrivateVault }
+    isPrivate
   );
 }
 
@@ -174,7 +171,6 @@ export async function transferWhitelistManagerRole(
     vaultContract,
     "grantRole",
     ROLE_ID_WHITELIST_MANAGER,
-    newManagerAddress,
-    { gasLimit: GAS_LIMITS.grantRole }
+    newManagerAddress
   );
 }

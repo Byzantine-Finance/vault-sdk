@@ -1,6 +1,6 @@
 // @ts-check
 
-export type ChainsOptions = 1 | 17000;
+export type ChainsOptions = 1 | 17000 | 11155111 | 560048; // Mainnet, Holesky, Sepolia, Hoodi
 
 export interface NetworkConfig {
   name: string;

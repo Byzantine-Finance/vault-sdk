@@ -7,7 +7,6 @@
 // Change the limit manager (only for the role owner)
 
 import { ethers } from "ethers";
-import { GAS_LIMITS } from "../../constants";
 import { callContractMethod, executeContractMethod } from "../../utils";
 
 // Role identifier constants
@@ -81,9 +80,7 @@ export async function setVaultDepositLimit(
   }
 
   // Set the deposit limit
-  return await executeContractMethod(vaultContract, "setDepositLimit", limit, {
-    gasLimit: GAS_LIMITS.setDepositLimit,
-  });
+  return await executeContractMethod(vaultContract, "setDepositLimit", limit);
 }
 
 /**
@@ -116,8 +113,7 @@ export async function setDepositLimitStatus(
   return await executeContractMethod(
     vaultContract,
     "setIsDepositLimit",
-    enabled,
-    { gasLimit: GAS_LIMITS.setDepositLimit }
+    enabled
   );
 }
 
@@ -161,7 +157,6 @@ export async function transferLimitManagerRole(
     vaultContract,
     "grantRole",
     ROLE_ID_LIMIT_MANAGER,
-    newManagerAddress,
-    { gasLimit: GAS_LIMITS.grantRole }
+    newManagerAddress
   );
 }

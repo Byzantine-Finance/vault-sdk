@@ -164,17 +164,6 @@ export async function createEigenlayerERC20Vault(
   const formattedEigenParams = formatEigenParams(params.eigenlayer);
 
   try {
-    // Import gas limits from constants
-    const { GAS_LIMITS } = require("../../constants");
-
-    // Define default transaction options
-    const defaultOptions = {
-      gasLimit: GAS_LIMITS.createEigenERC20Vault,
-    };
-
-    // Merge default options with user-provided options (user options take precedence)
-    const txOptions = { ...defaultOptions, ...options };
-
     // Use an explicit function signature to avoid ambiguity with the overloaded functions
     // Function signature from ABI for createEigenByzVault with ByzVaultParams and EigenParams
     const functionName =
@@ -187,7 +176,7 @@ export async function createEigenlayerERC20Vault(
         functionName,
         formattedBaseParams,
         formattedEigenParams,
-        txOptions
+        options
       );
     } catch (methodError: any) {
       // If that fails, use a direct approach with getFunction
@@ -196,7 +185,7 @@ export async function createEigenlayerERC20Vault(
         methodError.message
       );
       const method = contract.getFunction(functionName);
-      return await method(formattedBaseParams, formattedEigenParams, txOptions);
+      return await method(formattedBaseParams, formattedEigenParams, options);
     }
   } catch (error: any) {
     console.error("Error creating Eigenlayer ERC20 vault:", error);
@@ -232,15 +221,6 @@ export async function createEigenlayerNativeVault(
   const formattedEigenPodParams = formatEigenPodParams(params.eigenpod);
 
   try {
-    // Import gas limits from constants
-    const { GAS_LIMITS } = require("../../constants");
-
-    // Define advanced transaction options with a manual gas limit if necessary
-    const txOptions = {
-      gasLimit: GAS_LIMITS.createEigenNativeVault,
-      ...options,
-    };
-
     // Use an explicit function signature to avoid ambiguity with the overloaded functions
     // Function signature from ABI for createEigenByzVault with NativeByzVaultParams, EigenParams, and EigenPodParams
     const functionName =
@@ -254,7 +234,7 @@ export async function createEigenlayerNativeVault(
         nativeByzVaultParams,
         formattedEigenParams,
         formattedEigenPodParams,
-        txOptions
+        options
       );
     } catch (methodError: any) {
       // If that fails, use a direct approach with getFunction
@@ -267,7 +247,7 @@ export async function createEigenlayerNativeVault(
         nativeByzVaultParams,
         formattedEigenParams,
         formattedEigenPodParams,
-        txOptions
+        options
       );
     }
   } catch (error: any) {
@@ -303,15 +283,6 @@ export async function createSymbioticERC20Vault(
   const formattedSymbioticParams = formatSymbioticParams(params.symbiotic);
 
   try {
-    // Import gas limits from constants
-    const { GAS_LIMITS } = require("../../constants");
-
-    // Define transaction options
-    const txOptions = {
-      gasLimit: GAS_LIMITS.createSymbioticERC20Vault,
-      ...options,
-    };
-
     // Use an explicit function signature to avoid ambiguity
     // const functionName =
     //   "createSymByzVault(tuple(address,address,address,address,address,address,address,uint256,uint16,bool,bool,bool,string,string,string),tuple(tuple(address,uint48,address,tuple(address,address)[],tuple(address,address,address)[]),tuple(uint64,uint48),tuple(uint8,address,address,address[],address[],address,address),tuple(uint8,uint48,uint256)))";
@@ -323,7 +294,7 @@ export async function createSymbioticERC20Vault(
         "createSymByzVault",
         formattedBaseParams,
         formattedSymbioticParams,
-        txOptions
+        options
       );
     } catch (methodError: any) {
       // If that fails, use a direct approach with getFunction
@@ -335,7 +306,7 @@ export async function createSymbioticERC20Vault(
       return await method(
         formattedBaseParams,
         formattedSymbioticParams,
-        txOptions
+        options
       );
     }
   } catch (error: any) {
@@ -374,15 +345,6 @@ export async function createSuperVaultERC20(
   const formattedEigenParams = formatEigenParams(params.eigenlayer);
 
   try {
-    // Import gas limits from constants
-    const { GAS_LIMITS } = require("../../constants");
-
-    // Define transaction options
-    const txOptions = {
-      gasLimit: GAS_LIMITS.createSuperVaultERC20,
-      ...options,
-    };
-
     // Create the SuperVaultParams structure according to the ABI
     const superVaultParams = {
       byzVaultParams: formattedBaseParams,
@@ -399,7 +361,7 @@ export async function createSuperVaultERC20(
       contract,
       "createSuperERC20Vault",
       superVaultParams,
-      txOptions
+      options
     );
   } catch (error: any) {
     console.error("Error creating SuperVault ERC20 vault:", error);
@@ -441,22 +403,13 @@ export async function setTokenToEigenStrategy(
       );
     }
 
-    // Import gas limits from constants
-    const { GAS_LIMITS } = require("../../constants");
-
-    // Define transaction options
-    const txOptions = {
-      gasLimit: GAS_LIMITS.setTokenToEigenStrategy,
-      ...options,
-    };
-
     // Use executeContractMethod to call the contract
     return await executeContractMethod(
       contract,
       "setTokenToEigenStrategy",
       tokens,
       strategies,
-      txOptions
+      options
     );
   } catch (error: any) {
     console.error("Error setting token to Eigen strategy:", error);

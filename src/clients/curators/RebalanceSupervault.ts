@@ -8,7 +8,6 @@
 // Force the rebalance of the supervault // rebalance()
 
 import { ethers } from "ethers";
-import { GAS_LIMITS } from "../../constants";
 import { callContractMethod, executeContractMethod } from "../../utils";
 
 // The role ID for the balancer manager (if applicable)
@@ -120,8 +119,7 @@ export async function updateDistributionRatio(
     return await executeContractMethod(
       supervaultContract,
       "updateDistributionRatio",
-      ratio,
-      { gasLimit: GAS_LIMITS.setDepositLimit }
+      ratio
     );
   } else {
     throw new Error(
@@ -148,8 +146,7 @@ export async function setBalancerManager(
     return await executeContractMethod(
       supervaultContract,
       "setBalancerManager",
-      newManagerAddress,
-      { gasLimit: GAS_LIMITS.grantRole }
+      newManagerAddress
     );
   } else {
     // Alternative: try using role-based access control if available
@@ -181,8 +178,7 @@ export async function setBalancerManager(
         supervaultContract,
         "grantRole",
         ROLE_ID_BALANCER_MANAGER,
-        newManagerAddress,
-        { gasLimit: GAS_LIMITS.grantRole }
+        newManagerAddress
       );
     } catch (error) {
       throw new Error(
@@ -204,9 +200,7 @@ export async function forceRebalance(
 ): Promise<ethers.TransactionResponse> {
   // This assumes there's a method to force a rebalance
   if (typeof supervaultContract.rebalance === "function") {
-    return await executeContractMethod(supervaultContract, "rebalance", {
-      gasLimit: GAS_LIMITS.setDepositLimit * 3,
-    });
+    return await executeContractMethod(supervaultContract, "rebalance");
   } else {
     throw new Error("This supervault does not support forced rebalancing");
   }

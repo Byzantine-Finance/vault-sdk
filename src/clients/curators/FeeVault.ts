@@ -7,7 +7,6 @@
 // Change the fee manager (only for the role owner)
 
 import { ethers } from "ethers";
-import { GAS_LIMITS } from "../../constants";
 import { callContractMethod, executeContractMethod } from "../../utils";
 
 // The role ID for the fee manager (curator fee claimer)
@@ -136,7 +135,6 @@ export async function transferFeeManagerRole(
     vaultContract,
     "grantRole",
     ROLE_ID_FEE_MANAGER,
-    newManagerAddress,
-    { gasLimit: GAS_LIMITS.grantRole }
+    newManagerAddress
   );
 }

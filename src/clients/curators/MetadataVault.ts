@@ -5,7 +5,6 @@
 // Change the metadata of the vault // updateMetadataURI (string metadataURI), use pinata to store the metadata
 
 import { ethers } from "ethers";
-import { GAS_LIMITS } from "../../constants";
 import { Metadata } from "../../types";
 import { callContractMethod, executeContractMethod } from "../../utils";
 
@@ -422,8 +421,7 @@ export async function setMetadata(
     return await executeContractMethod(
       vaultContract,
       "updateMetadataURI",
-      metadataURI,
-      { gasLimit: GAS_LIMITS.setDepositLimit }
+      metadataURI
     );
   } catch (error) {
     // Re-throw the error with a clean message and no stack trace
